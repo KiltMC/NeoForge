@@ -68,7 +68,7 @@ public class FluidTank implements IFluidHandler, IFluidTank {
 
     public int getFluidAmount()
     {
-        return fluid.getAmount();
+        return fluid.forge$getAmount();
     }
 
     public FluidTank readFromNBT(CompoundTag nbt) {
@@ -121,30 +121,30 @@ public class FluidTank implements IFluidHandler, IFluidTank {
         {
             if (fluid.isEmpty())
             {
-                return Math.min(capacity, resource.getAmount());
+                return Math.min(capacity, resource.forge$getAmount());
             }
             if (!fluid.isFluidEqual(resource))
             {
                 return 0;
             }
-            return Math.min(capacity - fluid.getAmount(), resource.getAmount());
+            return Math.min(capacity - fluid.forge$getAmount(), resource.forge$getAmount());
         }
         if (fluid.isEmpty())
         {
-            fluid = new FluidStack(resource, Math.min(capacity, resource.getAmount()));
+            fluid = new FluidStack(resource, Math.min(capacity, resource.forge$getAmount()));
             onContentsChanged();
-            return fluid.getAmount();
+            return fluid.forge$getAmount();
         }
         if (!fluid.isFluidEqual(resource))
         {
             return 0;
         }
-        int filled = capacity - fluid.getAmount();
+        int filled = capacity - fluid.forge$getAmount();
 
         if (resource.getAmount() < filled)
         {
-            fluid.grow(resource.getAmount());
-            filled = resource.getAmount();
+            fluid.grow(resource.forge$getAmount());
+            filled = resource.forge$getAmount();
         }
         else
         {
@@ -163,7 +163,7 @@ public class FluidTank implements IFluidHandler, IFluidTank {
         {
             return FluidStack.EMPTY;
         }
-        return drain(resource.getAmount(), action);
+        return drain(resource.forge$getAmount(), action);
     }
 
     @NotNull
@@ -173,7 +173,7 @@ public class FluidTank implements IFluidHandler, IFluidTank {
         int drained = maxDrain;
         if (fluid.getAmount() < drained)
         {
-            drained = fluid.getAmount();
+            drained = fluid.forge$getAmount();
         }
         FluidStack stack = new FluidStack(fluid, drained);
         if (action.execute() && drained > 0)
@@ -201,7 +201,7 @@ public class FluidTank implements IFluidHandler, IFluidTank {
 
     public int getSpace()
     {
-        return Math.max(0, capacity - fluid.getAmount());
+        return Math.max(0, capacity - fluid.forge$getAmount());
     }
 
 }

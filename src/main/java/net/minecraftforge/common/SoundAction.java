@@ -27,6 +27,14 @@ public final class SoundAction
         return ACTIONS.computeIfAbsent(name, SoundAction::new);
     }
 
+    public static io.github.fabricators_of_create.porting_lib.fluids.sound.SoundAction toFabric(SoundAction action) {
+        return io.github.fabricators_of_create.porting_lib.fluids.sound.SoundAction.get(action.name());
+    }
+
+    public io.github.fabricators_of_create.porting_lib.fluids.sound.SoundAction asFabric() {
+        return toFabric(this);
+    }
+
     private final String name;
 
     private SoundAction(final String name)

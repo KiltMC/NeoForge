@@ -6,48 +6,47 @@
 package net.minecraftforge.client.loading;
 
 
+import net.minecraft.SharedConstants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.DataPackConfig;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.gui.LoadingErrorScreen;
+import net.minecraftforge.common.ForgeConfig;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LogicalSidedProvider;
+import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.fml.*;
+import net.minecraftforge.forgespi.language.IModInfo;
+import net.minecraftforge.forgespi.locating.IModFile;
+import net.minecraftforge.internal.BrandingControl;
+import net.minecraftforge.logging.CrashReportExtender;
+import net.minecraftforge.resource.DelegatingPackResources;
+import net.minecraftforge.resource.PathPackResources;
+import net.minecraftforge.resource.ResourcePackLoader;
+import net.minecraftforge.server.LanguageHook;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
-
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.packs.repository.RepositorySource;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.world.level.DataPackConfig;
-import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.fml.*;
-import net.minecraftforge.fml.loading.ImmediateWindowHandler;
-import net.minecraftforge.internal.BrandingControl;
-import net.minecraftforge.logging.CrashReportExtender;
-import net.minecraftforge.common.util.LogicalSidedProvider;
-import net.minecraftforge.forgespi.locating.IModFile;
-import net.minecraftforge.resource.PathPackResources;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.minecraft.SharedConstants;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ForgeConfig;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.client.gui.LoadingErrorScreen;
-import net.minecraftforge.resource.DelegatingPackResources;
-import net.minecraftforge.resource.ResourcePackLoader;
-import net.minecraftforge.server.LanguageHook;
-import net.minecraftforge.forgespi.language.IModInfo;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientModLoader
@@ -62,12 +61,12 @@ public class ClientModLoader
     {
         // force log4j to shutdown logging in a shutdown hook. This is because we disable default shutdown hook so the server properly logs it's shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(LogManager::shutdown));
-        ImmediateWindowHandler.updateProgress("Loading mods");
+        //ImmediateWindowHandler.updateProgress("Loading mods");
         loading = true;
         ClientModLoader.mc = minecraft;
         LogicalSidedProvider.setClient(()->minecraft);
         LanguageHook.loadForgeAndMCLangs();
-        createRunnableWithCatch(()->ModLoader.get().gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ImmediateWindowHandler::renderTick)).run();
+        //createRunnableWithCatch(()->ModLoader.get().gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ImmediateWindowHandler::renderTick)).run();
         if (error == null) {
             ResourcePackLoader.loadResourcePacks(defaultResourcePacks, ClientModLoader::buildPackFinder);
             ModLoader.get().postEvent(new AddPackFindersEvent(PackType.CLIENT_RESOURCES, defaultResourcePacks::addPackFinder));
@@ -95,16 +94,16 @@ public class ClientModLoader
     }
 
     private static void startModLoading(ModWorkManager.DrivenExecutor syncExecutor, Executor parallelExecutor) {
-        createRunnableWithCatch(() -> ModLoader.get().loadMods(syncExecutor, parallelExecutor, ImmediateWindowHandler::renderTick)).run();
+        //createRunnableWithCatch(() -> ModLoader.get().loadMods(syncExecutor, parallelExecutor, ImmediateWindowHandler::renderTick)).run();
     }
 
     private static void finishModLoading(ModWorkManager.DrivenExecutor syncExecutor, Executor parallelExecutor)
     {
-        createRunnableWithCatch(() -> ModLoader.get().finishMods(syncExecutor, parallelExecutor, ImmediateWindowHandler::renderTick)).run();
+        //createRunnableWithCatch(() -> ModLoader.get().finishMods(syncExecutor, parallelExecutor, ImmediateWindowHandler::renderTick)).run();
         loading = false;
         loadingComplete = true;
         // reload game settings on main thread
-        syncExecutor.execute(()->mc.options.load(true));
+        syncExecutor.execute(()->mc.options.load());
     }
 
     public static VersionChecker.Status checkForUpdates()

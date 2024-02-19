@@ -5,29 +5,14 @@
 
 package net.minecraftforge.client.model.generators;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import com.mojang.serialization.JsonOps;
-
-import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.block.model.BlockModel.GuiLight;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-import net.minecraft.client.renderer.block.model.BlockElementRotation;
-import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -40,6 +25,12 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * General purpose model builder, contains all the commonalities between item
@@ -249,7 +240,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
         }
 
         if (this.guiLight != null) {
-            root.addProperty("gui_light", this.guiLight.getSerializedName());
+            root.addProperty("gui_light", this.guiLight.name);
         }
 
         if (this.renderType != null) {
@@ -263,7 +254,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 JsonObject transform = new JsonObject();
                 ItemTransform vec = e.getValue();
                 if (vec.equals(ItemTransform.NO_TRANSFORM)) continue;
-                var hasRightRotation = !vec.rightRotation.equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
+                var hasRightRotation = !vec.getRightRotation().equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
                 if (!vec.translation.equals(ItemTransform.Deserializer.DEFAULT_TRANSLATION)) {
                     transform.add("translation", serializeVector3f(e.getValue().translation));
                 }
@@ -274,7 +265,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     transform.add("scale", serializeVector3f(e.getValue().scale));
                 }
                 if (hasRightRotation) {
-                    transform.add("right_rotation", serializeVector3f(vec.rightRotation));
+                    transform.add("right_rotation", serializeVector3f(vec.getRightRotation()));
                 }
                 display.add(e.getKey().getSerializedName(), transform);
             }

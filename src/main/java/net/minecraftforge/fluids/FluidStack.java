@@ -9,16 +9,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.registries.ForgeRegistries;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +32,7 @@ import java.util.Optional;
  * equal.
  *
  */
-public class FluidStack
+public class FluidStack extends io.github.fabricators_of_create.porting_lib.fluids.FluidStack
 {
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -42,7 +41,7 @@ public class FluidStack
     public static final Codec<FluidStack> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     BuiltInRegistries.FLUID.byNameCodec().fieldOf("FluidName").forGetter(FluidStack::getFluid),
-                    Codec.INT.fieldOf("Amount").forGetter(FluidStack::getAmount),
+                    Codec.INT.fieldOf("Amount").forGetter(FluidStack::forge$getAmount),
                     CompoundTag.CODEC.optionalFieldOf("Tag").forGetter(stack -> Optional.ofNullable(stack.getTag()))
             ).apply(instance, (fluid, amount, tag) -> {
                 FluidStack stack = new FluidStack(fluid, amount);
@@ -58,6 +57,7 @@ public class FluidStack
 
     public FluidStack(Fluid fluid, int amount)
     {
+        super(fluid, amount);
         if (fluid == null)
         {
             LOGGER.fatal("Null fluid supplied to fluidstack. Did you try and create a stack for an unregistered fluid?");
@@ -131,11 +131,9 @@ public class FluidStack
         return nbt;
     }
 
-    public void writeToPacket(FriendlyByteBuf buf)
+    public void forge$writeToPacket(FriendlyByteBuf buf)
     {
-        buf.writeRegistryId(ForgeRegistries.FLUIDS, getFluid());
-        buf.writeVarInt(getAmount());
-        buf.writeNbt(tag);
+        writeToPacket(buf);
     }
 
     public static FluidStack readFromPacket(FriendlyByteBuf buf)
@@ -149,12 +147,12 @@ public class FluidStack
 
     public final Fluid getFluid()
     {
-        return isEmpty ? Fluids.EMPTY : fluidDelegate.get();
+        return isEmpty ? Fluids.EMPTY : fluidDelegate.value();
     }
 
     public final Fluid getRawFluid()
     {
-        return fluidDelegate.get();
+        return fluidDelegate.value();
     }
 
     public boolean isEmpty() {
@@ -165,24 +163,22 @@ public class FluidStack
         isEmpty = getRawFluid() == Fluids.EMPTY || amount <= 0;
     }
 
-    public int getAmount()
+    public int forge$getAmount()
     {
-        return isEmpty ? 0 : amount ;
+        return (int) getAmount();
     }
 
     public void setAmount(int amount)
     {
-        if (getRawFluid() == Fluids.EMPTY) throw new IllegalStateException("Can't modify the empty stack.");
-        this.amount = amount;
-        updateEmpty();
+        setAmount((long) amount);
     }
 
     public void grow(int amount) {
-        setAmount(this.amount + amount);
+        grow((long) amount);
     }
 
     public void shrink(int amount) {
-        setAmount(this.amount - amount);
+        shrink((long) amount);
     }
 
     public boolean hasTag()
@@ -259,7 +255,7 @@ public class FluidStack
      */
     public boolean isFluidEqual(@NotNull FluidStack other)
     {
-        return getFluid() == other.getFluid() && isFluidStackTagEqual(other);
+        return isFluidEqual((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) other);
     }
 
     private boolean isFluidStackTagEqual(FluidStack other)
@@ -282,7 +278,7 @@ public class FluidStack
      */
     public boolean containsFluid(@NotNull FluidStack other)
     {
-        return isFluidEqual(other) && amount >= other.amount;
+        return containsFluid((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) other);
     }
 
     /**
@@ -294,7 +290,7 @@ public class FluidStack
      */
     public boolean isFluidStackIdentical(FluidStack other)
     {
-        return isFluidEqual(other) && amount == other.amount;
+        return isFluidStackIdentical((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) other);
     }
 
     /**
@@ -308,30 +304,5 @@ public class FluidStack
     public boolean isFluidEqual(@NotNull ItemStack other)
     {
         return FluidUtil.getFluidContained(other).map(this::isFluidEqual).orElse(false);
-    }
-
-    @Override
-    public final int hashCode()
-    {
-        int code = 1;
-        code = 31*code + getFluid().hashCode();
-        if (tag != null)
-            code = 31*code + tag.hashCode();
-        return code;
-    }
-
-    /**
-     * Default equality comparison for a FluidStack. Same functionality as isFluidEqual().
-     *
-     * This is included for use in data structures.
-     */
-    @Override
-    public final boolean equals(Object o)
-    {
-        if (!(o instanceof FluidStack))
-        {
-            return false;
-        }
-        return isFluidEqual((FluidStack) o);
     }
 }

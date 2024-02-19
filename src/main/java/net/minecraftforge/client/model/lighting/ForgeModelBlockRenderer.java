@@ -21,13 +21,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.common.ForgeConfig;
+import xyz.bluspring.kilt.injections.client.renderer.block.ModelBlockRendererInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BakedQuadInjection;
 
 import java.util.List;
 
 /**
  * Wrapper around {@link ModelBlockRenderer} to allow rendering blocks via Forge's lighting pipeline.
  */
-public class ForgeModelBlockRenderer extends ModelBlockRenderer
+public class ForgeModelBlockRenderer extends ModelBlockRenderer implements ModelBlockRendererInjection
 {
     private static final Direction[] SIDES = Direction.values();
 
@@ -49,7 +51,7 @@ public class ForgeModelBlockRenderer extends ModelBlockRenderer
         }
         else
         {
-            super.tesselateWithoutAO(level, model, state, pos, poseStack, vertexConsumer, checkSides, rand, seed, packedOverlay, modelData, renderType);
+            ModelBlockRendererInjection.super.tesselateWithoutAO(level, model, state, pos, poseStack, vertexConsumer, checkSides, rand, seed, packedOverlay, modelData, renderType);
         }
     }
 
@@ -62,7 +64,7 @@ public class ForgeModelBlockRenderer extends ModelBlockRenderer
         }
         else
         {
-            super.tesselateWithAO(level, model, state, pos, poseStack, vertexConsumer, checkSides, rand, seed, packedOverlay, modelData, renderType);
+            ModelBlockRendererInjection.super.tesselateWithAO(level, model, state, pos, poseStack, vertexConsumer, checkSides, rand, seed, packedOverlay, modelData, renderType);
         }
     }
 
@@ -82,7 +84,7 @@ public class ForgeModelBlockRenderer extends ModelBlockRenderer
             lighter.setup(level, pos, state);
             for (BakedQuad quad : quads)
             {
-                if (smoothLighter && !quad.hasAmbientOcclusion())
+                if (smoothLighter && !((BakedQuadInjection) quad).hasAmbientOcclusion())
                 {
                     if (flatLighter == null)
                     {
@@ -115,7 +117,7 @@ public class ForgeModelBlockRenderer extends ModelBlockRenderer
                 }
                 for (BakedQuad quad : quads)
                 {
-                    if (smoothLighter && !quad.hasAmbientOcclusion())
+                    if (smoothLighter && !((BakedQuadInjection) quad).hasAmbientOcclusion())
                     {
                         if (flatLighter == null)
                         {

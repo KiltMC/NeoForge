@@ -171,7 +171,7 @@ public class ForgeGui extends Gui
         }
     }
 
-    void renderHelmet(float partialTick, GuiGraphics guiGraphics)
+    public void renderHelmet(float partialTick, GuiGraphics guiGraphics)
     {
         ItemStack itemstack = this.minecraft.player.getInventory().getArmor(3);
 
@@ -229,7 +229,7 @@ public class ForgeGui extends Gui
     }
 
     @Override
-    protected void renderPortalOverlay(GuiGraphics guiGraphics, float alpha)
+    public void renderPortalOverlay(GuiGraphics guiGraphics, float alpha)
     {
         if (alpha > 0.0F)
         {

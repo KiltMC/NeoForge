@@ -7,34 +7,20 @@ package net.minecraftforge.client.model.geometry;
 
 import com.mojang.math.Transformation;
 import net.minecraft.Util;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-import net.minecraft.client.renderer.block.model.BlockFaceUV;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.FaceBakery;
-import net.minecraft.client.renderer.block.model.ItemModelGenerator;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BuiltInModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.ElementsModel;
-import net.minecraftforge.client.model.ForgeFaceData;
-import net.minecraftforge.client.model.IModelBuilder;
-import net.minecraftforge.client.model.IQuadTransformer;
-import net.minecraftforge.client.model.QuadTransformers;
-import net.minecraftforge.client.model.SimpleModelState;
+import net.minecraftforge.client.model.*;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockElementInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockModelInjection;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -100,9 +86,9 @@ public class UnbakedGeometryHelper
     @ApiStatus.Internal
     public static BakedModel bake(BlockModel blockModel, ModelBaker modelBaker, BlockModel owner, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ResourceLocation modelLocation, boolean guiLight3d)
     {
-        IUnbakedGeometry<?> customModel = blockModel.customData.getCustomGeometry();
+        IUnbakedGeometry<?> customModel = ((BlockModelInjection) blockModel).kilt$getCustomData().getCustomGeometry();
         if (customModel != null)
-            return customModel.bake(blockModel.customData, modelBaker, spriteGetter, modelState, blockModel.getOverrides(modelBaker, owner, spriteGetter), modelLocation);
+            return customModel.bake(((BlockModelInjection) blockModel).kilt$getCustomData(), modelBaker, spriteGetter, modelState, blockModel.getOverrides(modelBaker, owner, spriteGetter), modelLocation);
 
         // Handle vanilla item models here, since vanilla has a shortcut for them
         if (blockModel.getRootModel() == ModelBakery.GENERATION_MARKER)
@@ -115,7 +101,7 @@ public class UnbakedGeometryHelper
         }
 
         var elementsModel = new ElementsModel(blockModel.getElements());
-        return elementsModel.bake(blockModel.customData, modelBaker, spriteGetter, modelState, blockModel.getOverrides(modelBaker, owner, spriteGetter), modelLocation);
+        return elementsModel.bake(((BlockModelInjection) blockModel).kilt$getCustomData(), modelBaker, spriteGetter, modelState, blockModel.getOverrides(modelBaker, owner, spriteGetter), modelLocation);
     }
 
     /**
@@ -137,7 +123,7 @@ public class UnbakedGeometryHelper
         var elements = ITEM_MODEL_GENERATOR.processFrames(layerIndex, "layer" + layerIndex, spriteContents);
         if(faceData != null)
         {
-            elements.forEach(element -> element.setFaceData(faceData));
+            elements.forEach(element -> ((BlockElementInjection) element).setFaceData(faceData));
         }
         return elements;
     }

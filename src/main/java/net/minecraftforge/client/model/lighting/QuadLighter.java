@@ -14,8 +14,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.extensions.IForgeBlockAndTintGetter;
 import net.minecraftforge.client.model.IQuadTransformer;
-
 import org.joml.Vector3f;
 
 import java.util.Objects;
@@ -123,7 +123,7 @@ public abstract class QuadLighter
                     position[2] - 0.5f + ((normal[2] / 127f) * 0.5f)
             };
 
-            var shade = level.getShade(normals[i][0] / 127f, normals[i][1] / 127f, normals[i][2] / 127f, quad.isShade());
+            var shade = ((IForgeBlockAndTintGetter) level).getShade(normals[i][0] / 127f, normals[i][1] / 127f, normals[i][2] / 127f, quad.isShade());
             brightness[i] = calculateBrightness(adjustedPosition) * shade;
             int newLightmap = calculateLightmap(adjustedPosition, normal);
             lightmap[i] = Math.max(packedLightmap & 0xFFFF, newLightmap & 0xFFFF) |

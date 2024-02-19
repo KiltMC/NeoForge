@@ -13,6 +13,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.core.Direction;
 import net.minecraftforge.client.RenderTypeGroup;
+import xyz.bluspring.kilt.injections.client.resources.model.SimpleBakedModelBuilderInjection;
 
 import java.util.List;
 
@@ -80,7 +81,7 @@ public interface IModelBuilder<T extends IModelBuilder<T>>
         @Override
         public BakedModel build()
         {
-            return builder.build(renderTypes);
+            return ((SimpleBakedModelBuilderInjection) builder).build(renderTypes);
         }
     }
 

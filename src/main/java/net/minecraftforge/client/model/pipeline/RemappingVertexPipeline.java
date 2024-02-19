@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraftforge.client.extensions.IForgeVertexConsumer;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
@@ -21,7 +22,7 @@ import java.util.Set;
 /**
  * Vertex pipeline element that remaps incoming data to another format.
  */
-public class RemappingVertexPipeline implements VertexConsumer
+public class RemappingVertexPipeline implements VertexConsumer, IForgeVertexConsumer
 {
     private static final Set<VertexFormatElement> KNOWN_ELEMENTS = Set.of(DefaultVertexFormat.ELEMENT_POSITION,
             DefaultVertexFormat.ELEMENT_COLOR, DefaultVertexFormat.ELEMENT_UV, DefaultVertexFormat.ELEMENT_UV1,
@@ -135,7 +136,7 @@ public class RemappingVertexPipeline implements VertexConsumer
             else if (element.equals(DefaultVertexFormat.ELEMENT_UV2))
                 parent.uv2(uv2[0], uv2[1]);
             else
-                parent.misc(element, misc[miscElementIds.get(element)]);
+                ((IForgeVertexConsumer) parent).misc(element, misc[miscElementIds.get(element)]);
         }
         parent.endVertex();
     }

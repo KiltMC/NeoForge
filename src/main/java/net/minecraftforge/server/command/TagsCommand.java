@@ -166,7 +166,7 @@ class TagsCommand
                 .orElseThrow(() -> UNKNOWN_REGISTRY.create(registryKey.location()));
 
         final ResourceLocation elementLocation = ResourceLocationArgument.getId(ctx, "element");
-        final ResourceKey<?> elementKey = ResourceKey.create(cast(registryKey), elementLocation);
+        final ResourceKey<?> elementKey = ResourceKey.create((ResourceKey<? extends Registry<Object>>) cast(registryKey), elementLocation);
 
         final Holder<?> elementHolder = registry.getHolder(cast(elementKey))
                 .orElseThrow(() -> UNKNOWN_ELEMENT.create(elementLocation, registryKey.location()));

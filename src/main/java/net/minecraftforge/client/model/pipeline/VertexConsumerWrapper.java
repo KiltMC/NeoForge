@@ -7,13 +7,14 @@ package net.minecraftforge.client.model.pipeline;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
+import net.minecraftforge.client.extensions.IForgeVertexConsumer;
 
 /**
  * Wrapper for {@link VertexConsumer} which delegates all operations to its parent.
  * <p>
  * Useful for defining custom pipeline elements that only process certain data.
  */
-public abstract class VertexConsumerWrapper implements VertexConsumer
+public abstract class VertexConsumerWrapper implements VertexConsumer, IForgeVertexConsumer
 {
     protected final VertexConsumer parent;
 
@@ -67,7 +68,7 @@ public abstract class VertexConsumerWrapper implements VertexConsumer
     @Override
     public VertexConsumer misc(VertexFormatElement element, int... values)
     {
-        parent.misc(element, values);
+        ((IForgeVertexConsumer) parent).misc(element, values);
         return this;
     }
 

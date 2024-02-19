@@ -5,14 +5,7 @@
 
 package net.minecraftforge.client.model.geometry;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -21,10 +14,15 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockModelInjection;
+import xyz.bluspring.kilt.workarounds.ForgeWrappedFabricUnbakedGeometry;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * A {@linkplain IGeometryBakingContext geometry baking context} that is bound to a {@link BlockModel}.
@@ -36,7 +34,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     public final BlockModel owner;
     public final VisibilityData visibilityData = new VisibilityData();
     @Nullable
-    private IUnbakedGeometry<?> customGeometry;
+    private io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry<?> customGeometry;
     @Nullable
     private Transformation rootTransform;
     @Nullable
@@ -63,7 +61,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     @Nullable
     public IUnbakedGeometry<?> getCustomGeometry()
     {
-        return owner.parent != null && customGeometry == null ? owner.parent.customData.getCustomGeometry() : customGeometry;
+        return owner.parent != null && customGeometry == null ? new ForgeWrappedFabricUnbakedGeometry(owner.getCustomGeometry()) : (IUnbakedGeometry<?>) customGeometry;
     }
 
     public void setCustomGeometry(IUnbakedGeometry<?> geometry)
@@ -75,7 +73,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     public boolean isComponentVisible(String part, boolean fallback)
     {
         return owner.parent != null && !visibilityData.hasCustomVisibility(part) ?
-                owner.parent.customData.isComponentVisible(part, fallback) :
+                ((BlockModelInjection) owner.parent).kilt$getCustomData().isComponentVisible(part, fallback) :
                 visibilityData.isVisible(part, fallback);
     }
 
@@ -120,7 +118,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     {
         if (rootTransform != null)
             return rootTransform;
-        return owner.parent != null ? owner.parent.customData.getRootTransform() : Transformation.identity();
+        return owner.parent != null ? ((BlockModelInjection) owner.parent).kilt$getCustomData().getRootTransform() : Transformation.identity();
     }
 
     public void setRootTransform(Transformation rootTransform)
@@ -134,7 +132,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     {
         if (renderTypeHint != null)
             return renderTypeHint;
-        return owner.parent != null ? owner.parent.customData.getRenderTypeHint() : null;
+        return owner.parent != null ? ((BlockModelInjection) owner.parent).kilt$getCustomData().getRenderTypeHint() : null;
     }
 
     public void setRenderTypeHint(ResourceLocation renderTypeHint)

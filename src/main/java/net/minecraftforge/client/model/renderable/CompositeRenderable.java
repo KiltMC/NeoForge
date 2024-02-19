@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.client.extensions.IForgeVertexConsumer;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -89,7 +90,7 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
             var consumer = bufferSource.getBuffer(textureRenderTypeLookup.get(texture));
             for (var quad : quads)
             {
-                consumer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, lightmap, overlay, true);
+                ((IForgeVertexConsumer) consumer).putBulkData(poseStack.last(), quad, 1, 1, 1, 1, lightmap, overlay, true);
             }
         }
     }

@@ -5,18 +5,14 @@
 
 package net.minecraftforge.client.model.geometry;
 
-import java.util.Set;
-import java.util.function.Function;
-
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * General interface for any model that can be baked, superset of vanilla {@link UnbakedModel}.
@@ -26,7 +22,7 @@ import net.minecraft.resources.ResourceLocation;
  * @see IGeometryLoader
  * @see IGeometryBakingContext
  */
-public interface IUnbakedGeometry<T extends IUnbakedGeometry<T>>
+public interface IUnbakedGeometry<T extends IUnbakedGeometry<T>> extends io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry<T>
 {
     BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation);
 
@@ -47,4 +43,21 @@ public interface IUnbakedGeometry<T extends IUnbakedGeometry<T>>
     {
         return Set.of();
     }
+
+    // Kilt: Convert calls for Porting Lib's IUnbakedGeometry to Forge's
+    @Override
+    default BakedModel bake(BlockModel context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+        var ctx = new BlockGeometryBakingContext(context);
+        ctx.setGui3d(isGui3d);
+
+        return bake(ctx, baker, spriteGetter, modelState, overrides, modelLocation);
+    }
+
+    @Override
+    default void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel context) {
+        var ctx = new BlockGeometryBakingContext(context);
+
+        resolveParents(modelGetter, ctx);
+    }
+    // Kilt end
 }
