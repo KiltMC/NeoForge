@@ -5,30 +5,24 @@
 
 package net.minecraftforge.registries;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import com.mojang.serialization.Lifecycle;
+import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.network.HandshakeMessages;
-import net.minecraftforge.registries.ForgeRegistry.Snapshot;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RegistryManager
 {
@@ -38,7 +32,7 @@ public class RegistryManager
     public static final RegistryManager FROZEN = new RegistryManager("FROZEN");
     private static Set<ResourceLocation> vanillaRegistryKeys = Set.of();
 
-    BiMap<ResourceLocation, ForgeRegistry<?>> registries = HashBiMap.create();
+    BiMap<ResourceLocation, FabricWrappedForgeRegistry<?>> registries = HashBiMap.create();
     private Set<ResourceLocation> persisted = Sets.newHashSet();
     private Set<ResourceLocation> synced = Sets.newHashSet();
     private Map<ResourceLocation, ResourceLocation> legacyNames = new HashMap<>();
@@ -139,7 +133,7 @@ public class RegistryManager
         WritableRegistry<Registry<V>> registry = (WritableRegistry<Registry<V>>) rootRegistry;
         Registry<V> wrapper = forgeReg.getWrapper();
         if (wrapper != null)
-            registry.register(forgeReg.getRegistryKey(), wrapper, Lifecycle.experimental());
+            registry.register(forgeReg.getKiltRegistryKey(), wrapper, Lifecycle.experimental());
     }
 
     public static void postNewRegistryEvent()
@@ -178,9 +172,9 @@ public class RegistryManager
         findSuperTypes(type.getSuperclass(), types);
     }
 
-    public Map<ResourceLocation, Snapshot> takeSnapshot(boolean savingToDisc)
+    public Map<ResourceLocation, FabricWrappedForgeRegistry.Snapshot> takeSnapshot(boolean savingToDisc)
     {
-        Map<ResourceLocation, Snapshot> ret = Maps.newHashMap();
+        Map<ResourceLocation, FabricWrappedForgeRegistry.Snapshot> ret = Maps.newHashMap();
         Set<ResourceLocation> keys = savingToDisc ? this.persisted : this.synced;
         keys.forEach(name -> ret.put(name, getRegistry(name).makeSnapshot()));
         return ret;

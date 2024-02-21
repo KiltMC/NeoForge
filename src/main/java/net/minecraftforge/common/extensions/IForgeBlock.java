@@ -5,6 +5,8 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.tool.extensions.BlockExtensions;
+import net.fabricmc.fabric.api.block.v1.FabricBlock;
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,7 +53,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 @SuppressWarnings("deprecation")
-public interface IForgeBlock
+public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fabricators_of_create.porting_lib.extensions.extensions.BlockExtensions
 {
     private Block self()
     {

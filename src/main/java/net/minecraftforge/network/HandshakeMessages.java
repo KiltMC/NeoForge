@@ -5,6 +5,7 @@
 
 package net.minecraftforge.network;
 
+import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -12,21 +13,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
+import net.minecraftforge.registries.FabricWrappedForgeRegistry;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.RegistryManager;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.tuple.Pair;
-
-import com.google.common.collect.Maps;
-import org.jetbrains.annotations.Nullable;
 
 public class HandshakeMessages
 {
@@ -254,9 +249,14 @@ public class HandshakeMessages
     public static class S2CRegistry extends LoginIndexedMessage {
         private ResourceLocation registryName;
         @Nullable
-        private ForgeRegistry.Snapshot snapshot;
+        private FabricWrappedForgeRegistry.Snapshot snapshot;
 
         public S2CRegistry(final ResourceLocation name, @Nullable ForgeRegistry.Snapshot snapshot) {
+            this.registryName = name;
+            this.snapshot = snapshot;
+        }
+
+        public S2CRegistry(final ResourceLocation name, @Nullable FabricWrappedForgeRegistry.Snapshot snapshot) {
             this.registryName = name;
             this.snapshot = snapshot;
         }
@@ -270,9 +270,9 @@ public class HandshakeMessages
 
         public static S2CRegistry decode(final FriendlyByteBuf buffer) {
             ResourceLocation name = buffer.readResourceLocation();
-            ForgeRegistry.Snapshot snapshot = null;
+            FabricWrappedForgeRegistry.Snapshot snapshot = null;
             if (buffer.readBoolean())
-                snapshot = ForgeRegistry.Snapshot.read(buffer);
+                snapshot = FabricWrappedForgeRegistry.Snapshot.read(buffer);
             return new S2CRegistry(name, snapshot);
         }
 
@@ -285,7 +285,7 @@ public class HandshakeMessages
         }
 
         @Nullable
-        public ForgeRegistry.Snapshot getSnapshot() {
+        public FabricWrappedForgeRegistry.Snapshot getSnapshot() {
             return snapshot;
         }
     }

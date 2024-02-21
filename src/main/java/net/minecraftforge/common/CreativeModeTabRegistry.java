@@ -40,6 +40,7 @@ import xyz.bluspring.kilt.injections.world.item.CreativeModeTabInjection;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class CreativeModeTabRegistry
@@ -201,7 +202,7 @@ public final class CreativeModeTabRegistry
         DEFAULT_TABS.add(BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.INVENTORY));
 
         final List<Holder<CreativeModeTab>> indexed = new ArrayList<>();
-        BuiltInRegistries.CREATIVE_MODE_TAB.holders().filter(c -> !DEFAULT_TABS.contains(c.get())).forEach(indexed::add);
+        BuiltInRegistries.CREATIVE_MODE_TAB.holders().filter(c -> !DEFAULT_TABS.contains(((Supplier<CreativeModeTab>) c).get())).forEach(indexed::add);
         int vanillaTabs = 10;
 
         for (int i = 0; i < vanillaTabs; i++) // Vanilla ordering

@@ -16,7 +16,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.loading.ClientModLoader;
 import net.minecraftforge.fml.VersionChecker;
-import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.versions.forge.ForgeVersion;
 
 @OnlyIn(Dist.CLIENT)
@@ -51,7 +50,7 @@ public class TitleScreenModUpdateIndicator extends Screen
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
-        if (showNotification == null || !showNotification.shouldDraw() || !FMLConfig.getBoolConfigValue(FMLConfig.ConfigValue.VERSION_CHECK))
+        if (showNotification == null || !showNotification.shouldDraw())
         {
             return;
         }

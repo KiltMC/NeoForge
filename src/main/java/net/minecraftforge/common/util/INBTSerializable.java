@@ -11,8 +11,11 @@ import net.minecraft.nbt.Tag;
  * An interface designed to unify various things in the Minecraft
  * code base that can be serialized to and from a NBT tag.
  */
-public interface INBTSerializable<T extends Tag>
+public interface INBTSerializable<T extends Tag> extends io.github.fabricators_of_create.porting_lib.core.util.INBTSerializable<T>
 {
-    T serializeNBT();
-    void deserializeNBT(T nbt);
+    default T serializeNBT() {
+        throw new IllegalStateException("AAAAA");
+    }
+    default void deserializeNBT(T nbt) {
+    }
 }

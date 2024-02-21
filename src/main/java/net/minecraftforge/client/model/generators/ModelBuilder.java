@@ -25,6 +25,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockElementFaceInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockElementInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.ItemTransformInjection;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -254,7 +257,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 JsonObject transform = new JsonObject();
                 ItemTransform vec = e.getValue();
                 if (vec.equals(ItemTransform.NO_TRANSFORM)) continue;
-                var hasRightRotation = !vec.getRightRotation().equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
+                var hasRightRotation = !((ItemTransformInjection) vec).getRightRotation().equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
                 if (!vec.translation.equals(ItemTransform.Deserializer.DEFAULT_TRANSLATION)) {
                     transform.add("translation", serializeVector3f(e.getValue().translation));
                 }
@@ -265,7 +268,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     transform.add("scale", serializeVector3f(e.getValue().scale));
                 }
                 if (hasRightRotation) {
-                    transform.add("right_rotation", serializeVector3f(vec.getRightRotation()));
+                    transform.add("right_rotation", serializeVector3f(((ItemTransformInjection) vec).getRightRotation()));
                 }
                 display.add(e.getKey().getSerializedName(), transform);
             }
@@ -302,8 +305,8 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     partObj.addProperty("shade", part.shade);
                 }
 
-                if (!part.getFaceData().equals(ForgeFaceData.DEFAULT)) {
-                    partObj.add("forge_data", ForgeFaceData.CODEC.encodeStart(JsonOps.INSTANCE, part.getFaceData()).result().get());
+                if (!((BlockElementInjection) part).getFaceData().equals(ForgeFaceData.DEFAULT)) {
+                    partObj.add("forge_data", ForgeFaceData.CODEC.encodeStart(JsonOps.INSTANCE, ((BlockElementInjection) part).getFaceData()).result().get());
                 }
 
                 JsonObject faces = new JsonObject();
@@ -325,8 +328,8 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     if (face.tintIndex != -1) {
                         faceObj.addProperty("tintindex", face.tintIndex);
                     }
-                    if (!face.getFaceData().equals(ForgeFaceData.DEFAULT)) {
-                        faceObj.add("forge_data", ForgeFaceData.CODEC.encodeStart(JsonOps.INSTANCE, face.getFaceData()).result().get());
+                    if (!((BlockElementInjection) face).getFaceData().equals(ForgeFaceData.DEFAULT)) {
+                        faceObj.add("forge_data", ForgeFaceData.CODEC.encodeStart(JsonOps.INSTANCE, ((BlockElementInjection) face).getFaceData()).result().get());
                     }
                     faces.add(dir.getSerializedName(), faceObj);
                 }
@@ -558,7 +561,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
         BlockElement build() {
             Map<Direction, BlockElementFace> faces = this.faces.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().build(), (k1, k2) -> { throw new IllegalArgumentException(); }, LinkedHashMap::new));
-            return new BlockElement(from, to, faces, rotation == null ? null : rotation.build(), shade, new ForgeFaceData(this.color, this.blockLight, this.skyLight, this.hasAmbientOcclusion));
+            return BlockElementInjection.create(from, to, faces, rotation == null ? null : rotation.build(), shade, new ForgeFaceData(this.color, this.blockLight, this.skyLight, this.hasAmbientOcclusion));
         }
 
         public T end() { return self(); }
@@ -659,7 +662,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 if (this.texture == null) {
                     throw new IllegalStateException("A model face must have a texture");
                 }
-                return new BlockElementFace(cullface, tintindex, texture, new BlockFaceUV(uvs, rotation.rotation), new ForgeFaceData(this.color, this.blockLight, this.skyLight, this.hasAmbientOcclusion));
+                return BlockElementFaceInjection.create(cullface, tintindex, texture, new BlockFaceUV(uvs, rotation.rotation), new ForgeFaceData(this.color, this.blockLight, this.skyLight, this.hasAmbientOcclusion));
             }
 
             public ElementBuilder end() { return ElementBuilder.this; }
@@ -790,7 +793,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
             }
 
             ItemTransform build() {
-                return new ItemTransform(rotation, translation, scale, rightRotation);
+                return ItemTransformInjection.create(rotation, translation, scale, rightRotation);
             }
 
             public TransformsBuilder end() { return TransformsBuilder.this; }

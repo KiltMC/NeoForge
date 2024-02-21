@@ -5,6 +5,7 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.tool.extensions.ItemStackExtensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -45,7 +46,7 @@ import java.util.Objects;
 /*
  * Extension added to ItemStack that bounces to ItemSack sensitive Item methods. Typically this is just for convince.
  */
-public interface IForgeItemStack extends ICapabilitySerializable<CompoundTag>
+public interface IForgeItemStack extends ICapabilitySerializable<CompoundTag>, ItemStackExtensions, io.github.fabricators_of_create.porting_lib.extensions.extensions.ItemStackExtensions
 {
     // Helpers for accessing Item data
     private ItemStack self()

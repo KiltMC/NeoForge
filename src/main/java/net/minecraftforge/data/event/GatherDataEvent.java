@@ -13,14 +13,10 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.event.IModBusEvent;
+import xyz.bluspring.kilt.injections.data.DataGeneratorInjection;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -102,12 +98,12 @@ public class GatherDataEvent extends Event implements IModBusEvent
         }
 
         public void runAll() {
-            Map<Path, List<DataGenerator>> paths = generators.stream().collect(Collectors.groupingBy(gen -> gen.getPackOutput().getOutputFolder(), LinkedHashMap::new, Collectors.toList()));
+            Map<Path, List<DataGenerator>> paths = generators.stream().collect(Collectors.groupingBy(gen -> ((DataGeneratorInjection) gen).getPackOutput().getOutputFolder(), LinkedHashMap::new, Collectors.toList()));
 
             paths.values().forEach(LamdbaExceptionUtils.rethrowConsumer(lst -> {
                 DataGenerator parent = lst.get(0);
                 for (int x = 1; x < lst.size(); x++)
-                    lst.get(x).getProvidersView().forEach((name, provider) -> parent.addProvider(true, provider));
+                    ((DataGeneratorInjection) lst.get(x)).getProvidersView().forEach((name, provider) -> ((DataGeneratorInjection) parent).addProvider(true, provider));
                 parent.run();
             }));
         }

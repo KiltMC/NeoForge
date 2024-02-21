@@ -98,6 +98,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.commands.synchronization.ArgumentTypeInfosInjection;
+import xyz.bluspring.kilt.injections.data.DataGeneratorInjection;
 import xyz.bluspring.kilt.injections.item.crafting.IngredientInjection;
 import xyz.bluspring.kilt.injections.server.packs.metadata.pack.PackMetadataSectionInjection;
 import xyz.bluspring.kilt.injections.world.item.ItemDisplayContextInjection;
@@ -494,11 +495,11 @@ public class ForgeMod
     public void gatherData(GatherDataEvent event)
     {
         DataGenerator gen = event.getGenerator();
-        PackOutput packOutput = gen.getPackOutput();
+        PackOutput packOutput = ((DataGeneratorInjection) gen).getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-        gen.addProvider(true, new PackMetadataGenerator(packOutput)
+        ((DataGeneratorInjection) gen).addProvider(true, new PackMetadataGenerator(packOutput)
                 .add(PackMetadataSection.TYPE, PackMetadataSectionInjection.create(
                         Component.translatable("pack.forge.description"),
                         DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES),
@@ -506,17 +507,17 @@ public class ForgeMod
                 ))
         );
         ForgeBlockTagsProvider blockTags = new ForgeBlockTagsProvider(packOutput, lookupProvider, existingFileHelper);
-        gen.addProvider(event.includeServer(), blockTags);
-        gen.addProvider(event.includeServer(), new ForgeItemTagsProvider(packOutput, lookupProvider, blockTags.contentsGetter(), existingFileHelper));
-        gen.addProvider(event.includeServer(), new ForgeEntityTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
-        gen.addProvider(event.includeServer(), new ForgeFluidTagsProvider(packOutput, lookupProvider, existingFileHelper));
-        gen.addProvider(event.includeServer(), new ForgeRecipeProvider(packOutput));
-        gen.addProvider(event.includeServer(), new ForgeLootTableProvider(packOutput));
-        gen.addProvider(event.includeServer(), new ForgeBiomeTagsProvider(packOutput, lookupProvider, existingFileHelper));
-        gen.addProvider(event.includeServer(), new ForgeDamageTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), blockTags);
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeItemTagsProvider(packOutput, lookupProvider, blockTags.contentsGetter(), existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeEntityTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeFluidTagsProvider(packOutput, lookupProvider, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeRecipeProvider(packOutput));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeLootTableProvider(packOutput));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeBiomeTagsProvider(packOutput, lookupProvider, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeDamageTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
 
-        gen.addProvider(event.includeClient(), new ForgeSpriteSourceProvider(packOutput, existingFileHelper));
-        gen.addProvider(event.includeClient(), new VanillaSoundDefinitionsProvider(packOutput, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeClient(), new ForgeSpriteSourceProvider(packOutput, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeClient(), new VanillaSoundDefinitionsProvider(packOutput, existingFileHelper));
     }
 
     public void missingSoundMapping(MissingMappingsEvent event)

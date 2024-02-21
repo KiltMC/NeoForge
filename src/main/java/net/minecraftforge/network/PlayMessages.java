@@ -22,6 +22,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import xyz.bluspring.kilt.injections.client.gui.screens.MenuScreensInjection;
@@ -288,7 +289,7 @@ public class PlayMessages
                 try
                 {
                     MenuScreensInjection.getScreenFactory(msg.getType(), Minecraft.getInstance(), msg.getWindowId(), msg.getName()).ifPresent(f -> {
-                        AbstractContainerMenu c = (AbstractContainerMenu) msg.getType().create(msg.getWindowId(), Minecraft.getInstance().player.getInventory(), msg.getAdditionalData());
+                        AbstractContainerMenu c = (AbstractContainerMenu) ((IForgeMenuType<?>) msg.getType()).create(msg.getWindowId(), Minecraft.getInstance().player.getInventory(), msg.getAdditionalData());
 
                         @SuppressWarnings("unchecked") Screen s = ((MenuScreens.ScreenConstructor<AbstractContainerMenu, ?>) f).create(c, Minecraft.getInstance().player.getInventory(), msg.getName());
                         Minecraft.getInstance().player.containerMenu = ((MenuAccess<?>) s).getMenu();

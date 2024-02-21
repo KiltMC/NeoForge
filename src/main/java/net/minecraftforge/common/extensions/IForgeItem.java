@@ -6,6 +6,8 @@
 package net.minecraftforge.common.extensions;
 
 import com.google.common.collect.Multimap;
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.ItemExtensions;
+import io.github.fabricators_of_create.porting_lib.item.UseFirstBehaviorItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -48,7 +50,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 // TODO systemic review of all extension functions. lots of unused -C
-public interface IForgeItem
+public interface IForgeItem extends ItemExtensions, io.github.fabricators_of_create.porting_lib.entity.extensions.ItemExtensions, UseFirstBehaviorItem
 {
     private Item self()
     {

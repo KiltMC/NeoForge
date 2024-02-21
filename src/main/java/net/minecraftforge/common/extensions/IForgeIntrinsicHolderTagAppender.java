@@ -46,14 +46,6 @@ public interface IForgeIntrinsicHolderTagAppender<T> extends IForgeTagAppender<T
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    default IntrinsicHolderTagsProvider.IntrinsicTagAppender<T> addTags(TagKey<T>... values)
-    {
-        IForgeTagAppender.super.addTags(values);
-        return self();
-    }
-
-    @Override
     default IntrinsicHolderTagsProvider.IntrinsicTagAppender<T> replace()
     {
         IForgeTagAppender.super.replace();

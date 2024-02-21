@@ -60,7 +60,7 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider implements 
     }
 
     @Override
-    protected void buildRecipes(Consumer<FinishedRecipe> consumer)
+    public void buildRecipes(Consumer<FinishedRecipe> consumer)
     {
         replace(Items.STICK, Tags.Items.RODS_WOODEN);
         replace(Items.GOLD_INGOT, Tags.Items.INGOTS_GOLD);

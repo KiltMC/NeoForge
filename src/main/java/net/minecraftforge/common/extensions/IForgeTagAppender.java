@@ -5,25 +5,17 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.TagAppenderExtensions;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
-public interface IForgeTagAppender<T>
+public interface IForgeTagAppender<T> extends TagAppenderExtensions
 {
     private TagsProvider.TagAppender<T> self() {
         return (TagsProvider.TagAppender<T>) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default TagsProvider.TagAppender<T> addTags(TagKey<T>... values) {
-        TagsProvider.TagAppender<T> builder = self();
-        for (TagKey<T> value : values) {
-            builder.addTag(value);
-        }
-        return builder;
     }
 
     default TagsProvider.TagAppender<T> addOptionalTag(TagKey<T> value) {

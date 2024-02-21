@@ -5,15 +5,15 @@
 
 package net.minecraftforge.registries;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 class NamespacedDefaultedWrapper<T> extends NamespacedWrapper<T> implements DefaultedRegistry<T>
 {
@@ -24,7 +24,7 @@ class NamespacedDefaultedWrapper<T> extends NamespacedWrapper<T> implements Defa
     NamespacedDefaultedWrapper(ForgeRegistry<T> fowner, Function<T, Holder.Reference<T>> intrusiveHolderCallback, RegistryManager stage) {
         super(fowner, intrusiveHolderCallback, stage);
         this.delegate = fowner;
-        this.defaultKey = fowner.getDefaultKey();
+        this.defaultKey = fowner.getKiltDefaultKey();
     }
 
     // Reading Functions
@@ -46,7 +46,7 @@ class NamespacedDefaultedWrapper<T> extends NamespacedWrapper<T> implements Defa
     @Override
     public ResourceLocation getDefaultKey()
     {
-        return this.delegate.getDefaultKey();
+        return this.delegate.getKiltDefaultKey();
     }
 
     @Nullable

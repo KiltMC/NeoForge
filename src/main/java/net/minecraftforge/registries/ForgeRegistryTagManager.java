@@ -14,21 +14,16 @@ import net.minecraftforge.registries.tags.ITag;
 import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-class ForgeRegistryTagManager<V> implements ITagManager<V>
+public class ForgeRegistryTagManager<V> implements ITagManager<V>
 {
-    private final ForgeRegistry<V> owner;
+    private final FabricWrappedForgeRegistry<V> owner;
     private volatile Map<TagKey<V>, ITag<V>> tags = new IdentityHashMap<>();
 
-    ForgeRegistryTagManager(ForgeRegistry<V> owner)
+    public ForgeRegistryTagManager(FabricWrappedForgeRegistry<V> owner)
     {
         this.owner = owner;
     }
@@ -113,7 +108,7 @@ class ForgeRegistryTagManager<V> implements ITagManager<V>
     public TagKey<V> createTagKey(@NotNull ResourceLocation location)
     {
         Objects.requireNonNull(location);
-        return TagKey.create(this.owner.getRegistryKey(), location);
+        return TagKey.create(this.owner.getKiltRegistryKey(), location);
     }
 
     @NotNull
