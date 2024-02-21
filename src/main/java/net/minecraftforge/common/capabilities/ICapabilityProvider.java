@@ -23,7 +23,9 @@ public interface ICapabilityProvider
      *   <strong>CAN BE NULL</strong>. Null is defined to represent 'internal' or 'self'
      * @return The requested an optional holding the requested capability.
      */
-    @NotNull <T> LazyOptional<T> getCapability(@NotNull final Capability<T> cap, final @Nullable Direction side);
+    @NotNull default <T> LazyOptional<T> getCapability(@NotNull final Capability<T> cap, final @Nullable Direction side) {
+        throw new IllegalStateException("what?");
+    }
 
     /*
      * Purely added as a bouncer to sided version, to make modders stop complaining about calling with a null value.

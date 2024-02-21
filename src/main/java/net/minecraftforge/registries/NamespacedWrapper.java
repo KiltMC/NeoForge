@@ -14,11 +14,7 @@ import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.Util;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -27,22 +23,16 @@ import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import xyz.bluspring.kilt.injections.HolderReferenceInjection;
+import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
+
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistry
+class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistry, MappedRegistryInjection
 {
     static final Logger LOGGER = LogUtils.getLogger();
     private final ForgeRegistry<T> delegate;
@@ -75,7 +65,7 @@ class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistr
             throw new IllegalStateException("Can not register to a locked registry. Modder should use NeoForge Register methods.");
 
         Validate.notNull(value);
-        markKnown();
+        ((MappedRegistryInjection) this).markKnown();
         this.registryLifecycle = this.registryLifecycle.add(lifecycle);
 
         int realId = this.delegate.add(id, key.location(), value);
@@ -349,7 +339,7 @@ class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistr
         if (!unregistered.isEmpty())
             throw new IllegalStateException("Unbound values in registry " + this.key() + ": " + unregistered.stream().map(ResourceLocation::toString).collect(Collectors.joining(", \n\t")));
 
-        if (this.unregisteredIntrusiveHolders != null && this.unregisteredIntrusiveHolders.values().stream().anyMatch(r -> !r.isBound() && r.getType() == Holder.Reference.Type.INTRUSIVE)) {
+        if (this.unregisteredIntrusiveHolders != null && this.unregisteredIntrusiveHolders.values().stream().anyMatch(r -> !r.isBound() && ((HolderReferenceInjection) r).getType() == Holder.Reference.Type.INTRUSIVE)) {
             throw new IllegalStateException("Some intrusive holders were not registered: " + this.unregisteredIntrusiveHolders.values() + " Hint: Did you register all your registry objects? Registry stage: " + stage.getName());
         }
 

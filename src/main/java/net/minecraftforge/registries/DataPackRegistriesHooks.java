@@ -6,20 +6,14 @@
 package net.minecraftforge.registries;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.fabricators_of_create.porting_lib.registries.mixin.NetworkedRegistryDataAccessor;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySynchronization;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @ApiStatus.Internal
@@ -52,7 +46,7 @@ public final class DataPackRegistriesHooks
         if (data.networkCodec() != null)
         {
             SYNCED_CUSTOM_REGISTRIES.add(loaderData.key());
-            NETWORKABLE_REGISTRIES.put(loaderData.key(), new RegistrySynchronization.NetworkedRegistryData<>(loaderData.key(), data.networkCodec()));
+            NETWORKABLE_REGISTRIES.put(loaderData.key(), NetworkedRegistryDataAccessor.createNetworkedRegistryData(loaderData.key(), data.networkCodec()));
         }
     }
 

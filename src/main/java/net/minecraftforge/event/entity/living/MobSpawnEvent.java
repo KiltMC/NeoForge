@@ -5,20 +5,12 @@
 
 package net.minecraftforge.event.entity.living;
 
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
-import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraftforge.common.ForgeInternalHandler;
@@ -29,6 +21,9 @@ import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.LogicalSide;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.entity.MobInjection;
 
 /**
  * This class holds all events relating to the entire flow of mob spawns.<br>
@@ -386,7 +381,7 @@ public abstract class MobSpawnEvent extends EntityEvent
          */
         public void setSpawnCancelled(boolean cancel)
         {
-            this.getEntity().setSpawnCancelled(cancel);
+            ((MobInjection) this.getEntity()).setSpawnCancelled(cancel);
         }
 
         /**
@@ -396,7 +391,7 @@ public abstract class MobSpawnEvent extends EntityEvent
          */
         public boolean isSpawnCancelled()
         {
-            return this.getEntity().isSpawnCancelled();
+            return ((MobInjection) this.getEntity()).isSpawnCancelled();
         }
     }
 

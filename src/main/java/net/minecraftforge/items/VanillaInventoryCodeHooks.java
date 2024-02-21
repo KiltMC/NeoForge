@@ -5,23 +5,23 @@
 
 package net.minecraftforge.items;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DropperBlock;
 import net.minecraft.world.level.block.HopperBlock;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.Hopper;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.DispenserBlockEntity;
+import net.minecraft.world.level.block.entity.Hopper;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.level.block.entity.HopperBlockEntityInjection;
 
 import java.util.Optional;
 
@@ -182,7 +182,7 @@ public class VanillaInventoryCodeHooks
                         int k = 0;
                         if (source instanceof HopperBlockEntity)
                         {
-                            if (destinationHopper.getLastUpdateTime() >= ((HopperBlockEntity) source).getLastUpdateTime())
+                            if (((HopperBlockEntityInjection) destinationHopper).getLastUpdateTime() >= ((HopperBlockEntityInjection) source).getLastUpdateTime())
                             {
                                 k = 1;
                             }

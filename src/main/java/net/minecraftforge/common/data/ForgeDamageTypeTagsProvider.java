@@ -5,8 +5,6 @@
 
 package net.minecraftforge.common.data;
 
-import java.util.concurrent.CompletableFuture;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.DamageTypeTagsProvider;
@@ -17,13 +15,18 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.extensions.IForgeTagAppender;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
+
+import java.util.concurrent.CompletableFuture;
 
 public final class ForgeDamageTypeTagsProvider extends DamageTypeTagsProvider
 {
 
     public ForgeDamageTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper)
     {
-        super(output, lookupProvider, "forge", existingFileHelper);
+        super(output, lookupProvider);
+        ((TagsProviderInjection) (Object) this).kilt$setModId("forge");
+        ((TagsProviderInjection) (Object) this).kilt$setExistingFileHelper(existingFileHelper);
     }
 
     @Override

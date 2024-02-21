@@ -27,18 +27,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.data.recipes.RecipeProviderInjection;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public final class ForgeRecipeProvider extends VanillaRecipeProvider
+public final class ForgeRecipeProvider extends VanillaRecipeProvider implements RecipeProviderInjection
 {
     private final Map<Item, TagKey<Item>> replacements = new HashMap<>();
     private final Set<ResourceLocation> excludes = new HashSet<>();
@@ -134,14 +130,14 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider
 
     @Nullable
     @Override
-    protected CompletableFuture<?> saveAdvancement(CachedOutput output, FinishedRecipe recipe, JsonObject json)
+    public CompletableFuture<?> saveAdvancement(CachedOutput output, FinishedRecipe recipe, JsonObject json)
     {
         // NOOP - We don't replace any of the advancement things yet...
         return null;
     }
 
     @Override
-    protected CompletableFuture<?> buildAdvancement(CachedOutput output, ResourceLocation name, Advancement.Builder builder)
+    public CompletableFuture<?> buildAdvancement(CachedOutput output, ResourceLocation name, Advancement.Builder builder)
     {
         // NOOP - We don't replace any of the advancement things yet...
         return CompletableFuture.allOf();

@@ -6,18 +6,20 @@
 package net.minecraftforge.registries;
 
 import com.mojang.logging.LogUtils;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
+
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Register new registries when you receive this event through {@link RegistryBuilder} and {@link #create(RegistryBuilder)}.
@@ -63,7 +65,7 @@ public class NewRegistryEvent extends Event implements IModBusEvent
         Map<RegistryBuilder<?>, IForgeRegistry<?>> builtRegistries = new IdentityHashMap<>();
 
         if (BuiltInRegistries.REGISTRY instanceof MappedRegistry<?> rootRegistry)
-            rootRegistry.unfreeze();
+            ((MappedRegistryInjection) rootRegistry).unfreeze();
 
         for (RegistryData<?> data : this.registries)
         {

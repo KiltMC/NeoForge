@@ -8,7 +8,6 @@ package net.minecraftforge.common.data;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -18,6 +17,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +27,9 @@ public final class ForgeItemTagsProvider extends ItemTagsProvider
 {
     public ForgeItemTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagLookup<Block>> blockTagProvider, ExistingFileHelper existingFileHelper)
     {
-        super(output, lookupProvider, blockTagProvider, "forge", existingFileHelper);
+        super(output, lookupProvider, blockTagProvider);
+        ((TagsProviderInjection) (Object) this).kilt$setModId("forge");
+        ((TagsProviderInjection) (Object) this).kilt$setExistingFileHelper(existingFileHelper);
     }
 
     @SuppressWarnings("unchecked")
@@ -57,7 +59,7 @@ public final class ForgeItemTagsProvider extends ItemTagsProvider
         tag(Tags.Items.DUSTS_GLOWSTONE).add(Items.GLOWSTONE_DUST);
         tag(Tags.Items.DUSTS_PRISMARINE).add(Items.PRISMARINE_SHARD);
         tag(Tags.Items.DUSTS_REDSTONE).add(Items.REDSTONE);
-        addColored(tag(Tags.Items.DYES)::addTags, Tags.Items.DYES, "{color}_dye");
+        addColored((tag) -> tag(Tags.Items.DYES).addTags(tag), Tags.Items.DYES, "{color}_dye");
         tag(Tags.Items.EGGS).add(Items.EGG);
         tag(Tags.Items.ENCHANTING_FUELS).addTag(Tags.Items.GEMS_LAPIS);
         copy(Tags.Blocks.END_STONES, Tags.Items.END_STONES);

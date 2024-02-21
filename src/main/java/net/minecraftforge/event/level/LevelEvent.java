@@ -5,10 +5,6 @@
 
 package net.minecraftforge.event.level;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -16,16 +12,23 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProgressListener;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraftforge.common.ForgeInternalHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.LogicalSide;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This event is fired whenever an event involving a {@link LevelAccessor} occurs.
@@ -131,7 +134,7 @@ public class LevelEvent extends Event
      *
      * <p>If an entry is added to the list, it needs to be a globally unique instance.</p>
      *
-     * The event is called in {@link net.minecraft.world.level.NaturalSpawner#mobsAt(ServerLevel,
+     * The event is called in {@link xyz.bluspring.kilt.injections.world.level.NaturalSpawnerInjection#mobsAt(ServerLevel,
      * StructureManager, ChunkGenerator, MobCategory, RandomSource, BlockPos)}.</p>
      * 
      * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.

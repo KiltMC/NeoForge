@@ -11,18 +11,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 import net.minecraft.core.IdMapper;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
@@ -31,7 +19,6 @@ import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -41,7 +28,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.levelgen.DebugLevelSource;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.common.ForgeHooks;
@@ -64,6 +50,14 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
+import xyz.bluspring.kilt.injections.entity.SpawnPlacementsInjection;
+import xyz.bluspring.kilt.injections.world.item.ItemDisplayContextInjection;
+import xyz.bluspring.kilt.injections.world.level.levelgen.DebugLevelSourceInjection;
+
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 /**
  * INTERNAL ONLY
@@ -173,7 +167,7 @@ public class GameData
         return new RegistryBuilder<ItemDisplayContext>()
             .setMaxID(128 * 2) /* 0 -> 127 gets positive ID, 128 -> 256 gets negative ID */.disableOverrides().disableSaving()
             .setDefaultKey(new ResourceLocation("minecraft:none"))
-            .onAdd(ItemDisplayContext.ADD_CALLBACK);
+            .onAdd(ItemDisplayContextInjection.ADD_CALLBACK);
     }
 
     private static <T> RegistryBuilder<T> makeRegistry(ResourceKey<? extends Registry<T>> key)
@@ -248,7 +242,7 @@ public class GameData
     public static void unfreezeData()
     {
         LOGGER.debug(REGISTRIES, "Unfreezing vanilla registries");
-        BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof MappedRegistry).forEach(r -> ((MappedRegistry<?>)r).unfreeze());
+        BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof MappedRegistry).forEach(r -> ((MappedRegistryInjection)r).unfreeze());
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -321,7 +315,7 @@ public class GameData
         Set<ResourceLocation> keySet = new HashSet<>(RegistryManager.ACTIVE.registries.keySet());
         keySet.addAll(RegistryManager.getVanillaRegistryKeys());
 
-        Set<ResourceLocation> ordered = new LinkedHashSet<>(MappedRegistry.getKnownRegistries());
+        Set<ResourceLocation> ordered = new LinkedHashSet<>(MappedRegistryInjection.getKnownRegistries());
         ordered.retainAll(keySet);
         ordered.addAll(keySet.stream().sorted(ResourceLocation::compareNamespaced).toList());
 
@@ -361,7 +355,7 @@ public class GameData
         } else
         {
             ForgeHooks.modifyAttributes();
-            SpawnPlacements.fireSpawnPlacementEvent();
+            SpawnPlacementsInjection.fireSpawnPlacementEvent();
             CreativeModeTabRegistry.sortTabs();
         }
     }
@@ -463,7 +457,7 @@ public class GameData
 
                 block.getLootTable();
             }
-            DebugLevelSource.initValidStates();
+            DebugLevelSourceInjection.initValidStates();
         }
     }
 

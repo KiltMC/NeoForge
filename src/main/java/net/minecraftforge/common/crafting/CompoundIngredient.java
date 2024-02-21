@@ -5,27 +5,27 @@
 
 package net.minecraftforge.common.crafting;
 
+import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntComparators;
+import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.item.crafting.IngredientInjection;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntComparators;
-import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.FriendlyByteBuf;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /** Ingredient that matches if any of the child ingredients match */
 public class CompoundIngredient extends AbstractIngredient
@@ -60,7 +60,7 @@ public class CompoundIngredient extends AbstractIngredient
                 allIngredients.add(child);
         }
         if (!vanillaIngredients.isEmpty())
-            allIngredients.add(merge(vanillaIngredients));
+            allIngredients.add(IngredientInjection.merge(vanillaIngredients));
         if (allIngredients.size() == 1)
             return allIngredients.get(0);
         return new CompoundIngredient(allIngredients);
@@ -112,7 +112,7 @@ public class CompoundIngredient extends AbstractIngredient
     }
 
     @Override
-    protected void invalidate()
+    public void invalidate()
     {
         this.itemIds = null;
         this.stacks = null;

@@ -35,7 +35,7 @@ public class DatapackBuiltinEntriesProvider extends RegistriesDatapackGenerator
      */
     public DatapackBuiltinEntriesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Set<String> modIds)
     {
-        super(output, registries, modIds);
+        super(output, registries);
     }
 
     /**

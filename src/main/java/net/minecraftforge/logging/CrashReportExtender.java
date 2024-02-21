@@ -19,7 +19,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 
 public class CrashReportExtender
 {
@@ -37,7 +39,7 @@ public class CrashReportExtender
 
     public static void addCrashReportHeader(StringBuilder stringbuilder, CrashReport crashReport)
     {
-        net.minecraftforge.forge.snapshots.ForgeSnapshotsMod.addCrashReportHeader(stringbuilder, crashReport);
+        //net.minecraftforge.forge.snapshots.ForgeSnapshotsMod.addCrashReportHeader(stringbuilder, crashReport);
     }
 
     public static String generateEnhancedStackTrace(final Throwable throwable) {

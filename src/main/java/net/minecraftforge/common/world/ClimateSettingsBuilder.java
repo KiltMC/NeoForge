@@ -7,6 +7,7 @@ package net.minecraftforge.common.world;
 
 import net.minecraft.world.level.biome.Biome.ClimateSettings;
 import net.minecraft.world.level.biome.Biome.TemperatureModifier;
+import xyz.bluspring.kilt.mixin.world.level.biome.BiomeClimateSettingsAccessor;
 
 /**
  * Builder for {@link ClimateSettings}.
@@ -55,7 +56,7 @@ public class ClimateSettingsBuilder
      */
     public ClimateSettings build()
     {
-        return new ClimateSettings(this.hasPrecipitation, this.temperature, this.temperatureModifier, this.downfall);
+        return BiomeClimateSettingsAccessor.createClimateSettings(this.hasPrecipitation, this.temperature, this.temperatureModifier, this.downfall);
     }
 
     /**

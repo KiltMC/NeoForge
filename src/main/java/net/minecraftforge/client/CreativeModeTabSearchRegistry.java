@@ -71,7 +71,7 @@ public class CreativeModeTabSearchRegistry
         if (tab == CreativeModeTabs.searchTab())
             return SearchRegistry.CREATIVE_TAGS;
 
-        if (!tab.hasSearchBar())
+        if (!((CreativeModeTabInjection) tab).hasSearchBar())
             return null;
 
         return TAG_SEARCH_KEYS.computeIfAbsent(tab, k -> new SearchRegistry.Key<>());

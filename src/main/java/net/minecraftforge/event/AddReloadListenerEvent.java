@@ -8,13 +8,14 @@ package net.minecraftforge.event;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.ReloadableServerResources;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
+import xyz.bluspring.kilt.injections.ReloadableServerResourcesInjection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class AddReloadListenerEvent extends Event
      */
     public ICondition.IContext getConditionContext()
     {
-        return serverResources.getConditionContext();
+        return ((ReloadableServerResourcesInjection) serverResources).getConditionContext();
     }
 
     /**

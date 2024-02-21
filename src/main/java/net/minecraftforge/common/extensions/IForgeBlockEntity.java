@@ -5,27 +5,28 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.BlockEntityExtensions;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import org.jetbrains.annotations.NotNull;
 
-public interface IForgeBlockEntity extends ICapabilitySerializable<CompoundTag>
+public interface IForgeBlockEntity extends ICapabilitySerializable<CompoundTag>, BlockEntityExtensions
 {
     private BlockEntity self() { return (BlockEntity) this; }
 
@@ -76,7 +77,9 @@ public interface IForgeBlockEntity extends ICapabilitySerializable<CompoundTag>
      *
      * @return A compound tag for custom persistent data
      */
-     CompoundTag getPersistentData();
+     default CompoundTag getPersistentData() {
+         return this.getCustomData();
+     }
 
      default void onChunkUnloaded(){}
 
