@@ -323,7 +323,8 @@ public class GameData
 
         Set<ResourceLocation> ordered = new LinkedHashSet<>(MappedRegistryInjection.getKnownRegistries());
         ordered.retainAll(keySet);
-        ordered.addAll(keySet.stream().sorted(ResourceLocation::compareNamespaced).toList());
+        // *[INTERNAL SCREAMING]*
+        ordered.addAll(keySet.stream().sorted(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath)).toList());
 
         RuntimeException aggregate = new RuntimeException();
         for (ResourceLocation rootRegistryName : ordered)

@@ -34,7 +34,9 @@ public class NetworkEvent extends Event
     // Kilt: work around crash
     public NetworkEvent()
     {
-        this(null, null, -1);
+        this.payload = null;
+        this.source = null;
+        this.loginIndex = -1;
     }
 
     private NetworkEvent(final ICustomPacket<?> payload, final Supplier<Context> source)
@@ -74,17 +76,29 @@ public class NetworkEvent extends Event
 
     public static class ServerCustomPayloadEvent extends NetworkEvent
     {
+        public ServerCustomPayloadEvent() {
+            super();
+        }
+
         ServerCustomPayloadEvent(final ICustomPacket<?> payload, final Supplier<Context> source) {
             super(payload, source);
         }
     }
     public static class ClientCustomPayloadEvent extends NetworkEvent
     {
+        public ClientCustomPayloadEvent() {
+            super();
+        }
+
         ClientCustomPayloadEvent(final ICustomPacket<?> payload, final Supplier<Context> source) {
             super(payload, source);
         }
     }
     public static class ServerCustomPayloadLoginEvent extends ServerCustomPayloadEvent {
+        public ServerCustomPayloadLoginEvent() {
+            super();
+        }
+
         ServerCustomPayloadLoginEvent(ICustomPacket<?> payload, Supplier<Context> source)
         {
             super(payload, source);
@@ -92,6 +106,10 @@ public class NetworkEvent extends Event
     }
 
     public static class ClientCustomPayloadLoginEvent extends ClientCustomPayloadEvent {
+        public ClientCustomPayloadLoginEvent() {
+            super();
+        }
+
         ClientCustomPayloadLoginEvent(ICustomPacket<?> payload, Supplier<Context> source)
         {
             super(payload, source);
@@ -122,6 +140,10 @@ public class NetworkEvent extends Event
     }
 
     public static class LoginPayloadEvent extends NetworkEvent {
+        public LoginPayloadEvent() {
+            super();
+        }
+
         LoginPayloadEvent(final FriendlyByteBuf payload, final Supplier<Context> source, final int loginIndex) {
             super(payload, source, loginIndex);
         }

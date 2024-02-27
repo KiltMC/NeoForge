@@ -27,6 +27,12 @@ public class ChunkEvent extends LevelEvent
 {
     private final ChunkAccess chunk;
 
+    public ChunkEvent()
+    {
+        super(null);
+        this.chunk = null;
+    }
+
     public ChunkEvent(ChunkAccess chunk)
     {
         super(chunk.getWorldForge());
@@ -61,6 +67,12 @@ public class ChunkEvent extends LevelEvent
     {
         private final boolean newChunk;
 
+        public Load()
+        {
+            super();
+            this.newChunk = false;
+        }
+
         @ApiStatus.Internal
         public Load(ChunkAccess chunk, boolean newChunk)
         {
@@ -94,6 +106,11 @@ public class ChunkEvent extends LevelEvent
      **/
     public static class Unload extends ChunkEvent
     {
+        public Unload()
+        {
+            super();
+        }
+
         public Unload(ChunkAccess chunk)
         {
             super(chunk);
