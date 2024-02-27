@@ -7,16 +7,15 @@ package net.minecraftforge.network;
 
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.PacketListener;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketListener;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.thread.BlockableEventLoop;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.common.util.LogicalSidedProvider;
+import net.minecraftforge.eventbus.api.Event;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +30,12 @@ public class NetworkEvent extends Event
     private final FriendlyByteBuf payload;
     private final Supplier<Context> source;
     private final int loginIndex;
+
+    // Kilt: work around crash
+    public NetworkEvent()
+    {
+        this(null, null, -1);
+    }
 
     private NetworkEvent(final ICustomPacket<?> payload, final Supplier<Context> source)
     {
