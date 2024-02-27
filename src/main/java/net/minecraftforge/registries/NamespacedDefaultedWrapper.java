@@ -24,7 +24,7 @@ class NamespacedDefaultedWrapper<T> extends NamespacedWrapper<T> implements Defa
     NamespacedDefaultedWrapper(ForgeRegistry<T> fowner, Function<T, Holder.Reference<T>> intrusiveHolderCallback, RegistryManager stage) {
         super(fowner, intrusiveHolderCallback, stage);
         this.delegate = fowner;
-        this.defaultKey = fowner.getKiltDefaultKey();
+        this.defaultKey = fowner.getDefaultKey();
     }
 
     // Reading Functions
@@ -46,7 +46,7 @@ class NamespacedDefaultedWrapper<T> extends NamespacedWrapper<T> implements Defa
     @Override
     public ResourceLocation getDefaultKey()
     {
-        return this.delegate.getKiltDefaultKey();
+        return this.delegate.getDefaultKey();
     }
 
     @Nullable

@@ -6,9 +6,8 @@
 package net.minecraftforge.registries;
 
 import net.minecraft.resources.ResourceLocation;
-import xyz.bluspring.kilt.workarounds.IFabricWrappedForgeRegistry;
 
-public interface IForgeRegistryModifiable<V> extends IFabricWrappedForgeRegistry<V>
+public interface IForgeRegistryModifiable<V> extends IForgeRegistry<V>
 {
     void clear();
     V remove(ResourceLocation key);

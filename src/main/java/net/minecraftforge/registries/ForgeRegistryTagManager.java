@@ -18,12 +18,12 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class ForgeRegistryTagManager<V> implements ITagManager<V>
+class ForgeRegistryTagManager<V> implements ITagManager<V>
 {
-    private final FabricWrappedForgeRegistry<V> owner;
+    private final ForgeRegistry<V> owner;
     private volatile Map<TagKey<V>, ITag<V>> tags = new IdentityHashMap<>();
 
-    public ForgeRegistryTagManager(FabricWrappedForgeRegistry<V> owner)
+    ForgeRegistryTagManager(ForgeRegistry<V> owner)
     {
         this.owner = owner;
     }
@@ -108,7 +108,7 @@ public class ForgeRegistryTagManager<V> implements ITagManager<V>
     public TagKey<V> createTagKey(@NotNull ResourceLocation location)
     {
         Objects.requireNonNull(location);
-        return TagKey.create(this.owner.getKiltRegistryKey(), location);
+        return TagKey.create(this.owner.getRegistryKey(), location);
     }
 
     @NotNull

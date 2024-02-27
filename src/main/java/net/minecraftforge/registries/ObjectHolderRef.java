@@ -84,7 +84,7 @@ class ObjectHolderRef implements Consumer<Predicate<ResourceLocation>>
     @Override
     public void accept(Predicate<ResourceLocation> filter)
     {
-        if (registry == null || !filter.test(registry.getKiltRegistryName()))
+        if (registry == null || !filter.test(registry.getRegistryName()))
             return;
 
         Object thing;

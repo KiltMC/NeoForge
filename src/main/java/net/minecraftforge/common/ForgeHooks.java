@@ -119,7 +119,10 @@ import net.minecraftforge.event.level.NoteBlockEvent;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.registries.*;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistry;
+import net.minecraftforge.registries.GameData;
+import net.minecraftforge.registries.RegistryManager;
 import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.server.permission.PermissionAPI;
 import org.apache.commons.lang3.function.TriFunction;
@@ -1221,7 +1224,7 @@ public class ForgeHooks
         fmlData.put("Registries", registries);
         LOGGER.debug(WORLDPERSISTENCE, "Gathering id map for writing to world save {}", worldData.getLevelName());
 
-        for (Map.Entry<ResourceLocation, FabricWrappedForgeRegistry.Snapshot> e : RegistryManager.ACTIVE.takeSnapshot(true).entrySet())
+        for (Map.Entry<ResourceLocation, ForgeRegistry.Snapshot> e : RegistryManager.ACTIVE.takeSnapshot(true).entrySet())
         {
             registries.put(e.getKey().toString(), e.getValue().write());
         }
@@ -1317,11 +1320,11 @@ public class ForgeHooks
 
         if (tag.contains("Registries"))
         {
-            Map<ResourceLocation, FabricWrappedForgeRegistry.Snapshot> snapshot = new HashMap<>();
+            Map<ResourceLocation, ForgeRegistry.Snapshot> snapshot = new HashMap<>();
             CompoundTag regs = tag.getCompound("Registries");
             for (String key : regs.getAllKeys())
             {
-                snapshot.put(new ResourceLocation(key), FabricWrappedForgeRegistry.Snapshot.read(regs.getCompound(key)));
+                snapshot.put(new ResourceLocation(key), ForgeRegistry.Snapshot.read(regs.getCompound(key)));
             }
             failedElements = GameData.injectSnapshot(snapshot, true, true);
         }

@@ -23,7 +23,6 @@ import net.minecraftforge.event.entity.player.PlayerNegotiationEvent;
 import net.minecraftforge.network.ConnectionData.ModMismatchData;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
-import net.minecraftforge.registries.FabricWrappedForgeRegistry;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.GameData;
 import org.apache.commons.lang3.tuple.Pair;
@@ -108,7 +107,7 @@ public class HandshakeHandler
     private final NetworkDirection direction;
     private final Connection manager;
     private int packetPosition;
-    private Map<ResourceLocation, FabricWrappedForgeRegistry.Snapshot> registrySnapshots;
+    private Map<ResourceLocation, ForgeRegistry.Snapshot> registrySnapshots;
     private Set<ResourceLocation> registriesToReceive;
     private Map<ResourceLocation, String> registryHashes;
     private boolean negotiationStarted = false;

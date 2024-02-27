@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistry, MappedRegistryInjection
+class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistry, MappedRegistryInjection
 {
     static final Logger LOGGER = LogUtils.getLogger();
     private final ForgeRegistry<T> delegate;
@@ -52,7 +52,7 @@ public class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockable
 
     NamespacedWrapper(ForgeRegistry<T> fowner, Function<T, Holder.Reference<T>> intrusiveHolderCallback, RegistryManager stage)
     {
-        super(fowner.getKiltRegistryKey(), Lifecycle.stable(), intrusiveHolderCallback != null);
+        super(fowner.getRegistryKey(), Lifecycle.stable(), intrusiveHolderCallback != null);
         this.delegate = fowner;
         this.intrusiveHolderCallback = intrusiveHolderCallback;
         this.stage = stage;
@@ -65,7 +65,7 @@ public class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockable
             throw new IllegalStateException("Can not register to a locked registry. Modder should use NeoForge Register methods.");
 
         Validate.notNull(value);
-        ((MappedRegistryInjection) this).markKnown();
+        markKnown();
         this.registryLifecycle = this.registryLifecycle.add(lifecycle);
 
         int realId = this.delegate.add(id, key.location(), value);
@@ -124,7 +124,7 @@ public class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockable
     @Override
     public boolean containsKey(ResourceKey<T> key)
     {
-        return this.delegate.getKiltRegistryName().equals(key.registry()) && containsKey(key.location());
+        return this.delegate.getRegistryName().equals(key.registry()) && containsKey(key.location());
     }
 
     @Override
@@ -161,7 +161,7 @@ public class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockable
     @Override
     public Set<ResourceLocation> keySet()
     {
-        return this.delegate.getKiltKeys();
+        return this.delegate.getKeys();
     }
 
     @Override
@@ -173,7 +173,7 @@ public class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockable
     @Override
     public Set<Map.Entry<ResourceKey<T>, T>> entrySet()
     {
-        return this.delegate.getKiltEntries();
+        return this.delegate.getEntries();
     }
 
     @Override
