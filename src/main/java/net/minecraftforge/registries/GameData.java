@@ -186,7 +186,10 @@ public class GameData
     public static <T> MappedRegistry<T> getWrapper(ResourceKey<? extends Registry<T>> key, Lifecycle lifecycle)
     {
         IForgeRegistry<T> reg = RegistryManager.ACTIVE.getRegistry(key);
-        Validate.notNull(reg, "Attempted to get vanilla wrapper for unknown registry: " + key.toString());
+
+        if (reg == null)
+            return null;
+
         @SuppressWarnings("unchecked")
         MappedRegistry<T> ret = reg.getSlaveMap(NamespacedWrapper.Factory.ID, NamespacedWrapper.class);
         Validate.notNull(ret, "Attempted to get vanilla wrapper for registry created incorrectly: " + key.toString());
@@ -196,7 +199,10 @@ public class GameData
     public static <T> MappedRegistry<T> getWrapper(ResourceKey<? extends Registry<T>> key, Lifecycle lifecycle, String defKey)
     {
         IForgeRegistry<T> reg = RegistryManager.ACTIVE.getRegistry(key);
-        Validate.notNull(reg, "Attempted to get vanilla wrapper for unknown registry: " + key.toString());
+
+        if (reg == null)
+            return null;
+
         @SuppressWarnings("unchecked")
         MappedRegistry<T> ret = reg.getSlaveMap(NamespacedDefaultedWrapper.Factory.ID, NamespacedDefaultedWrapper.class);
         Validate.notNull(ret, "Attempted to get vanilla wrapper for registry created incorrectly: " + key.toString());
