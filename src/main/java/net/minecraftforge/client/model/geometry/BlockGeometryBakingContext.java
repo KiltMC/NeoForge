@@ -61,7 +61,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     @Nullable
     public IUnbakedGeometry<?> getCustomGeometry()
     {
-        return owner.parent != null && customGeometry == null ? owner.getCustomGeometry() == null ? null : new ForgeWrappedFabricUnbakedGeometry(owner.getCustomGeometry()) : (IUnbakedGeometry<?>) customGeometry;
+        return owner.parent != null && customGeometry == null ? owner.getCustomGeometry() == null ? null : new ForgeWrappedFabricUnbakedGeometry(owner.getCustomGeometry()) : customGeometry != null ? new ForgeWrappedFabricUnbakedGeometry(customGeometry) : null;
     }
 
     public void setCustomGeometry(IUnbakedGeometry<?> geometry)
