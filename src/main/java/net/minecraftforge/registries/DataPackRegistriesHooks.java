@@ -35,7 +35,7 @@ public final class DataPackRegistriesHooks
         NETWORKABLE_REGISTRIES.forEach(builder::put);
         NETWORKABLE_REGISTRIES.clear();
         NETWORKABLE_REGISTRIES.putAll(builder.build());
-        return Collections.unmodifiableMap(NETWORKABLE_REGISTRIES);
+        return ImmutableMap.ofEntries(NETWORKABLE_REGISTRIES.entrySet().toArray(Map.Entry[]::new));
     }
 
     /* Internal forge method, registers a datapack registry codec and folder. */
