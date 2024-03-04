@@ -5,7 +5,10 @@
 
 package net.minecraftforge.common.capabilities;
 
+import com.google.common.reflect.TypeToken;
 import net.minecraftforge.fml.common.asm.CapabilityTokenSubclass;
+
+import java.lang.reflect.Type;
 
 /**
  * Inspired by {@link com.google.common.reflect.TypeToken TypeToken}, use a subclass to capture
@@ -23,9 +26,12 @@ import net.minecraftforge.fml.common.asm.CapabilityTokenSubclass;
  */
 public abstract class CapabilityToken<T>
 {
+    private final TypeToken<T> typeToken = new TypeToken<>(this.getClass()) {};
+    private final Type type = typeToken.getType();
+
     protected final String getType()
     {
-        throw new RuntimeException("This will be implemented by a transformer");
+        return this.type.getTypeName();
     }
 
     @Override
