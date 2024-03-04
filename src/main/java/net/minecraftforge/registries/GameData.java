@@ -78,6 +78,9 @@ public class GameData
     private static final boolean DISABLE_VANILLA_REGISTRIES = Boolean.parseBoolean(System.getProperty("forge.disableVanillaGameData", "false")); // Use for unit tests/debugging
     private static final BiConsumer<ResourceLocation, ForgeRegistry<?>> LOCK_VANILLA = (name, reg) -> reg.slaves.values().stream().filter(o -> o instanceof ILockableRegistry).forEach(o -> ((ILockableRegistry)o).lock());
 
+    // Kilt: This is to work around a problem where registries aren't ordered correctly.
+    public static List<IForgeRegistry<?>> kilt$registries;
+
     static {
         init();
     }
@@ -92,6 +95,12 @@ public class GameData
         if (hasInit)
             return;
         hasInit = true;
+
+        // Kilt: You would think this is unnecessary, but for some reason,
+        //       the JVM refuses to act like it's initialized when it's in
+        //       the static field above.
+        if (kilt$registries == null)
+            kilt$registries = new LinkedList<>();
 
         // Game objects
         makeRegistry(Keys.BLOCKS, "air").addCallback(BlockCallbacks.INSTANCE).legacyName("blocks").intrusiveHolderCallback(Block::builtInRegistryHolder).create();
@@ -318,19 +327,33 @@ public class GameData
     @SuppressWarnings("deprecation")
     public static void postRegisterEvents()
     {
-        Set<ResourceLocation> keySet = new HashSet<>(RegistryManager.ACTIVE.registries.keySet());
-        keySet.addAll(RegistryManager.getVanillaRegistryKeys());
+        var keySet = new ArrayList<>(kilt$registries.stream().map(IForgeRegistry::getRegistryName).toList());
+        var activeKeySet = RegistryManager.ACTIVE.registries.keySet();
+        activeKeySet.retainAll(keySet);
+        keySet.addAll(activeKeySet);
+        var vanillaSet = new ArrayList<>(RegistryManager.getVanillaRegistryKeys().stream().toList());
+        vanillaSet.retainAll(keySet);
+        keySet.addAll(vanillaSet);
 
         Set<ResourceLocation> ordered = new LinkedHashSet<>(MappedRegistryInjection.getKnownRegistries());
         ordered.retainAll(keySet);
         // *[INTERNAL SCREAMING]*
-        ordered.addAll(keySet.stream().sorted(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath)).toList());
+        //ordered.addAll(keySet.stream().sorted(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath)).toList());
+        keySet.addAll(ordered);
+
+        // Kilt: No double registering. I beg.
+        var registered = new LinkedList<ResourceLocation>();
 
         RuntimeException aggregate = new RuntimeException();
-        for (ResourceLocation rootRegistryName : ordered)
+        for (ResourceLocation rootRegistryName : keySet)
         {
             try
             {
+                if (registered.contains(rootRegistryName))
+                    continue;
+
+                registered.add(rootRegistryName);
+
                 ResourceKey<? extends Registry<?>> registryKey = ResourceKey.createRegistryKey(rootRegistryName);
                 ForgeRegistry<?> forgeRegistry = RegistryManager.ACTIVE.getRegistry(rootRegistryName);
                 Registry<?> vanillaRegistry = BuiltInRegistries.REGISTRY.get(rootRegistryName);

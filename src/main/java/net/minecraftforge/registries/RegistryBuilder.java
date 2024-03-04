@@ -225,7 +225,12 @@ public class RegistryBuilder<T>
             else
                 addCallback(new NamespacedDefaultedWrapper.Factory<T>());
         }
-        return RegistryManager.ACTIVE.createRegistry(registryName, this);
+        var registry = RegistryManager.ACTIVE.createRegistry(registryName, this);
+
+        // Kilt: Work around ordering issues.
+        GameData.kilt$registries.add(registry);
+
+        return registry;
     }
 
     @Nullable
