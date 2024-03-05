@@ -327,12 +327,12 @@ public class GameData
     @SuppressWarnings("deprecation")
     public static void postRegisterEvents()
     {
+        // Kilt: if we use a HashSet, it goes out of order for some reason.
         var keySet = new ArrayList<>(kilt$registries.stream().map(IForgeRegistry::getRegistryName).toList());
         var activeKeySet = RegistryManager.ACTIVE.registries.keySet();
-        activeKeySet.retainAll(keySet);
         keySet.addAll(activeKeySet);
+
         var vanillaSet = new ArrayList<>(RegistryManager.getVanillaRegistryKeys().stream().toList());
-        vanillaSet.retainAll(keySet);
         keySet.addAll(vanillaSet);
 
         Set<ResourceLocation> ordered = new LinkedHashSet<>(MappedRegistryInjection.getKnownRegistries());
@@ -341,11 +341,20 @@ public class GameData
         //ordered.addAll(keySet.stream().sorted(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath)).toList());
         keySet.addAll(ordered);
 
+        // Kilt: We want all of these values to be unique, but a HashSet will make it out of order, so...
+        var uniqueList = new ArrayList<ResourceLocation>();
+        for (ResourceLocation loc : keySet) {
+            if (uniqueList.contains(loc))
+                continue;
+
+            uniqueList.add(loc);
+        }
+
         // Kilt: No double registering. I beg.
         var registered = new LinkedList<ResourceLocation>();
 
         RuntimeException aggregate = new RuntimeException();
-        for (ResourceLocation rootRegistryName : keySet)
+        for (ResourceLocation rootRegistryName : uniqueList)
         {
             try
             {
