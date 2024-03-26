@@ -5,49 +5,11 @@
 
 package net.minecraftforge.common;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import net.minecraftforge.fml.Logging;
-import net.minecraftforge.fml.config.IConfigSpec;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-
-import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.core.EnumGetMethod;
-import com.electronwill.nightconfig.core.ConfigSpec.CorrectionAction;
-import com.electronwill.nightconfig.core.ConfigSpec.CorrectionListener;
-import com.electronwill.nightconfig.core.InMemoryFormat;
-import com.electronwill.nightconfig.core.UnmodifiableConfig;
-import com.electronwill.nightconfig.core.file.FileConfig;
-import com.electronwill.nightconfig.core.utils.UnmodifiableConfigWrapper;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
-
 /*
  * Like {@link com.electronwill.nightconfig.core.ConfigSpec} except in builder format, and extended to accept comments, language keys,
  * and other things Forge configs would find useful.
  */
-public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> implements IConfigSpec<ForgeConfigSpec>//TODO: Remove extends and pipe everything through getSpec/getValues?
+/*public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> implements IConfigSpec<ForgeConfigSpec>//TODO: Remove extends and pipe everything through getSpec/getValues?
 {
     private Map<List<String>, String> levelComments;
     private Map<List<String>, String> levelTranslationKeys;
@@ -835,7 +797,7 @@ public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfi
          * @throws NullPointerException if the {@link ForgeConfigSpec config spec} object that will contain this has
          *                              not yet been built
          * @throws IllegalStateException if the associated config has not yet been loaded
-         */
+         *//*
         @Override
         public T get()
         {
@@ -870,7 +832,7 @@ public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfi
 
         /**
          * {@return the default value for the configuration setting}
-         */
+         *//*
         public T getDefault()
         {
             return defaultSupplier.get();
@@ -979,3 +941,4 @@ public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfi
         return Lists.newArrayList(DOT_SPLITTER.split(path));
     }
 }
+*/
