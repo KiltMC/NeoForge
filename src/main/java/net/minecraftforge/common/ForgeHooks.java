@@ -1594,7 +1594,11 @@ public class ForgeHooks
 
         ModLoader.get().postEvent(new BuildCreativeModeTabContentsEvent(tab, tabKey, params, entries));
 
-        for (var entry : entries)
+        for (var entry : entries) {
+            if (entry.getKey().is(Items.AIR))
+                continue;
+            
             output.accept(entry.getKey(), entry.getValue());
+        }
     }
 }

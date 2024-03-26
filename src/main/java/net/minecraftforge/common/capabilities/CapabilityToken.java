@@ -7,6 +7,7 @@ package net.minecraftforge.common.capabilities;
 
 import com.google.common.reflect.TypeToken;
 import net.minecraftforge.fml.common.asm.CapabilityTokenSubclass;
+import xyz.bluspring.kilt.Kilt;
 
 import java.lang.reflect.Type;
 
@@ -26,11 +27,27 @@ import java.lang.reflect.Type;
  */
 public abstract class CapabilityToken<T>
 {
-    private final TypeToken<T> typeToken = new TypeToken<>(this.getClass()) {};
-    private final Type type = typeToken.getType();
+    private TypeToken<T> typeToken;
+
+    public CapabilityToken() {
+        try {
+            typeToken = new TypeToken<>(this.getClass()) {};
+            type = typeToken.getType();
+        } catch (Exception ignored) {
+            typeToken = null;
+            type = null;
+        }
+    }
+
+    private Type type;
 
     protected final String getType()
     {
+        if (this.type == null) {
+            Kilt.Companion.getLogger().error("ruh roh, a type is unknown");
+            return "UNKNOWN";
+        }
+
         return this.type.getTypeName();
     }
 

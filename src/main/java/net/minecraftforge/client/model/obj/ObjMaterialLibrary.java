@@ -6,7 +6,7 @@
 package net.minecraftforge.client.model.obj;
 
 import com.google.common.collect.Maps;
-import joptsimple.internal.Strings;
+import org.apache.logging.log4j.util.Strings;
 import org.joml.Vector4f;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class ObjMaterialLibrary
             {
                 case "newmtl":
                 {
-                    String name = Strings.join(Arrays.copyOfRange(line, 1, line.length), " ");
+                    String name = Strings.join(Arrays.stream(Arrays.copyOfRange(line, 1, line.length)).iterator(), ' ');
                     currentMaterial = new Material(name);
                     materials.put(name, currentMaterial);
                     break;
