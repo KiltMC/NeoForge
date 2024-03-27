@@ -135,6 +135,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.Kilt;
 import xyz.bluspring.kilt.injections.entity.AttributeSupplierBuilderInjection;
 import xyz.bluspring.kilt.injections.world.inventory.AnvilMenuInjection;
 import xyz.bluspring.kilt.injections.world.level.LevelInjection;
@@ -1595,9 +1596,14 @@ public class ForgeHooks
         ModLoader.get().postEvent(new BuildCreativeModeTabContentsEvent(tab, tabKey, params, entries));
 
         for (var entry : entries) {
-            if (entry.getKey().is(Items.AIR))
+            if (entry.getKey().isEmpty()) {
+                Kilt.Companion.getLogger().error("An entry failed to load!");
+                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).forEach(f -> {
+                    Kilt.Companion.getLogger().error(f.toStackTraceElement().toString());
+                });
                 continue;
-            
+            }
+
             output.accept(entry.getKey(), entry.getValue());
         }
     }
