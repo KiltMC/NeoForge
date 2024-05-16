@@ -16,9 +16,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xyz.bluspring.kilt.mixin.porting_lib.TicketHelperAccessor;
-import xyz.bluspring.kilt.mixin.porting_lib.TicketOwnerAccessor;
-import xyz.bluspring.kilt.mixin.porting_lib.TicketTrackerAccessor;
+import xyz.bluspring.kilt.mixin.compat.porting_lib.TicketHelperAccessor;
+import xyz.bluspring.kilt.mixin.compat.porting_lib.TicketOwnerAccessor;
+import xyz.bluspring.kilt.mixin.compat.porting_lib.TicketTrackerAccessor;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
