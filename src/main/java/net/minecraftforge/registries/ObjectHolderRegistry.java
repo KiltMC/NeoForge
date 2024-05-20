@@ -5,29 +5,24 @@
 
 package net.minecraftforge.registries;
 
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
+import com.google.common.collect.Maps;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.forgespi.language.ModFileScanData;
-
-import com.google.common.collect.Maps;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Internal registry for tracking {@link ObjectHolder} references
@@ -72,12 +67,12 @@ public class ObjectHolderRegistry
     // IMPORTANT: Updates to this collection must be reflected in ObjectHolderDefinalize. Duplicated cuz classloaders, yay!
     // Classnames are validated below.
     private static final List<VanillaObjectHolderData> VANILLA_OBJECT_HOLDERS = List.of(
-            new VanillaObjectHolderData("net.minecraft.world.level.block.Blocks", "block", "net.minecraft.world.level.block.Block"),
-            new VanillaObjectHolderData("net.minecraft.world.item.Items", "item", "net.minecraft.world.item.Item"),
-            new VanillaObjectHolderData("net.minecraft.world.item.enchantment.Enchantments", "enchantment", "net.minecraft.world.item.enchantment.Enchantment"),
-            new VanillaObjectHolderData("net.minecraft.world.effect.MobEffects", "mob_effect", "net.minecraft.world.effect.MobEffect"),
-            new VanillaObjectHolderData("net.minecraft.core.particles.ParticleTypes", "particle_type", "net.minecraft.core.particles.ParticleType"),
-            new VanillaObjectHolderData("net.minecraft.sounds.SoundEvents", "sound_event", "net.minecraft.sounds.SoundEvent")
+            new VanillaObjectHolderData("net.minecraft.class_2246", "block", "net.minecraft.class_2248"), // Block, Blocks
+            new VanillaObjectHolderData("net.minecraft.class_1802", "item", "net.minecraft.class_1792"), // Items, Item
+            new VanillaObjectHolderData("net.minecraft.class_1893", "enchantment", "net.minecraft.class_1887"), // Enchantments, Enchantment
+            new VanillaObjectHolderData("net.minecraft.class_1294", "mob_effect", "net.minecraft.class_1291"), // MobEffects, MobEffect
+            new VanillaObjectHolderData("net.minecraft.class_2398", "particle_type", "net.minecraft.class_2396"), // ParticleTypes, ParticleType
+            new VanillaObjectHolderData("net.minecraft.class_3417", "sound_event", "net.minecraft.class_3414") // SoundEvents, SoundEvent
     );
 
     public static void findObjectHolders()
@@ -238,5 +233,18 @@ public class ObjectHolderRegistry
         }
     }
 
-    private record VanillaObjectHolderData(String holderClass, String registryName, String registryType) {}
+    private record VanillaObjectHolderData(String holderClass, String registryName, String registryType) {
+        private static final MappingResolver mappingResolver = FabricLoader.getInstance().getMappingResolver();
+
+        // Kilt: We're using Intermediary class names now, so we need to have a way to remap it in dev.
+        @Override
+        public String holderClass() {
+            return mappingResolver.mapClassName("intermediary", holderClass.replace(".", "/")).replace("/", ".");
+        }
+
+        @Override
+        public String registryType() {
+            return mappingResolver.mapClassName("intermediary", registryType.replace(".", "/")).replace("/", ".");
+        }
+    }
 }
