@@ -79,7 +79,8 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         return (B)this;
     }
 
-    protected final @Nullable CapabilityDispatcher getCapabilities()
+    // Kilt: change protected to public
+    public final @Nullable CapabilityDispatcher getCapabilities()
     {
         if (isLazy && !initialized)
         {
