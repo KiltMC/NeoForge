@@ -239,12 +239,12 @@ public class ObjectHolderRegistry
         // Kilt: We're using Intermediary class names now, so we need to have a way to remap it in dev.
         @Override
         public String holderClass() {
-            return mappingResolver.mapClassName("intermediary", holderClass.replace(".", "/")).replace("/", ".");
+            return mappingResolver.mapClassName("intermediary", holderClass);
         }
 
         @Override
         public String registryType() {
-            return mappingResolver.mapClassName("intermediary", registryType.replace(".", "/")).replace("/", ".");
+            return mappingResolver.mapClassName("intermediary", registryType);
         }
     }
 }
