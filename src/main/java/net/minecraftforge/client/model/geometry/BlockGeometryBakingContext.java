@@ -18,7 +18,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockModelInjection;
-import xyz.bluspring.kilt.workarounds.ForgeWrappedFabricUnbakedGeometry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     public final BlockModel owner;
     public final VisibilityData visibilityData = new VisibilityData();
     @Nullable
-    private io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry<?> customGeometry;
+    private IUnbakedGeometry<?> customGeometry;
     @Nullable
     private Transformation rootTransform;
     @Nullable
@@ -61,7 +60,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     @Nullable
     public IUnbakedGeometry<?> getCustomGeometry()
     {
-        return owner.parent != null && customGeometry == null ? owner.getCustomGeometry() == null ? null : new ForgeWrappedFabricUnbakedGeometry(owner.getCustomGeometry()) : customGeometry != null ? new ForgeWrappedFabricUnbakedGeometry(customGeometry) : null;
+        return owner.parent != null && customGeometry == null ? ((BlockModelInjection) owner.parent).kilt$getCustomData().getCustomGeometry() : customGeometry;
     }
 
     public void setCustomGeometry(IUnbakedGeometry<?> geometry)

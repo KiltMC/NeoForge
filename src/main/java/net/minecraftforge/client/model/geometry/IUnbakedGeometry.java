@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockModelInjection;
 
 import java.util.Set;
 import java.util.function.Function;
@@ -47,7 +48,8 @@ public interface IUnbakedGeometry<T extends IUnbakedGeometry<T>> extends io.gith
     // Kilt: Convert calls for Porting Lib's IUnbakedGeometry to Forge's
     @Override
     default BakedModel bake(BlockModel context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
-        var ctx = new BlockGeometryBakingContext(context);
+        // Don't replace existing data
+        var ctx = ((BlockModelInjection) context).kilt$getCustomData();
         ctx.setGui3d(isGui3d);
 
         return bake(ctx, baker, spriteGetter, modelState, overrides, modelLocation);
