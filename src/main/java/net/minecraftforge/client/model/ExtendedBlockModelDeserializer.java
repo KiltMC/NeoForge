@@ -27,16 +27,7 @@ import java.util.Map;
  */
 public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer
 {
-    public static final Gson INSTANCE = (new GsonBuilder())
-            .registerTypeAdapter(BlockModel.class, new ExtendedBlockModelDeserializer())
-            .registerTypeAdapter(BlockElement.class, new BlockElement.Deserializer())
-            .registerTypeAdapter(BlockElementFace.class, new BlockElementFace.Deserializer())
-            .registerTypeAdapter(BlockFaceUV.class, new BlockFaceUV.Deserializer())
-            .registerTypeAdapter(ItemTransform.class, new ItemTransform.Deserializer())
-            .registerTypeAdapter(ItemTransforms.class, new ItemTransforms.Deserializer())
-            .registerTypeAdapter(ItemOverride.class, new ItemOverride.Deserializer())
-            .registerTypeAdapter(Transformation.class, new TransformationHelper.Deserializer())
-            .create();
+    public static final Gson INSTANCE = BlockModel.GSON;
 
     public BlockModel deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext) throws JsonParseException
     {
