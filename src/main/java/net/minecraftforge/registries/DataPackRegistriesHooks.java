@@ -7,6 +7,7 @@ package net.minecraftforge.registries;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.fabricators_of_create.porting_lib.registries.mixin.NetworkedRegistryDataAccessor;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySynchronization;
 import net.minecraft.resources.RegistryDataLoader;
@@ -43,10 +44,17 @@ public final class DataPackRegistriesHooks
     {
         RegistryDataLoader.RegistryData<T> loaderData = data.loaderData();
         DATA_PACK_REGISTRIES.add(loaderData);
+        var dataCodec = loaderData.elementCodec();
         if (data.networkCodec() != null)
         {
+            var networked = NetworkedRegistryDataAccessor.createNetworkedRegistryData(loaderData.key(), data.networkCodec());
             SYNCED_CUSTOM_REGISTRIES.add(loaderData.key());
             NETWORKABLE_REGISTRIES.put(loaderData.key(), NetworkedRegistryDataAccessor.createNetworkedRegistryData(loaderData.key(), data.networkCodec()));
+            DynamicRegistries.registerSynced(loaderData.key(), dataCodec, networked.networkCodec());
+        }
+        else
+        {
+            DynamicRegistries.register(loaderData.key(), dataCodec);
         }
     }
 
