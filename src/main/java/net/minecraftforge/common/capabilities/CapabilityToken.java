@@ -48,7 +48,7 @@ public abstract class CapabilityToken<T>
             return "UNKNOWN";
         }
 
-        return this.type.getTypeName();
+        return this.type.getTypeName().replace(".", "/");
     }
 
     @Override
