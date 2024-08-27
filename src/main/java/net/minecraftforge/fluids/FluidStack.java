@@ -133,7 +133,9 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     public void forge$writeToPacket(FriendlyByteBuf buf)
     {
-        writeToPacket(buf);
+        buf.writeRegistryId(ForgeRegistries.FLUIDS, getFluid());
+        buf.writeVarInt(forge$getAmount());
+        buf.writeNbt(tag);
     }
 
     public static FluidStack readFromPacket(FriendlyByteBuf buf)
