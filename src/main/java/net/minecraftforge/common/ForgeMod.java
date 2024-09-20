@@ -8,6 +8,7 @@ package net.minecraftforge.common;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.fabricators_of_create.porting_lib.attributes.PortingLibAttributes;
 import net.minecraft.DetectedVersion;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -131,16 +132,16 @@ public class ForgeMod
             ArgumentTypeInfosInjection.registerByClass(ModIdArgument.class,
                     SingletonArgumentInfo.contextFree(ModIdArgument::modIdArgument)));
 
-    public static final RegistryObject<Attribute> SWIM_SPEED = ATTRIBUTES.register("swim_speed", () -> new RangedAttribute("forge.swim_speed", 1.0D, 0.0D, 1024.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> SWIM_SPEED = ATTRIBUTES.register("swim_speed", () -> PortingLibAttributes.SWIM_SPEED);
     public static final RegistryObject<Attribute> NAMETAG_DISTANCE = ATTRIBUTES.register("nametag_distance", () -> new RangedAttribute("forge.name_tag_distance", 64.0D, 0.0D, 64.0).setSyncable(true));
-    public static final RegistryObject<Attribute> ENTITY_GRAVITY = ATTRIBUTES.register("entity_gravity", () -> new RangedAttribute("forge.entity_gravity", 0.08D, -8.0D, 8.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> ENTITY_GRAVITY = ATTRIBUTES.register("entity_gravity", () -> PortingLibAttributes.ENTITY_GRAVITY);
 
     /**
      * Reach Distance represents the distance at which a player may interact with the world.  The default is 4.5 blocks.  Players in creative mode have an additional 0.5 blocks of block reach.
      * @see IForgePlayer#getBlockReach()
      * @see IForgePlayer#canReach(BlockPos, double)
      */
-    public static final RegistryObject<Attribute> BLOCK_REACH = ATTRIBUTES.register("block_reach", () -> new RangedAttribute("forge.block_reach", 4.5D, 0.0D, 1024.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> BLOCK_REACH = ATTRIBUTES.register("block_reach", () -> PortingLibAttributes.BLOCK_REACH);
 
     /**
      * Attack Range represents the distance at which a player may attack an entity.  The default is 3 blocks.  Players in creative mode have an additional 3 blocks of entity reach.
@@ -149,13 +150,13 @@ public class ForgeMod
      * @see IForgePlayer#canReach(Entity, double)
      * @see IForgePlayer#canReach(Vec3, double)
      */
-    public static final RegistryObject<Attribute> ENTITY_REACH = ATTRIBUTES.register("entity_reach", () -> new RangedAttribute("forge.entity_reach", 3.0D, 0.0D, 1024.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> ENTITY_REACH = ATTRIBUTES.register("entity_reach", () -> PortingLibAttributes.ENTITY_REACH);
 
     /**
      * Step Height Addition modifies the amount of blocks an entity may walk up without jumping.
      * @see IForgeEntity#getStepHeight()
      */
-    public static final RegistryObject<Attribute> STEP_HEIGHT = ATTRIBUTES.register("step_height", () -> new RangedAttribute("forge.step_height", 0.0D, -512.0D, 512.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> STEP_HEIGHT = ATTRIBUTES.register("step_height", () -> PortingLibAttributes.STEP_HEIGHT_ADDITION);
 
     /**
      * @deprecated Use {@link #STEP_HEIGHT}
@@ -470,6 +471,13 @@ public class ForgeMod
             ForgeRegistries.ATTRIBUTES.addAlias(new ResourceLocation("forge", "attack_range"), new ResourceLocation("forge", "entity_reach"));
             ForgeRegistries.ATTRIBUTES.addAlias(new ResourceLocation("forge", "step_height_addition"), new ResourceLocation("forge", "step_height"));
         }
+
+        // Kilt: Add aliases between Fabric and Forge values
+        ForgeRegistries.ATTRIBUTES.addAlias(new ResourceLocation("forge", "block_reach"), new ResourceLocation("reach-entity-attributes", "reach"));
+        ForgeRegistries.ATTRIBUTES.addAlias(new ResourceLocation("forge", "entity_reach"), new ResourceLocation("reach-entity-attributes", "attack_range"));
+        ForgeRegistries.ATTRIBUTES.addAlias(new ResourceLocation("forge", "step_height"), new ResourceLocation("porting_lib", "step_height_addition"));
+        ForgeRegistries.ATTRIBUTES.addAlias(new ResourceLocation("forge", "entity_gravity"), new ResourceLocation("porting_lib", "entity_gravity"));
+        ForgeRegistries.ATTRIBUTES.addAlias(new ResourceLocation("forge", "swim_speed"), new ResourceLocation("porting_lib", "swim_speed"));
     }
 
     public void preInit(FMLCommonSetupEvent evt)
