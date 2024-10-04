@@ -14,13 +14,14 @@ import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
+import xyz.bluspring.kilt.workarounds.CapabilityInvalidationWorkaround;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> implements ICapabilityProviderImpl<B>
+public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> implements ICapabilityProviderImpl<B>, CapabilityInvalidationWorkaround
 {
     @VisibleForTesting
     static boolean SUPPORTS_LAZY_CAPABILITIES = true;
@@ -157,12 +158,16 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
      * when they are finished.
      * Be sure to make your invalidate callbaks recursion safe.
      */
-    public void invalidateCaps()
+    public void kilt$invalidateCaps()
     {
         this.valid = false;
         final CapabilityDispatcher disp = getCapabilities();
         if (disp != null)
             disp.invalidate();
+    }
+
+    public void invalidateCaps() {
+        this.kilt$invalidateCaps();
     }
 
     /*

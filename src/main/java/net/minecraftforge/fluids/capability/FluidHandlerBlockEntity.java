@@ -6,11 +6,11 @@
 package net.minecraftforge.fluids.capability;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -18,8 +18,9 @@ import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.workarounds.CapabilityInvalidationWorkaround;
 
-public class FluidHandlerBlockEntity extends BlockEntity
+public class FluidHandlerBlockEntity extends BlockEntity implements CapabilityInvalidationWorkaround
 {
     protected FluidTank tank = new FluidTank(FluidType.BUCKET_VOLUME);
 
@@ -51,5 +52,10 @@ public class FluidHandlerBlockEntity extends BlockEntity
         if (capability == ForgeCapabilities.FLUID_HANDLER)
             return holder.cast();
         return super.getCapability(capability, facing);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        this.kilt$invalidateCaps();
     }
 }
