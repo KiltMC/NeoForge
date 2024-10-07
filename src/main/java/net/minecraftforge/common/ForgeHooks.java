@@ -1587,11 +1587,11 @@ public class ForgeHooks
                 }
         );
 
-        /*originalGenerator.accept(params, (stack, vis) -> {
+        originalGenerator.accept(params, (stack, vis) -> {
             if (stack.getCount() != 1)
                 throw new IllegalArgumentException("The stack count must be 1");
             entries.put(stack, vis);
-        });*/
+        });
 
         ModLoader.get().postEvent(new BuildCreativeModeTabContentsEvent(tab, tabKey, params, entries));
 
