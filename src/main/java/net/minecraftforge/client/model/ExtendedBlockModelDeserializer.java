@@ -7,12 +7,12 @@ package net.minecraftforge.client.model;
 
 import com.google.gson.*;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraftforge.client.model.geometry.GeometryLoaderManager;
 import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
-import net.minecraftforge.common.util.TransformationHelper;
 import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockModelInjection;
 
@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer
 {
-    public static final Gson INSTANCE = BlockModel.GSON;
+    public static Gson INSTANCE;
 
     public BlockModel deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext) throws JsonParseException
     {
