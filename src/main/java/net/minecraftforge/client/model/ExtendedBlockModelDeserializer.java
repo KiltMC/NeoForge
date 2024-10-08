@@ -32,6 +32,12 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer
     public BlockModel deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext) throws JsonParseException
     {
         BlockModel model = super.deserialize(element, targetType, deserializationContext);
+        return this.kilt$deserialize(element, targetType, deserializationContext, model);
+    }
+
+    // Kilt: Separate to allow regular deserialize to be called by other mods, while this method can be called by Kilt itself
+    public BlockModel kilt$deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext, BlockModel model) throws JsonParseException
+    {
         JsonObject jsonobject = element.getAsJsonObject();
         IUnbakedGeometry<?> geometry = deserializeGeometry(deserializationContext, jsonobject);
 

@@ -185,5 +185,9 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
             data.clear();
             data.putAll(visibilityData.data);
         }
+
+        public boolean kilt$hasAnyData() {
+            return data.isEmpty();
+        }
     }
 }
