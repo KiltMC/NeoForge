@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import com.mojang.serialization.JsonOps;
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.ItemTransformExtensions;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.block.model.BlockModel.GuiLight;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
@@ -230,6 +231,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
         return rootTransforms;
     }
 
+    @SuppressWarnings("RedundantCast")
     @VisibleForTesting
     public JsonObject toJson() {
         JsonObject root = new JsonObject();
@@ -257,7 +259,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 JsonObject transform = new JsonObject();
                 ItemTransform vec = e.getValue();
                 if (vec.equals(ItemTransform.NO_TRANSFORM)) continue;
-                var hasRightRotation = !((ItemTransformInjection) vec).getRightRotation().equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
+                var hasRightRotation = !((ItemTransformExtensions) vec).getRightRotation().equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
                 if (!vec.translation.equals(ItemTransform.Deserializer.DEFAULT_TRANSLATION)) {
                     transform.add("translation", serializeVector3f(e.getValue().translation));
                 }
@@ -268,7 +270,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     transform.add("scale", serializeVector3f(e.getValue().scale));
                 }
                 if (hasRightRotation) {
-                    transform.add("right_rotation", serializeVector3f(((ItemTransformInjection) vec).getRightRotation()));
+                    transform.add("right_rotation", serializeVector3f(((ItemTransformExtensions) vec).getRightRotation()));
                 }
                 display.add(e.getKey().getSerializedName(), transform);
             }
