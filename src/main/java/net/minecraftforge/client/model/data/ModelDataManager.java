@@ -7,7 +7,6 @@ package net.minecraftforge.client.model.data;
 
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
@@ -23,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -109,7 +107,7 @@ public class ModelDataManager
             return;
 
         ChunkPos chunk = event.getChunk().getPos();
-        modelDataManager.needModelDataRefresh.remove(chunk);
-        modelDataManager.modelDataCache.remove(chunk);
+        modelDataManager.needModelDataRefresh.remove(chunk.toLong());
+        modelDataManager.modelDataCache.remove(chunk.toLong());
     }
 }
