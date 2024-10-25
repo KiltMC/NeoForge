@@ -88,6 +88,7 @@ public interface IForgeBlockEntity extends ICapabilitySerializable<CompoundTag>,
      * or right before the first tick when the chunk is generated or loaded from disk.
      * Override instead of adding {@code if (firstTick)} stuff in update.
      */
+    @Override
      default void onLoad()
      {
          requestModelDataUpdate();
