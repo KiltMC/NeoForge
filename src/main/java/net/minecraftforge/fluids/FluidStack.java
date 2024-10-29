@@ -232,12 +232,12 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     public Component getDisplayName()
     {
-        return this.getFluid().forge$getFluidType().getDescription(this);
+        return this.getFluid().getFluidType().getDescription(this);
     }
 
     public String getTranslationKey()
     {
-        return this.getFluid().forge$getFluidType().getDescriptionId(this);
+        return this.getFluid().getFluidType().getDescriptionId(this);
     }
 
     /**

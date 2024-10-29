@@ -5,29 +5,29 @@
 
 package net.minecraftforge.fluids;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import java.util.Optional;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraftforge.common.SoundActions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public abstract class ForgeFlowingFluid extends FlowingFluid
@@ -84,7 +84,7 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     @Override
     public boolean canConvertToSource(FluidState state, Level level, BlockPos pos)
     {
-        return this.forge$getFluidType().canConvertToSource(state, level, pos);
+        return this.getFluidType().canConvertToSource(state, level, pos);
     }
 
     @Override
@@ -148,7 +148,7 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     @Override
     public Optional<SoundEvent> getPickupSound()
     {
-        return Optional.ofNullable(forge$getFluidType().getSound(SoundActions.BUCKET_FILL));
+        return Optional.ofNullable(getFluidType().getSound(SoundActions.BUCKET_FILL));
     }
 
     public static class Flowing extends ForgeFlowingFluid

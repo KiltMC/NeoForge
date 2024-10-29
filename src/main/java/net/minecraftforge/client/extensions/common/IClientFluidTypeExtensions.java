@@ -43,7 +43,7 @@ public interface IClientFluidTypeExtensions
 
     static IClientFluidTypeExtensions of(Fluid fluid)
     {
-        return of(fluid.forge$getFluidType());
+        return of(fluid.getFluidType());
     }
 
     static IClientFluidTypeExtensions of(FluidType type)
