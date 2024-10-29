@@ -5,11 +5,11 @@
 
 package net.minecraftforge.fluids.capability.wrappers;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.LiquidBlockContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlockContainer;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.FluidUtil;
@@ -73,7 +73,7 @@ public class BlockWrapper extends VoidFluidHandler
                 {
                     if (action.execute())
                     {
-                        liquidContainer.placeLiquid(world, blockPos, state, resource.getFluid().getFluidType().getStateForPlacement(world, blockPos, resource));
+                        liquidContainer.placeLiquid(world, blockPos, state, resource.getFluid().forge$getFluidType().getStateForPlacement(world, blockPos, resource));
                     }
                     return FluidType.BUCKET_VOLUME;
                 }

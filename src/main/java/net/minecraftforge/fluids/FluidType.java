@@ -26,9 +26,11 @@ import net.minecraftforge.common.SoundAction;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.mixin.FluidTypeAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
@@ -55,6 +57,41 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public static final Lazy<Integer> SIZE = Lazy.of(() -> ForgeRegistries.FLUID_TYPES.get().getKeys().size());
 
+    private static final Map<io.github.fabricators_of_create.porting_lib.fluids.FluidType, FluidType> kilt$wrappedFluidTypes = new ConcurrentHashMap<>();
+
+    public static FluidType kilt$tryGetWrappingFluidType(io.github.fabricators_of_create.porting_lib.fluids.FluidType fabricFluidType) {
+        return kilt$wrappedFluidTypes.computeIfAbsent(fabricFluidType, FluidType::new);
+    }
+
+    private io.github.fabricators_of_create.porting_lib.fluids.FluidType kilt$wrapped;
+
+    // Kilt: Wrap around the existing Porting Lib fluid type if possible
+    private FluidType(io.github.fabricators_of_create.porting_lib.fluids.FluidType wrapped)
+    {
+        super(io.github.fabricators_of_create.porting_lib.fluids.FluidType.Properties.create()
+            .descriptionId(((FluidTypeAccessor) wrapped).getDescriptionId())
+            .motionScale(((FluidTypeAccessor) wrapped).getMotionScale())
+            .canPushEntity(((FluidTypeAccessor) wrapped).isCanPushEntity())
+            .canSwim(((FluidTypeAccessor) wrapped).isCanSwim())
+            .canDrown(((FluidTypeAccessor) wrapped).isCanDrown())
+            .fallDistanceModifier(((FluidTypeAccessor) wrapped).getFallDistanceModifier())
+            .canExtinguish(((FluidTypeAccessor) wrapped).isCanExtinguish())
+            .canConvertToSource(((FluidTypeAccessor) wrapped).isCanConvertToSource())
+            .supportsBoating(((FluidTypeAccessor) wrapped).isSupportsBoating())
+            .pathType(((FluidTypeAccessor) wrapped).getPathType())
+            .adjacentPathType(((FluidTypeAccessor) wrapped).getAdjacentPathType())
+            .canHydrate(((FluidTypeAccessor) wrapped).isCanHydrate())
+            .lightLevel(((FluidTypeAccessor) wrapped).getLightLevel())
+            .density(((FluidTypeAccessor) wrapped).getDensity())
+            .temperature(((FluidTypeAccessor) wrapped).getTemperature())
+            .viscosity(((FluidTypeAccessor) wrapped).getViscosity())
+            .rarity(((FluidTypeAccessor) wrapped).getRarity())
+        );
+
+        this.kilt$wrapped = wrapped;
+        this.initClient();
+    }
+
     /**
      * Default constructor.
      *
@@ -63,12 +100,23 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
     public FluidType(final Properties properties)
     {
         super(io.github.fabricators_of_create.porting_lib.fluids.FluidType.Properties.create()
-                .adjacentPathType(properties.adjacentPathType)
-                .canConvertToSource(properties.canConvertToSource)
-                .pathType(properties.pathType)
-                .canHydrate(properties.canHydrate)
-                .canExtinguish(properties.canExtinguish)
-                .descriptionId(properties.descriptionId)
+            .descriptionId(properties.descriptionId)
+            .motionScale(properties.motionScale)
+            .canPushEntity(properties.canPushEntity)
+            .canSwim(properties.canSwim)
+            .canDrown(properties.canDrown)
+            .fallDistanceModifier(properties.fallDistanceModifier)
+            .canExtinguish(properties.canExtinguish)
+            .canConvertToSource(properties.canConvertToSource)
+            .supportsBoating(properties.supportsBoating)
+            .pathType(properties.pathType)
+            .adjacentPathType(properties.adjacentPathType)
+            .canHydrate(properties.canHydrate)
+            .lightLevel(properties.lightLevel)
+            .density(properties.density)
+            .temperature(properties.temperature)
+            .viscosity(properties.viscosity)
+            .rarity(properties.rarity)
         );
 
         this.initClient();
@@ -85,6 +133,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
     @Nullable
     public SoundEvent getSound(SoundAction action)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getSound(action.asFabric());
+
         return this.sounds.get(action.asFabric());
     }
 
@@ -100,6 +151,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
     @Nullable
     public SoundEvent getSound(Entity entity, SoundAction action)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getSound(entity, action.asFabric());
+
         return this.getSound(entity, action.asFabric());
     }
 
@@ -116,6 +170,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
     @Nullable
     public SoundEvent getSound(@Nullable Player player, BlockGetter getter, BlockPos pos, SoundAction action)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getSound(player, getter, pos, action.asFabric());
+
         return this.getSound(player, getter, pos, action.asFabric());
     }
 
@@ -129,6 +186,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public boolean canConvertToSource(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.canConvertToSource(stack);
+
         return canConvertToSource((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -143,6 +203,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
     @Nullable
     public SoundEvent getSound(FluidStack stack, SoundAction action)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getSound(stack, action.asFabric());
+
         return this.getSound(action.asFabric());
     }
 
@@ -154,6 +217,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public Component getDescription(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getDescription(stack);
+
         return Component.translatable(this.getDescriptionId(stack));
     }
 
@@ -167,6 +233,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public String getDescriptionId(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getDescriptionId(stack);
+
         return this.getDescriptionId();
     }
 
@@ -180,6 +249,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public boolean canHydrate(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.canHydrate(stack);
+
         return this.canHydrate((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -194,6 +266,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public int getLightLevel(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getLightLevel(stack);
+
         return this.getLightLevel((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -209,6 +284,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public int getDensity(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getDensity(stack);
+
         return this.getDensity((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -224,6 +302,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public int getTemperature(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getTemperature(stack);
+
         return this.getTemperature((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -240,6 +321,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public int getViscosity(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getViscosity(stack);
+
         return this.getViscosity((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -253,6 +337,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public Rarity getRarity(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getRarity(stack);
+
         return this.getRarity((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -266,6 +353,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public ItemStack getBucket(FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getBucket(stack);
+
         return getBucket((io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -280,6 +370,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public FluidState getStateForPlacement(BlockAndTintGetter getter, BlockPos pos, FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getStateForPlacement(getter, pos, stack);
+
         return getStateForPlacement(getter, pos, (io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -293,6 +386,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public final boolean canBePlacedInLevel(BlockAndTintGetter getter, BlockPos pos, FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.canBePlacedInLevel(getter, pos, stack);
+
         return canBePlacedInLevel(getter, pos, (io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -311,6 +407,9 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public boolean isVaporizedOnPlacement(Level level, BlockPos pos, FluidStack stack)
     {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.isVaporizedOnPlacement(level, pos, stack);
+
         return isVaporizedOnPlacement(level, pos, (io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
@@ -328,11 +427,19 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public void onVaporize(@Nullable Player player, Level level, BlockPos pos, FluidStack stack)
     {
+        if (kilt$wrapped != null) {
+            kilt$wrapped.onVaporize(player, level, pos, stack);
+            return;
+        }
+
         onVaporize(player, level, pos, (io.github.fabricators_of_create.porting_lib.fluids.FluidStack) stack);
     }
 
     @Override
     public String toString() {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.toString();
+
         @Nullable ResourceLocation name = ForgeRegistries.FLUID_TYPES.get().getKey(this);
         return name != null ? name.toString() : "Unregistered FluidType";
     }

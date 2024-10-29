@@ -883,6 +883,12 @@ public class ForgeHooks
             return ForgeMod.LAVA_TYPE.get();
         if (ForgeMod.MILK.filter(milk -> milk == fluid).isPresent() || ForgeMod.FLOWING_MILK.filter(milk -> milk == fluid).isPresent())
             return ForgeMod.MILK_TYPE.get();
+
+        var fabricFluidType = fluid.getFluidType();
+        if (fabricFluidType != null) {
+            return FluidType.kilt$tryGetWrappingFluidType(fabricFluidType);
+        }
+
         throw new RuntimeException("Mod fluids must override getFluidType.");
     }
 

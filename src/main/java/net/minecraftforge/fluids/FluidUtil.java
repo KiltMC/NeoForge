@@ -6,22 +6,26 @@
 package net.minecraftforge.fluids;
 
 import com.google.common.base.Preconditions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BucketPickup;
 import net.minecraft.world.level.block.LiquidBlockContainer;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.SoundActions;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -32,15 +36,10 @@ import net.minecraftforge.fluids.capability.wrappers.BucketPickupHandlerWrapper;
 import net.minecraftforge.fluids.capability.wrappers.FluidBlockWrapper;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-
-import java.util.Optional;
-
-import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class FluidUtil
 {
@@ -136,7 +135,7 @@ public class FluidUtil
                             tryFluidTransfer(containerFluidHandler, fluidSource, maxAmount, true);
                             if (player != null)
                             {
-                                SoundEvent soundevent = simulatedTransfer.getFluid().getFluidType().getSound(simulatedTransfer, SoundActions.BUCKET_FILL);
+                                SoundEvent soundevent = simulatedTransfer.getFluid().forge$getFluidType().getSound(simulatedTransfer, SoundActions.BUCKET_FILL);
 
                                 if (soundevent != null)
                                 {
@@ -190,7 +189,7 @@ public class FluidUtil
 
                     if (doDrain && player != null)
                     {
-                        SoundEvent soundevent = transfer.getFluid().getFluidType().getSound(transfer, SoundActions.BUCKET_EMPTY);
+                        SoundEvent soundevent = transfer.getFluid().forge$getFluidType().getSound(transfer, SoundActions.BUCKET_EMPTY);
 
                         if (soundevent != null)
                         {
@@ -557,7 +556,7 @@ public class FluidUtil
         }
 
         Fluid fluid = resource.getFluid();
-        if (fluid == Fluids.EMPTY || !fluid.getFluidType().canBePlacedInLevel(level, pos, resource))
+        if (fluid == Fluids.EMPTY || !fluid.forge$getFluidType().canBePlacedInLevel(level, pos, resource))
         {
             return false;
         }
@@ -579,12 +578,12 @@ public class FluidUtil
             return false; // Non-air, solid, unreplacable block. We can't put fluid here.
         }
 
-        if (fluid.getFluidType().isVaporizedOnPlacement(level, pos, resource))
+        if (fluid.forge$getFluidType().isVaporizedOnPlacement(level, pos, resource))
         {
             FluidStack result = fluidSource.drain(resource, IFluidHandler.FluidAction.EXECUTE);
             if (!result.isEmpty())
             {
-                result.getFluid().getFluidType().onVaporize(player, level, pos, result);
+                result.getFluid().forge$getFluidType().onVaporize(player, level, pos, result);
                 return true;
             }
         }
@@ -603,7 +602,7 @@ public class FluidUtil
             FluidStack result = tryFluidTransfer(handler, fluidSource, resource, true);
             if (!result.isEmpty())
             {
-                SoundEvent soundevent = resource.getFluid().getFluidType().getSound(resource, SoundActions.BUCKET_EMPTY);
+                SoundEvent soundevent = resource.getFluid().forge$getFluidType().getSound(resource, SoundActions.BUCKET_EMPTY);
 
                 if (soundevent != null)
                 {
@@ -624,7 +623,7 @@ public class FluidUtil
      */
     private static IFluidHandler getFluidBlockHandler(Fluid fluid, Level level, BlockPos pos)
     {
-        BlockState state = fluid.getFluidType().getBlockForFluidState(level, pos, fluid.defaultFluidState());
+        BlockState state = fluid.forge$getFluidType().getBlockForFluidState(level, pos, fluid.defaultFluidState());
         return new BlockWrapper(state, level, pos);
     }
 
@@ -674,6 +673,6 @@ public class FluidUtil
             }
         }
 
-        return fluid.getFluidType().getBucket(fluidStack);
+        return fluid.forge$getFluidType().getBucket(fluidStack);
     }
 }
