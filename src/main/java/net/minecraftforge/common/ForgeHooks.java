@@ -13,7 +13,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.commands.CommandSourceStack;
@@ -518,18 +517,15 @@ public class ForgeHooks
         if (itemstack.getTag() != null)
             nbt = itemstack.getTag().copy();
 
-        var transaction = Transaction.openOuter();
-        var capturedBlockSnapshots = ((LevelInjection) level).getCapturedBlockSnapshots();
-
         if (!(itemstack.getItem() instanceof BucketItem)) // if not bucket
-            level.snapshotParticipant().updateSnapshots(transaction);
+            ((LevelInjection) level).kilt$setCapturingSnapshots(true);
 
         ItemStack copy = itemstack.copy();
         InteractionResult ret = itemstack.getItem().useOn(context);
         if (itemstack.isEmpty())
             ForgeEventFactory.onPlayerDestroyItem(player, copy, context.getHand());
 
-        transaction.commit();
+        ((LevelInjection) level).kilt$setCapturingSnapshots(false);
 
         if (ret.consumesAction())
         {
@@ -541,8 +537,8 @@ public class ForgeHooks
                 newNBT = itemstack.getTag().copy();
             }
             @SuppressWarnings("unchecked")
-            List<BlockSnapshot> blockSnapshots = (List<BlockSnapshot>) capturedBlockSnapshots.clone();
-            capturedBlockSnapshots.clear();
+            List<BlockSnapshot> blockSnapshots = (List<BlockSnapshot>) ((LevelInjection) level).getCapturedBlockSnapshots().clone();
+            ((LevelInjection) level).getCapturedBlockSnapshots().clear();
 
             // make sure to set pre-placement item data for event
             itemstack.setCount(size);
@@ -566,9 +562,9 @@ public class ForgeHooks
                 // revert back all captured blocks
                 for (BlockSnapshot blocksnapshot : Lists.reverse(blockSnapshots))
                 {
-                    level.snapshotParticipant().updateSnapshots(transaction);
+                    ((LevelInjection) level).kilt$setRestoringSnapshots(true);
                     blocksnapshot.restore(true, false);
-                    transaction.commit();
+                    ((LevelInjection) level).kilt$setRestoringSnapshots(false);
                 }
             }
             else
@@ -590,8 +586,7 @@ public class ForgeHooks
                     player.awardStat(Stats.ITEM_USED.get(item));
             }
         }
-        capturedBlockSnapshots.clear();
-        transaction.close();
+        ((LevelInjection) level).getCapturedBlockSnapshots().clear();
 
         return ret;
     }
