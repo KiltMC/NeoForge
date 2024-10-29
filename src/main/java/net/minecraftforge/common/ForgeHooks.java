@@ -12,7 +12,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.Lifecycle;
+import io.github.fabricators_of_create.porting_lib.fluids.extensions.FluidExtension;
+import io.github.fabricators_of_create.porting_lib.fluids.wrapper.FluidAttributeFluidType;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.commands.CommandSourceStack;
@@ -883,6 +887,17 @@ public class ForgeHooks
             return ForgeMod.LAVA_TYPE.get();
         if (ForgeMod.MILK.filter(milk -> milk == fluid).isPresent() || ForgeMod.FLOWING_MILK.filter(milk -> milk == fluid).isPresent())
             return ForgeMod.MILK_TYPE.get();
+
+        var fabricFluidType = ((FluidExtension) fluid).getFluidType();
+        if (fabricFluidType != null) {
+            return FluidType.kilt$tryGetWrappingFluidType(fabricFluidType);
+        }
+
+        var handler = FluidVariantAttributes.getHandler(fluid);
+        if (handler != null) {
+            return FluidType.kilt$tryGetWrappingFluidType(new FluidAttributeFluidType(FluidVariant.of(fluid), handler));
+        }
+
         throw new RuntimeException("Mod fluids must override getFluidType.");
     }
 
