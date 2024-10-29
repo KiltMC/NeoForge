@@ -58,7 +58,7 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     }
 
     @Override
-    public FluidType forge$getFluidType()
+    public FluidType getFluidType()
     {
         return this.fluidType.get();
     }
