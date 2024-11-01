@@ -5,6 +5,7 @@
 
 package net.minecraftforge.fluids;
 
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -72,7 +73,7 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
     private FluidType(io.github.fabricators_of_create.porting_lib.fluids.FluidType wrapped)
     {
         super(io.github.fabricators_of_create.porting_lib.fluids.FluidType.Properties.create()
-            .descriptionId(((FluidTypeAccessor) wrapped).getDescriptionId())
+            .descriptionId(wrapped.getDescriptionId())
             .motionScale(((FluidTypeAccessor) wrapped).getMotionScale())
             .canPushEntity(((FluidTypeAccessor) wrapped).isCanPushEntity())
             .canSwim(((FluidTypeAccessor) wrapped).isCanSwim())
@@ -123,6 +124,24 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
         );
 
         this.initClient();
+    }
+
+    /**
+     * Returns the identifier representing the name of the fluid type.
+     * If no identifier was specified, then the identifier will be defaulted
+     * to {@code fluid_type.<modid>.<registry_name>}.
+     *
+     * @return the identifier representing the name of the fluid type
+     */
+    public String getDescriptionId()
+    {
+        if (kilt$wrapped != null)
+            return kilt$wrapped.getDescriptionId();
+
+        if (((FluidTypeAccessor) this).kilt$getDescriptionId() == null)
+            ((FluidTypeAccessor) this).kilt$setDescriptionId(Util.makeDescriptionId("fluid_type", ForgeRegistries.FLUID_TYPES.get().getKey(this)));
+
+        return ((FluidTypeAccessor) this).kilt$getDescriptionId();
     }
 
 
