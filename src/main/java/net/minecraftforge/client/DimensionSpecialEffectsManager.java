@@ -26,6 +26,10 @@ public final class DimensionSpecialEffectsManager
     private static ImmutableMap<ResourceLocation, DimensionSpecialEffects> EFFECTS;
     private static DimensionSpecialEffects DEFAULT_EFFECTS;
 
+    public static DimensionSpecialEffects kilt$getDefaultEffects() {
+        return DEFAULT_EFFECTS;
+    }
+
     /**
      * Finds the {@link DimensionSpecialEffects} for a given dimension type, or the default if none is registered.
      */
