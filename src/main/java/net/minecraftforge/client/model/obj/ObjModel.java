@@ -9,7 +9,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.math.Transformation;
-import joptsimple.internal.Strings;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -29,21 +28,14 @@ import net.minecraftforge.client.model.pipeline.QuadBakingVertexConsumer;
 import net.minecraftforge.client.model.renderable.CompositeRenderable;
 import net.minecraftforge.client.textures.UnitTextureAtlasSprite;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -145,7 +137,7 @@ public class ObjModel extends SimpleUnbakedGeometry<ObjModel>
 
                 case "usemtl": // Sets the current material (starts new mesh)
                 {
-                    String mat = Strings.join(Arrays.copyOfRange(line, 1, line.length), " ");
+                    String mat = Strings.join(Arrays.stream(Arrays.copyOfRange(line, 1, line.length)).iterator(), ' ');
                     ObjMaterialLibrary.Material newMat = mtllib.getMaterial(mat);
                     if (!Objects.equals(newMat, currentMat))
                     {
@@ -201,7 +193,7 @@ public class ObjModel extends SimpleUnbakedGeometry<ObjModel>
                     {
                         String vertexData = line[i + 1];
                         String[] vertexParts = vertexData.split("/");
-                        int[] vertex = Arrays.stream(vertexParts).mapToInt(num -> Strings.isNullOrEmpty(num) ? 0 : Integer.parseInt(num)).toArray();
+                        int[] vertex = Arrays.stream(vertexParts).mapToInt(num -> com.google.common.base.Strings.isNullOrEmpty(num) ? 0 : Integer.parseInt(num)).toArray();
                         if (vertex[0] < 0) vertex[0] = model.positions.size() + vertex[0];
                         else vertex[0]--;
                         if (vertex.length > 1)

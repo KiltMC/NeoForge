@@ -35,7 +35,7 @@ public class RegisterGameTestsEvent extends Event implements IModBusEvent
      * Registers an entire class to the game test registry.
      * All methods annotated with {@link GameTest} or {@link GameTestGenerator} will be registered.
      * If the set of enabled namespaces is non-empty,
-     * a method will only be registered if its {@link GameTest#templateNamespace() template namespace} is in an enabled namespace.
+     * a method will only be registered if its {@link xyz.bluspring.kilt.injections.gametest.framework.GameTestInjection#templateNamespace() template namespace} is in an enabled namespace.
      *
      * @param testClass the test class to register to the game test registry
      */
@@ -48,7 +48,7 @@ public class RegisterGameTestsEvent extends Event implements IModBusEvent
      * Registers a single method to the game test registry.
      * The method will only be registered if it is annotated with {@link GameTest} or {@link GameTestGenerator}.
      * If the set of enabled namespaces is non-empty,
-     * the method will only be registered if its {@link GameTest#templateNamespace() template namespace} is an enabled namespace.
+     * the method will only be registered if its {@link xyz.bluspring.kilt.injections.gametest.framework.GameTestInjection#templateNamespace() template namespace} is an enabled namespace.
      *
      * @param testMethod the test method to register to the game test registry
      */

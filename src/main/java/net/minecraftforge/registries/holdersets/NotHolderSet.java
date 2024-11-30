@@ -5,30 +5,23 @@
 
 package net.minecraftforge.registries.holdersets;
 
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.*;
+import net.minecraft.resources.HolderSetCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
+import net.minecraftforge.common.ForgeMod;
+import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.resources.RegistryOpsInjection;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderOwner;
-import org.jetbrains.annotations.Nullable;
-
-import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.HolderSetCodec;
-import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
-import net.minecraftforge.common.ForgeMod;
 
 /**
  * <p>Holderset that represents all elements of a registry not present in another holderset.
@@ -47,7 +40,7 @@ public class NotHolderSet<T> implements ICustomHolderSet<T>
     public static <T> Codec<? extends ICustomHolderSet<T>> codec(ResourceKey<? extends Registry<T>> registryKey, Codec<Holder<T>> holderCodec, boolean forceList)
     {
         return RecordCodecBuilder.<NotHolderSet<T>>create(builder -> builder.group(
-                RegistryOps.retrieveRegistryLookup(registryKey).forGetter(NotHolderSet::registryLookup),
+                RegistryOpsInjection.retrieveRegistryLookup(registryKey).forGetter(NotHolderSet::registryLookup),
                 HolderSetCodec.create(registryKey, holderCodec, forceList).fieldOf("value").forGetter(NotHolderSet::value)
             ).apply(builder, NotHolderSet::new));
     }

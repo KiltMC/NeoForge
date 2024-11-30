@@ -17,11 +17,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Constants;
 import net.minecraft.FileUtil;
-import net.minecraft.client.Camera;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.MouseHandler;
-import net.minecraft.client.Options;
+import net.minecraft.client.*;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.gui.Font;
@@ -47,12 +43,7 @@ import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -72,14 +63,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.locale.Language;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.ChatType;
-import net.minecraft.network.chat.ChatTypeDecoration;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentContents;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.PlayerChatMessage;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -112,33 +96,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientChatEvent;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.client.event.ClientPlayerChangeGameTypeEvent;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.ComputeFovModifierEvent;
-import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.event.MovementInputUpdateEvent;
-import net.minecraftforge.client.event.RecipesUpdatedEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.client.event.RegisterShadersEvent;
-import net.minecraftforge.client.event.RenderArmEvent;
-import net.minecraftforge.client.event.RenderBlockScreenEffectEvent;
-import net.minecraftforge.client.event.RenderHandEvent;
-import net.minecraftforge.client.event.RenderHighlightEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.client.event.ScreenshotEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.event.ToastAddEvent;
-import net.minecraftforge.client.event.ViewportEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
@@ -162,7 +120,6 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.VersionChecker;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forge.snapshots.ForgeSnapshotsModClient;
 import net.minecraftforge.gametest.ForgeGameTestHooks;
 import net.minecraftforge.network.NetworkConstants;
 import net.minecraftforge.network.NetworkRegistry;
@@ -178,21 +135,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.multiplayer.ServerDataInjection;
+import xyz.bluspring.kilt.injections.client.renderer.ShaderInstanceInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.ModelBlockRendererInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BakedQuadInjection;
+import xyz.bluspring.kilt.injections.client.renderer.texture.SpriteContentsInjection;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Stack;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -388,7 +339,7 @@ public class ForgeHooksClient
     public static void renderMainMenu(TitleScreen gui, GuiGraphics guiGraphics, Font font, int width, int height, int alpha)
     {
         VersionChecker.Status status = ForgeVersion.getStatus();
-        ForgeSnapshotsModClient.renderMainMenuWarning(status, gui, guiGraphics, font, width, height, alpha);
+        //ForgeSnapshotsModClient.renderMainMenuWarning(status, gui, guiGraphics, font, width, height, alpha);
 
         forgeStatusLine = switch(status)
         {
@@ -549,7 +500,7 @@ public class ForgeHooksClient
 
     public static boolean calculateFaceWithoutAO(BlockAndTintGetter getter, BlockState state, BlockPos pos, BakedQuad quad, boolean isFaceCubic, float[] brightness, int[] lightmap)
     {
-        if (quad.hasAmbientOcclusion())
+        if (((BakedQuadInjection) quad).hasAmbientOcclusion())
             return false;
 
         BlockPos lightmapPos = isFaceCubic ? pos.relative(quad.getDirection()) : pos;
@@ -659,7 +610,7 @@ public class ForgeHooksClient
 
     public static boolean onScreenMouseScrollPre(MouseHandler mouseHelper, Screen guiScreen, double scrollDelta)
     {
-        Window mainWindow = guiScreen.getMinecraft().getWindow();
+        Window mainWindow = Minecraft.getInstance().getWindow();
         double mouseX = mouseHelper.xpos() * (double) mainWindow.getGuiScaledWidth() / (double) mainWindow.getScreenWidth();
         double mouseY = mouseHelper.ypos() * (double) mainWindow.getGuiScaledHeight() / (double) mainWindow.getScreenHeight();
         Event event = new ScreenEvent.MouseScrolled.Pre(guiScreen, mouseX, mouseY, scrollDelta);
@@ -668,7 +619,7 @@ public class ForgeHooksClient
 
     public static void onScreenMouseScrollPost(MouseHandler mouseHelper, Screen guiScreen, double scrollDelta)
     {
-        Window mainWindow = guiScreen.getMinecraft().getWindow();
+        Window mainWindow = Minecraft.getInstance().getWindow();
         double mouseX = mouseHelper.xpos() * (double) mainWindow.getGuiScaledWidth() / (double) mainWindow.getScreenWidth();
         double mouseY = mouseHelper.ypos() * (double) mainWindow.getGuiScaledHeight() / (double) mainWindow.getScreenHeight();
         Event event = new ScreenEvent.MouseScrolled.Post(guiScreen, mouseX, mouseY, scrollDelta);
@@ -760,7 +711,7 @@ public class ForgeHooksClient
         for (var renderType : model.getRenderTypes(state, RandomSource.create(state.getSeed(pos)), ModelData.EMPTY))
         {
             VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderTypeHelper.getMovingBlockRenderType(renderType));
-            blockRenderer.getModelRenderer().tesselateBlock(level, model, state, pos, stack, vertexConsumer, checkSides, RandomSource.create(), state.getSeed(pos), packedOverlay, ModelData.EMPTY, renderType);
+            ((ModelBlockRendererInjection) blockRenderer.getModelRenderer()).tesselateBlock(level, model, state, pos, stack, vertexConsumer, checkSides, RandomSource.create(), state.getSeed(pos), packedOverlay, ModelData.EMPTY, renderType);
         }
     }
 
@@ -799,10 +750,10 @@ public class ForgeHooksClient
             int spriteX, int spriteY, int mipmapLevel
     )
     {
-        if (contents.forgeMeta == null || contents.forgeMeta.getLoader() == null)
+        if (((SpriteContentsInjection) contents).kilt$getForgeMeta() == null || ((SpriteContentsInjection) contents).kilt$getForgeMeta().getLoader() == null)
             return null;
 
-        return contents.forgeMeta.getLoader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, spriteX, spriteY, mipmapLevel);
+        return ((SpriteContentsInjection) contents).kilt$getForgeMeta().getLoader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, spriteX, spriteY, mipmapLevel);
     }
 
 
@@ -869,37 +820,37 @@ public class ForgeHooksClient
             if (fmlver > NetworkConstants.FMLNETVERSION) {
                 extraReason = "fml.menu.multiplayer.clientoutdated";
             }
-            target.forgeData = new ExtendedServerListData("FML", extraServerMods.isEmpty() && fmlNetMatches && channelsMatch && modsMatch, mods.size(), extraReason, forgeData.isTruncated());
-        }, () -> target.forgeData = new ExtendedServerListData("VANILLA", NetworkRegistry.canConnectToVanillaServer(),0, null));
+            ((ServerDataInjection) target).setForgeData(new ExtendedServerListData("FML", extraServerMods.isEmpty() && fmlNetMatches && channelsMatch && modsMatch, mods.size(), extraReason, forgeData.isTruncated()));
+        }, () -> ((ServerDataInjection) target).setForgeData(new ExtendedServerListData("VANILLA", NetworkRegistry.canConnectToVanillaServer(),0, null)));
     }
 
     private static final ResourceLocation ICON_SHEET = new ResourceLocation(ForgeVersion.MOD_ID, "textures/gui/icons.png");
     public static void drawForgePingInfo(JoinMultiplayerScreen gui, ServerData target, GuiGraphics guiGraphics, int x, int y, int width, int relativeMouseX, int relativeMouseY) {
         int idx;
         String tooltip;
-        if (target.forgeData == null)
+        if (((ServerDataInjection) target).getForgeData() == null)
             return;
-        switch (target.forgeData.type()) {
+        switch (((ServerDataInjection) target).getForgeData().type()) {
             case "FML":
-                if (target.forgeData.isCompatible()) {
+                if (((ServerDataInjection) target).getForgeData().isCompatible()) {
                     idx = 0;
-                    tooltip = ForgeI18n.parseMessage("fml.menu.multiplayer.compatible", target.forgeData.numberOfMods());
+                    tooltip = ForgeI18n.parseMessage("fml.menu.multiplayer.compatible", ((ServerDataInjection) target).getForgeData().numberOfMods());
                 } else {
                     idx = 16;
-                    if(target.forgeData.extraReason() != null) {
-                        String extraReason = ForgeI18n.parseMessage(target.forgeData.extraReason());
+                    if(((ServerDataInjection) target).getForgeData().extraReason() != null) {
+                        String extraReason = ForgeI18n.parseMessage(((ServerDataInjection) target).getForgeData().extraReason());
                         tooltip = ForgeI18n.parseMessage("fml.menu.multiplayer.incompatible.extra", extraReason);
                     } else {
                         tooltip = ForgeI18n.parseMessage("fml.menu.multiplayer.incompatible");
                     }
                 }
-                if (target.forgeData.truncated())
+                if (((ServerDataInjection) target).getForgeData().truncated())
                 {
                     tooltip += "\n" + ForgeI18n.parseMessage("fml.menu.multiplayer.truncated");
                 }
                 break;
             case "VANILLA":
-                if (target.forgeData.isCompatible()) {
+                if (((ServerDataInjection) target).getForgeData().isCompatible()) {
                     idx = 48;
                     tooltip = ForgeI18n.parseMessage("fml.menu.multiplayer.vanilla");
                 } else {
@@ -909,7 +860,7 @@ public class ForgeHooksClient
                 break;
             default:
                 idx = 64;
-                tooltip = ForgeI18n.parseMessage("fml.menu.multiplayer.unknown", target.forgeData.type());
+                tooltip = ForgeI18n.parseMessage("fml.menu.multiplayer.unknown", ((ServerDataInjection) target).getForgeData().type());
         }
 
         guiGraphics.blit(ICON_SHEET, x + width - 18, y + 10, 16, 16, 0, idx, 16, 16, 256, 256);
@@ -1016,7 +967,7 @@ public class ForgeHooksClient
         @SubscribeEvent
         public static void registerShaders(RegisterShadersEvent event) throws IOException
         {
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), new ResourceLocation("forge","rendertype_entity_unlit_translucent"), DefaultVertexFormat.NEW_ENTITY), (p_172645_) -> {
+            event.registerShader(ShaderInstanceInjection.create(event.getResourceProvider(), new ResourceLocation("forge","rendertype_entity_unlit_translucent"), DefaultVertexFormat.NEW_ENTITY), (p_172645_) -> {
                 rendertypeEntityTranslucentUnlitShader = p_172645_;
             });
         }

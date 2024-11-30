@@ -5,8 +5,8 @@
 
 package net.minecraftforge.client.extensions;
 
-import net.minecraft.client.KeyMapping;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import org.jetbrains.annotations.NotNull;
@@ -49,9 +49,10 @@ public interface IForgeKeyMapping {
     /**
      * Returns true when one of the bindings' key codes conflicts with the other's modifier.
      */
-    default boolean hasKeyModifierConflict(KeyMapping other) {
-        if (getKeyConflictContext().conflicts(other.getKeyConflictContext()) || other.getKeyConflictContext().conflicts(getKeyConflictContext())) {
-            if (getKeyModifier().matches(other.getKey()) || other.getKeyModifier().matches(getKey()))
+    default boolean hasKeyModifierConflict(KeyMapping other)
+    {
+        if (getKeyConflictContext().conflicts(((IForgeKeyMapping) other).getKeyConflictContext()) || ((IForgeKeyMapping) other).getKeyConflictContext().conflicts(getKeyConflictContext())) {
+            if (getKeyModifier().matches(((IForgeKeyMapping) other).getKey()) || ((IForgeKeyMapping) other).getKeyModifier().matches(getKey()))
                 return true;
         }
         return false;

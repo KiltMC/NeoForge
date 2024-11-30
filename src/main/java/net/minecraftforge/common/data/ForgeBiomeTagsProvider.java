@@ -14,6 +14,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraftforge.common.Tags;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -22,7 +23,9 @@ public final class ForgeBiomeTagsProvider extends BiomeTagsProvider
 
     public ForgeBiomeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper)
     {
-        super(output, lookupProvider, "forge", existingFileHelper);
+        super(output, lookupProvider);
+        ((TagsProviderInjection) (Object) this).kilt$setModId("forge");
+        ((TagsProviderInjection) (Object) this).kilt$setExistingFileHelper(existingFileHelper);
     }
 
     @Override

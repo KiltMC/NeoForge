@@ -6,23 +6,24 @@
 package net.minecraftforge.client.gui;
 
 import com.google.common.base.Strings;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.ErrorScreen;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.Util;
+import net.minecraft.client.gui.screens.ErrorScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraftforge.client.gui.widget.ExtendedButton;
 import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.fml.LoadingFailedException;
 import net.minecraftforge.fml.ModLoadingException;
 import net.minecraftforge.fml.ModLoadingWarning;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.injections.client.gui.GuiGraphicsInjection;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -88,7 +89,7 @@ public class LoadingErrorScreen extends ErrorScreen {
 
     private void drawMultiLineCenteredString(GuiGraphics guiGraphics, Font fr, Component str, int x, int y) {
         for (FormattedCharSequence s : fr.split(str, this.width)) {
-            guiGraphics.drawString(fr, s, (float) (x - fr.width(s) / 2.0), (float) y, 0xFFFFFF, true);
+            ((GuiGraphicsInjection) guiGraphics).drawString(fr, s, (float) (x - fr.width(s) / 2.0), (float) y, 0xFFFFFF, true);
             y+=fr.lineHeight;
         }
     }
@@ -149,7 +150,7 @@ public class LoadingErrorScreen extends ErrorScreen {
                 for (FormattedCharSequence string : strings)
                 {
                     if (center)
-                        guiGraphics.drawString(font, string, left + (width / 2F) - font.width(string) / 2F, (float) y, 0xFFFFFF, false);
+                        ((GuiGraphicsInjection) guiGraphics).drawString(font, string, left + (width) - font.width(string) / 2F, (float) y, 0xFFFFFF, false);
                     else
                         guiGraphics.drawString(font, string, left + 5, y, 0xFFFFFF, false);
                     y += font.lineHeight;

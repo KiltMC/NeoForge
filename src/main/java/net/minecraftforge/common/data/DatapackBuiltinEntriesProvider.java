@@ -12,6 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
+import xyz.bluspring.kilt.injections.core.RegistrySetBuilderInjection;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class DatapackBuiltinEntriesProvider extends RegistriesDatapackGenerator
      */
     public DatapackBuiltinEntriesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Set<String> modIds)
     {
-        super(output, registries, modIds);
+        super(output, registries);
     }
 
     /**
@@ -63,7 +64,7 @@ public class DatapackBuiltinEntriesProvider extends RegistriesDatapackGenerator
      */
     private static HolderLookup.Provider constructRegistries(HolderLookup.Provider original, RegistrySetBuilder datapackEntriesBuilder)
     {
-        var builderKeys = new HashSet<>(datapackEntriesBuilder.getEntryKeys());
+        var builderKeys = new HashSet<>(((RegistrySetBuilderInjection) datapackEntriesBuilder).getEntryKeys());
         DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().filter(data -> !builderKeys.contains(data.key())).forEach(data -> datapackEntriesBuilder.add(data.key(), context -> {}));
         return datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original);
     }

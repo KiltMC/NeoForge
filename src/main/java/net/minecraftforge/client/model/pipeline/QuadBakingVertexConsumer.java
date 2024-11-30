@@ -13,8 +13,10 @@ import net.minecraft.Util;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
+import net.minecraftforge.client.extensions.IForgeVertexConsumer;
 import net.minecraftforge.client.model.IQuadTransformer;
 import net.minecraftforge.client.textures.UnitTextureAtlasSprite;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BakedQuadInjection;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -26,7 +28,7 @@ import java.util.function.Consumer;
  * This consumer accepts data in {@link com.mojang.blaze3d.vertex.DefaultVertexFormat#BLOCK} and is not picky about
  * ordering or missing elements, but will not automatically populate missing data (color will be black, for example).
  */
-public class QuadBakingVertexConsumer implements VertexConsumer
+public class QuadBakingVertexConsumer implements VertexConsumer, IForgeVertexConsumer
 {
     private final Map<VertexFormatElement, Integer> ELEMENT_OFFSETS = Util.make(new IdentityHashMap<>(), map -> {
         int i = 0;
@@ -128,7 +130,7 @@ public class QuadBakingVertexConsumer implements VertexConsumer
         if (++vertexIndex != 4)
             return;
         // We have a full quad, pass it to the consumer and reset
-        quadConsumer.accept(new BakedQuad(quadData, tintIndex, direction, sprite, shade, hasAmbientOcclusion));
+        quadConsumer.accept(BakedQuadInjection.withAo(quadData, tintIndex, direction, sprite, shade, hasAmbientOcclusion));
         vertexIndex = 0;
         quadData = new int[QUAD_DATA_SIZE];
     }

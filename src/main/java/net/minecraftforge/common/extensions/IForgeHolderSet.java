@@ -32,7 +32,7 @@ public interface IForgeHolderSet<T>
     default public SerializationType serializationType()
     {
         // handle vanilla holderset types
-        return this instanceof ListBacked<T> listBacked
+        return this instanceof ListBacked<?> listBacked
             ? listBacked.unwrap().map(
                 // serializes as tag name if this holderset is named 
                 tag -> SerializationType.STRING, 

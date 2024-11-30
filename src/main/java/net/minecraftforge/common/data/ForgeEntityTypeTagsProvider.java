@@ -10,6 +10,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.common.Tags;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -18,7 +19,9 @@ public class ForgeEntityTypeTagsProvider extends EntityTypeTagsProvider
 
     public ForgeEntityTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper)
     {
-        super(output, lookupProvider, "forge", existingFileHelper);
+        super(output, lookupProvider);
+        ((TagsProviderInjection) (Object) this).kilt$setModId("forge");
+        ((TagsProviderInjection) (Object) this).kilt$setExistingFileHelper(existingFileHelper);
     }
 
     @Override

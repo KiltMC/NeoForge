@@ -18,13 +18,13 @@ import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.entity.schedule.Schedule;
+import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.world.entity.ai.BrainInjection;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * This object is used to encapsulate state found inside a {@link Brain} instance,
@@ -166,7 +166,7 @@ public class BrainBuilder<E extends LivingEntity> {
     @ApiStatus.Internal
     public Brain<E> makeBrain(Dynamic<?> dynamic) {
         Brain<E> brain = Brain.provider(this.memoryTypes, this.sensorTypes).makeBrain(dynamic);
-        brain.copyFromBuilder(this);
+        ((BrainInjection<E>) brain).copyFromBuilder(this);
         return brain;
     }
 }

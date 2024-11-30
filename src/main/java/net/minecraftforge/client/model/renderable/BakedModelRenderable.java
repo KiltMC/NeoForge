@@ -16,6 +16,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.Unit;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.extensions.IForgeVertexConsumer;
 import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
@@ -69,7 +70,7 @@ public class BakedModelRenderable implements IRenderable<BakedModelRenderable.Co
             randomSource.setSeed(context.seed());
             // Given the lack of context, the requested render type has to be null to ensure the model renders all of its geometry
             for (BakedQuad quad : model.getQuads(context.state(), direction, randomSource, context.data(), null))
-                buffer.putBulkData(poseStack.last(), quad, tint.x(), tint.y(), tint.z(), tint.w(), lightmap, overlay, true);
+                ((IForgeVertexConsumer) buffer).putBulkData(poseStack.last(), quad, tint.x(), tint.y(), tint.z(), tint.w(), lightmap, overlay, true);
         }
     }
 

@@ -64,7 +64,7 @@ public class ForgeSpawnEggItem extends SpawnEggItem
     }
 
     @Override
-    protected EntityType<?> getDefaultType() {
+    public EntityType<?> getDefaultType() {
         return this.typeSupplier.get();
     }
 

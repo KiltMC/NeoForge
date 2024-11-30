@@ -8,13 +8,9 @@ package net.minecraftforge.registries;
 import com.google.common.collect.Lists;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry.AddCallback;
-import net.minecraftforge.registries.IForgeRegistry.BakeCallback;
-import net.minecraftforge.registries.IForgeRegistry.ClearCallback;
-import net.minecraftforge.registries.IForgeRegistry.CreateCallback;
-import net.minecraftforge.registries.IForgeRegistry.MissingFactory;
-import net.minecraftforge.registries.IForgeRegistry.ValidateCallback;
+import net.minecraftforge.registries.IForgeRegistry.*;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -240,6 +236,7 @@ public class RegistryBuilder<T> {
             else
                 addCallback(new NamespacedDefaultedWrapper.Factory<T>());
         }
+
         return RegistryManager.ACTIVE.createRegistry(registryName, this);
     }
 
@@ -370,7 +367,7 @@ public class RegistryBuilder<T> {
         return this.intrusiveHolderCallback;
     }
 
-    boolean getHasWrapper()
+    public boolean getHasWrapper()
     {
         return this.hasWrapper;
     }

@@ -5,8 +5,14 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.tool.extensions.ItemStackExtensions;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,11 +23,14 @@ import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -31,6 +40,9 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
@@ -43,7 +55,7 @@ import java.util.Objects;
 /*
  * Extension added to ItemStack that bounces to ItemSack sensitive Item methods. Typically this is just for convince.
  */
-public interface IForgeItemStack extends ICapabilitySerializable<CompoundTag>
+public interface IForgeItemStack extends ICapabilitySerializable<CompoundTag>, ItemStackExtensions, io.github.fabricators_of_create.porting_lib.extensions.extensions.ItemStackExtensions
 {
     // Helpers for accessing Item data
     private ItemStack self()
@@ -151,7 +163,7 @@ public interface IForgeItemStack extends ICapabilitySerializable<CompoundTag>
      * applies specifically to enchanting an item in the enchanting table and is
      * called when retrieving the list of possible enchantments for an item.
      * Enchantments may additionally (or exclusively) be doing their own checks in
-     * {@link Enchantment#canApplyAtEnchantingTable(ItemStack)};
+     * {@link xyz.bluspring.kilt.injections.item.enchantment.EnchantmentInjection#canApplyAtEnchantingTable(ItemStack)};
      * check the individual implementation for reference. By default this will check
      * if the enchantment type is valid for this item type.
      *

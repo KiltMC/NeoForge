@@ -5,39 +5,35 @@
 
 package net.minecraftforge.common.extensions;
 
-import java.util.Collection;
-import java.util.function.BiPredicate;
-
+import io.github.fabricators_of_create.porting_lib.entity.extensions.EntityExtensions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.SoundAction;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.entity.EntityInjection;
 
-public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>
+import java.util.Collection;
+import java.util.function.BiPredicate;
+
+public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, EntityExtensions
 {
     private Entity self() { return (Entity) this; }
 
@@ -433,7 +429,7 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>
     @Deprecated(forRemoval = true, since = "1.20.1") // Remove Entity Eye/Size hooks, as they need to be redesigned
     default float getEyeHeightForge(Pose pose, EntityDimensions size)
     {
-        return self().getEyeHeightAccess(pose, size);
+        return ((EntityInjection) self()).getEyeHeightAccess(pose, size);
     }
 
     /**

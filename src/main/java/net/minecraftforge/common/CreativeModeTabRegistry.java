@@ -10,14 +10,9 @@ import com.google.common.collect.Multimap;
 import com.google.common.graph.ElementOrder;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import java.util.Comparator;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -40,14 +35,12 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import xyz.bluspring.kilt.injections.world.item.CreativeModeTabInjection;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class CreativeModeTabRegistry
@@ -209,16 +202,16 @@ public final class CreativeModeTabRegistry
         DEFAULT_TABS.add(BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.INVENTORY));
 
         final List<Holder<CreativeModeTab>> indexed = new ArrayList<>();
-        BuiltInRegistries.CREATIVE_MODE_TAB.holders().filter(c -> !DEFAULT_TABS.contains(c.get())).forEach(indexed::add);
+        BuiltInRegistries.CREATIVE_MODE_TAB.holders().filter(c -> !DEFAULT_TABS.contains(((Supplier<CreativeModeTab>) c).get())).forEach(indexed::add);
         int vanillaTabs = 10;
 
         for (int i = 0; i < vanillaTabs; i++) // Vanilla ordering
         {
             final Holder<CreativeModeTab> value = indexed.get(i);
-            final CreativeModeTab tab = value.get();
+            final CreativeModeTab tab = (CreativeModeTab) value.get();
             final ResourceLocation name = value.unwrapKey().orElseThrow().location();
 
-            if (!tab.tabsBefore.isEmpty() || !tab.tabsAfter.isEmpty())
+            if (!((CreativeModeTabInjection) tab).kilt$getTabsBefore().isEmpty() || !((CreativeModeTabInjection) tab).kilt$getTabsAfter().isEmpty())
                 addTabOrder(tab, name);
             else
             {
@@ -234,10 +227,10 @@ public final class CreativeModeTabRegistry
         for (int i = vanillaTabs; i < indexed.size(); i++)
         {
             final Holder<CreativeModeTab> value = indexed.get(i);
-            final CreativeModeTab tab = value.get();
+            final CreativeModeTab tab = (CreativeModeTab) value.get();
             final ResourceLocation name = value.unwrapKey().orElseThrow().location();
 
-            if (!tab.tabsBefore.isEmpty() || !tab.tabsAfter.isEmpty())
+            if (!((CreativeModeTabInjection) tab).kilt$getTabsBefore().isEmpty() || !((CreativeModeTabInjection) tab).kilt$getTabsAfter().isEmpty())
                 addTabOrder(tab, name);
             else // if there is no order specified ensure the tab comes after the last vanilla tab
                 edges.put(lastVanilla, name);
@@ -251,12 +244,12 @@ public final class CreativeModeTabRegistry
 
     private static void addTabOrder(CreativeModeTab tab, ResourceLocation name)
     {
-        for (final ResourceLocation after : tab.tabsAfter)
+        for (final ResourceLocation after : ((CreativeModeTabInjection) tab).kilt$getTabsAfter())
         {
             edges.put(name, after);
         }
 
-        for (final ResourceLocation before : tab.tabsBefore)
+        for (final ResourceLocation before : ((CreativeModeTabInjection) tab).kilt$getTabsBefore())
         {
             edges.put(before, name);
         }

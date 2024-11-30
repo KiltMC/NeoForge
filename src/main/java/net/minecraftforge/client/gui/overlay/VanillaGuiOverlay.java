@@ -18,6 +18,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
+import xyz.bluspring.kilt.injections.client.gui.GuiInjection;
 
 /**
  * All the vanilla {@linkplain IGuiOverlay HUD overlays} in the order that they render.
@@ -144,7 +145,7 @@ public enum VanillaGuiOverlay
             gui.setupOverlayRenderState(true, false);
             if (gui.getMinecraft().gameMode.getPlayerMode() != GameType.SPECTATOR)
             {
-                gui.renderSelectedItemName(guiGraphics, Math.max(gui.leftHeight, gui.rightHeight));
+                ((GuiInjection) gui).renderSelectedItemName(guiGraphics, Math.max(gui.leftHeight, gui.rightHeight));
             }
             else if (gui.getMinecraft().player.isSpectator())
             {

@@ -13,6 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeEntity;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
+import xyz.bluspring.kilt.injections.world.entity.EntityInjection;
 
 /**
  * EntityEvent is fired when an event involving any Entity occurs.<br>
@@ -171,7 +172,7 @@ public class EntityEvent extends Event
         public void setNewSize(EntityDimensions size, boolean updateEyeHeight) {
             this.setNewSize(size);
             if (updateEyeHeight) {
-                this.newEyeHeight = this.getEntity().getEyeHeightAccess(this.getPose(), this.newSize);
+                this.newEyeHeight = ((EntityInjection) this.getEntity()).getEyeHeightAccess(this.getPose(), this.newSize);
             }
         }
         public float getOldEyeHeight() { return oldEyeHeight; }

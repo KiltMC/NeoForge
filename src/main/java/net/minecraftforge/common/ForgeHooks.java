@@ -5,62 +5,44 @@
 
 package net.minecraftforge.common;
 
-import com.google.common.collect.Queues;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
-
+import io.github.fabricators_of_create.porting_lib.fluids.extensions.FluidExtension;
+import io.github.fabricators_of_create.porting_lib.fluids.wrapper.FluidAttributeFluidType;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.minecraft.ChatFormatting;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderSet;
+import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.ChatDecorator;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextColor;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
@@ -68,146 +50,106 @@ import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.util.datafix.fixes.StructuresBecomeConfiguredFix;
+import net.minecraft.world.Container;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectUtil;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ExperienceOrb;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.EnderMan;
-import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.inventory.AnvilMenu;
-import net.minecraft.world.Container;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
-import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.stats.Stats;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
-import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifierManager;
 import net.minecraftforge.common.loot.LootTableIdCondition;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.common.util.BrainBuilder;
-import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.common.util.MavenVersionStringHelper;
-import net.minecraftforge.common.util.MutableHashedLinkedMap;
-import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.DifficultyChangeEvent;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.GrindstoneEvent;
-import net.minecraftforge.event.ItemAttributeModifierEvent;
-import net.minecraftforge.event.ItemStackedOnOtherEvent;
-import net.minecraftforge.event.ModMismatchEvent;
-import net.minecraftforge.event.ServerChatEvent;
-import net.minecraftforge.event.RegisterStructureConversionsEvent;
-import net.minecraftforge.event.VanillaGameEvent;
+import net.minecraftforge.common.util.*;
+import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
-import net.minecraftforge.event.entity.living.EnderManAngerEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingBreatheEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingDrownEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.*;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent.ILivingTargetType;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent.ILivingTargetType;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
-import net.minecraftforge.event.entity.living.LivingMakeBrainEvent;
-import net.minecraftforge.event.entity.living.LivingSwapItemsEvent;
-import net.minecraftforge.event.entity.living.LivingUseTotemEvent;
-import net.minecraftforge.event.entity.living.LootingLevelEvent;
-import net.minecraftforge.event.entity.living.ShieldBlockEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.CriticalHitEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.living.LivingGetProjectileEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.NoteBlockEvent;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.GameData;
 import net.minecraftforge.registries.RegistryManager;
+import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.server.permission.PermissionAPI;
-
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.pattern.BlockInWorld;
-import net.minecraft.world.level.material.Fluid;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.entity.AttributeSupplierBuilderInjection;
+import xyz.bluspring.kilt.injections.world.entity.ai.BrainInjection;
+import xyz.bluspring.kilt.injections.world.inventory.AnvilMenuInjection;
+import xyz.bluspring.kilt.injections.world.level.LevelInjection;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class ForgeHooks
 {
@@ -253,7 +195,7 @@ public class ForgeHooks
 
     public static Brain<?> onLivingMakeBrain(LivingEntity entity, Brain<?> originalBrain, Dynamic<?> dynamic)
     {
-        BrainBuilder<?> brainBuilder = originalBrain.createBuilder();
+        BrainBuilder<?> brainBuilder = ((BrainInjection) originalBrain).createBuilder();
         LivingMakeBrainEvent event = new LivingMakeBrainEvent(entity, brainBuilder);
         MinecraftForge.EVENT_BUS.post(event);
         return brainBuilder.makeBrain(dynamic);
@@ -579,14 +521,14 @@ public class ForgeHooks
             nbt = itemstack.getTag().copy();
 
         if (!(itemstack.getItem() instanceof BucketItem)) // if not bucket
-            level.captureBlockSnapshots = true;
+            ((LevelInjection) level).kilt$setCapturingSnapshots(true);
 
         ItemStack copy = itemstack.copy();
         InteractionResult ret = itemstack.getItem().useOn(context);
         if (itemstack.isEmpty())
             ForgeEventFactory.onPlayerDestroyItem(player, copy, context.getHand());
 
-        level.captureBlockSnapshots = false;
+        ((LevelInjection) level).kilt$setCapturingSnapshots(false);
 
         if (ret.consumesAction())
         {
@@ -598,8 +540,8 @@ public class ForgeHooks
                 newNBT = itemstack.getTag().copy();
             }
             @SuppressWarnings("unchecked")
-            List<BlockSnapshot> blockSnapshots = (List<BlockSnapshot>)level.capturedBlockSnapshots.clone();
-            level.capturedBlockSnapshots.clear();
+            List<BlockSnapshot> blockSnapshots = (List<BlockSnapshot>) ((LevelInjection) level).getCapturedBlockSnapshots().clone();
+            ((LevelInjection) level).getCapturedBlockSnapshots().clear();
 
             // make sure to set pre-placement item data for event
             itemstack.setCount(size);
@@ -623,9 +565,9 @@ public class ForgeHooks
                 // revert back all captured blocks
                 for (BlockSnapshot blocksnapshot : Lists.reverse(blockSnapshots))
                 {
-                    level.restoringBlockSnapshots = true;
+                    ((LevelInjection) level).kilt$setRestoringSnapshots(true);
                     blocksnapshot.restore(true, false);
-                    level.restoringBlockSnapshots = false;
+                    ((LevelInjection) level).kilt$setRestoringSnapshots(false);
                 }
             }
             else
@@ -647,7 +589,7 @@ public class ForgeHooks
                     player.awardStat(Stats.ITEM_USED.get(item));
             }
         }
-        level.capturedBlockSnapshots.clear();
+        ((LevelInjection) level).getCapturedBlockSnapshots().clear();
 
         return ret;
     }
@@ -659,7 +601,7 @@ public class ForgeHooks
         if (e.getOutput().isEmpty()) return true;
 
         outputSlot.setItem(0, e.getOutput());
-        container.setMaximumCost(e.getCost());
+        ((AnvilMenuInjection) container).setMaximumCost(e.getCost());
         container.repairItemCountCost = e.getMaterialCost();
         return false;
     }
@@ -883,8 +825,8 @@ public class ForgeHooks
         if (!custom)
             ret = ForgeEventFactory.loadLootTable(name, ret);
 
-        if (ret != null)
-           ret.freeze();
+        //if (ret != null)
+        //    ret.freeze();
 
         return ret;
     }
@@ -936,6 +878,17 @@ public class ForgeHooks
             return ForgeMod.LAVA_TYPE.get();
         if (ForgeMod.MILK.filter(milk -> milk == fluid).isPresent() || ForgeMod.FLOWING_MILK.filter(milk -> milk == fluid).isPresent())
             return ForgeMod.MILK_TYPE.get();
+
+        var fabricFluidType = ((FluidExtension) fluid).getFluidType();
+        if (fabricFluidType != null) {
+            return FluidType.kilt$tryGetWrappingFluidType(fabricFluidType);
+        }
+
+        var handler = FluidVariantAttributes.getHandler(fluid);
+        if (handler != null) {
+            return FluidType.kilt$tryGetWrappingFluidType(new FluidAttributeFluidType(FluidVariant.of(fluid), handler));
+        }
+
         throw new RuntimeException("Mod fluids must override getFluidType.");
     }
 
@@ -1226,8 +1179,8 @@ public class ForgeHooks
         finalMap.forEach((k, v) ->
         {
             AttributeSupplier supplier = DefaultAttributes.getSupplier(k);
-            AttributeSupplier.Builder newBuilder = supplier != null ? new AttributeSupplier.Builder(supplier) : new AttributeSupplier.Builder();
-            newBuilder.combine(v);
+            AttributeSupplier.Builder newBuilder = supplier != null ? AttributeSupplierBuilderInjection.create(supplier) : new AttributeSupplier.Builder();
+            ((AttributeSupplierBuilderInjection) newBuilder).combine(v);
             FORGE_ATTRIBUTES.put(k, newBuilder.build());
         });
     }
@@ -1495,7 +1448,7 @@ public class ForgeHooks
         int packFormat = section.getPackFormat();
         for (PackType packType : PackType.values())
         {
-            int format = section.getPackFormat(packType);
+            int format = section.getPackFormat();
             if (format != packFormat)
             {
                 json.addProperty(makePackFormatKey(packType), format);

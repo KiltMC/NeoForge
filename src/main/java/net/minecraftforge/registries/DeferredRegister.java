@@ -18,15 +18,8 @@ import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -193,6 +186,15 @@ public class DeferredRegister<T>
         }
 
         return ret;
+    }
+
+    public <I extends T> RegistryObject<I> kilt$getValue(final String name) {
+        if (seenRegisterEvent)
+            throw new IllegalStateException("Cannot register new entries to DeferredRegister after RegisterEvent has been fired.");
+        Objects.requireNonNull(name);
+        final ResourceLocation key = new ResourceLocation(modid, name);
+
+        return RegistryObject.create(key, this.registryKey, this.modid);
     }
 
     /**

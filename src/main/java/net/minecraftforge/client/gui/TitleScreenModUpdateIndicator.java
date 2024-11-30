@@ -5,18 +5,18 @@
 
 package net.minecraftforge.client.gui;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.loading.FMLConfig;
-import net.minecraftforge.versions.forge.ForgeVersion;
-import net.minecraftforge.fml.VersionChecker;
-import net.minecraftforge.client.loading.ClientModLoader;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.loading.ClientModLoader;
+import net.minecraftforge.fml.VersionChecker;
+import net.minecraftforge.versions.forge.ForgeVersion;
 
 @OnlyIn(Dist.CLIENT)
 public class TitleScreenModUpdateIndicator extends Screen
@@ -50,7 +50,7 @@ public class TitleScreenModUpdateIndicator extends Screen
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
-        if (showNotification == null || !showNotification.shouldDraw() || !FMLConfig.getBoolConfigValue(FMLConfig.ConfigValue.VERSION_CHECK))
+        if (showNotification == null || !showNotification.shouldDraw())
         {
             return;
         }
@@ -66,7 +66,7 @@ public class TitleScreenModUpdateIndicator extends Screen
     public static TitleScreenModUpdateIndicator init(TitleScreen guiMainMenu, Button modButton)
     {
         TitleScreenModUpdateIndicator titleScreenModUpdateIndicator = new TitleScreenModUpdateIndicator(modButton);
-        titleScreenModUpdateIndicator.resize(guiMainMenu.getMinecraft(), guiMainMenu.width, guiMainMenu.height);
+        titleScreenModUpdateIndicator.resize(Minecraft.getInstance(), guiMainMenu.width, guiMainMenu.height);
         titleScreenModUpdateIndicator.init();
         return titleScreenModUpdateIndicator;
     }

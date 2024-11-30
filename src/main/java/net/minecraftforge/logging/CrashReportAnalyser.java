@@ -131,7 +131,7 @@ public final class CrashReportAnalyser {
                 if (!iModInfo.getModId().equals("forge") && !iModInfo.getModId().equals("minecraft")) {
                     Set<String> packages = new HashSet<>();
 
-                    gameLayer.findModule(iModInfo.getModId()).ifPresent(module -> packages.addAll(module.getPackages()));
+                    //gameLayer.findModule(iModInfo.getModId()).ifPresent(module -> packages.addAll(module.getPackages()));
 
                     packages.forEach(s ->  PACKAGE_MOD_CACHE.put(s, iModInfo));
                 }

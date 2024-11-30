@@ -5,16 +5,17 @@
 
 package net.minecraftforge.common.extensions;
 
-import net.minecraft.world.entity.vehicle.MinecartFurnace;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
-import net.minecraft.world.level.block.state.properties.RailShape;
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.BaseRailBlockExtensions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.MinecartFurnace;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.RailShape;
 import org.jetbrains.annotations.Nullable;
 
-public interface IForgeBaseRailBlock
+public interface IForgeBaseRailBlock extends BaseRailBlockExtensions
 {
 
     /**

@@ -127,7 +127,7 @@ public interface IForgeFriendlyByteBuf
             self().writeBoolean(false);
         } else {
             self().writeBoolean(true);
-            stack.writeToPacket(self());
+            stack.forge$writeToPacket(self());
         }
     }
 

@@ -165,10 +165,10 @@ public abstract class ModelEvent extends Event
      */
     public static class RegisterGeometryLoaders extends ModelEvent implements IModBusEvent
     {
-        private final Map<ResourceLocation, IGeometryLoader<?>> loaders;
+        private final Map<ResourceLocation, io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<?>> loaders;
 
         @ApiStatus.Internal
-        public RegisterGeometryLoaders(Map<ResourceLocation, IGeometryLoader<?>> loaders)
+        public RegisterGeometryLoaders(Map<ResourceLocation, io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<?>> loaders)
         {
             this.loaders = loaders;
         }

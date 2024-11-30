@@ -5,13 +5,14 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
+import io.github.fabricators_of_create.porting_lib.entity.extensions.LevelExtensions;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
 import java.util.Collection;
 import java.util.Collections;
 
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.entity.PartEntity;
-
-public interface IForgeLevel extends ICapabilityProvider
+public interface IForgeLevel extends ICapabilityProvider, LevelExtensions, io.github.fabricators_of_create.porting_lib.extensions.extensions.LevelExtensions, io.github.fabricators_of_create.porting_lib.transfer.internal.extensions.LevelExtensions
 {
     /**
      * The maximum radius to scan for entities when trying to check bounding boxes. Vanilla's default is

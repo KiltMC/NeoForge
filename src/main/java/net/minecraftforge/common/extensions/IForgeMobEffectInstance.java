@@ -5,15 +5,15 @@
 
 package net.minecraftforge.common.extensions;
 
-import java.util.List;
-
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.item.ItemStack;
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.MobEffectInstanceExtensions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.item.ItemStack;
 
-public interface IForgeMobEffectInstance
+import java.util.List;
+
+public interface IForgeMobEffectInstance extends MobEffectInstanceExtensions
 {
 
     /***

@@ -8,6 +8,7 @@ package net.minecraftforge.client.extensions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.client.ForgeHooksClient;
+import xyz.bluspring.kilt.injections.client.resources.language.LanguageManagerInjection;
 
 import java.util.Locale;
 
@@ -45,6 +46,6 @@ public interface IForgeMinecraft
      */
     default Locale getLocale()
     {
-        return self().getLanguageManager().getJavaLocale();
+        return ((LanguageManagerInjection) self().getLanguageManager()).getJavaLocale();
     }
 }

@@ -6,20 +6,15 @@
 package net.minecraftforge.registries;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.fabricators_of_create.porting_lib.registries.mixin.NetworkedRegistryDataAccessor;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySynchronization;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @ApiStatus.Internal
@@ -41,7 +36,7 @@ public final class DataPackRegistriesHooks
         NETWORKABLE_REGISTRIES.forEach(builder::put);
         NETWORKABLE_REGISTRIES.clear();
         NETWORKABLE_REGISTRIES.putAll(builder.build());
-        return Collections.unmodifiableMap(NETWORKABLE_REGISTRIES);
+        return ImmutableMap.ofEntries(NETWORKABLE_REGISTRIES.entrySet().toArray(Map.Entry[]::new));
     }
 
     /* Internal forge method, registers a datapack registry codec and folder. */
@@ -49,10 +44,17 @@ public final class DataPackRegistriesHooks
     {
         RegistryDataLoader.RegistryData<T> loaderData = data.loaderData();
         DATA_PACK_REGISTRIES.add(loaderData);
+        var dataCodec = loaderData.elementCodec();
         if (data.networkCodec() != null)
         {
+            var networked = NetworkedRegistryDataAccessor.createNetworkedRegistryData(loaderData.key(), data.networkCodec());
             SYNCED_CUSTOM_REGISTRIES.add(loaderData.key());
-            NETWORKABLE_REGISTRIES.put(loaderData.key(), new RegistrySynchronization.NetworkedRegistryData<>(loaderData.key(), data.networkCodec()));
+            NETWORKABLE_REGISTRIES.put(loaderData.key(), NetworkedRegistryDataAccessor.createNetworkedRegistryData(loaderData.key(), data.networkCodec()));
+            DynamicRegistries.registerSynced(loaderData.key(), dataCodec, networked.networkCodec());
+        }
+        else
+        {
+            DynamicRegistries.register(loaderData.key(), dataCodec);
         }
     }
 

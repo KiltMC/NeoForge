@@ -22,13 +22,14 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.fml.LogicalSide;
 import org.joml.Vector3d;
+import xyz.bluspring.kilt.injections.client.renderer.RenderPropertiesInjection;
 
 import java.util.function.Consumer;
 
 /**
  * {@linkplain LogicalSide#CLIENT Client-only} extensions to {@link Block}.
  *
- * @see Block#initializeClient(Consumer)
+ * @see RenderPropertiesInjection#initializeClient(Consumer)
  */
 public interface IClientBlockExtensions
 {
@@ -41,7 +42,7 @@ public interface IClientBlockExtensions
 
     static IClientBlockExtensions of(Block block)
     {
-        return block.getRenderPropertiesInternal() instanceof IClientBlockExtensions e ? e : DEFAULT;
+        return ((RenderPropertiesInjection<Block>) block).getRenderPropertiesInternal() instanceof IClientBlockExtensions e ? e : DEFAULT;
     }
 
     /**

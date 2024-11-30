@@ -5,6 +5,8 @@
 
 package net.minecraftforge.common;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -31,6 +33,10 @@ public final class ToolAction
     public static ToolAction get(String name)
     {
         return actions.computeIfAbsent(name, ToolAction::new);
+    }
+
+    public static @Nullable ToolAction kilt$getNullable(String name) {
+        return actions.get(name);
     }
 
     /**

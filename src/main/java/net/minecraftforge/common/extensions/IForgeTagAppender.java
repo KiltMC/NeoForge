@@ -5,24 +5,17 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.TagAppenderExtensions;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
-public interface IForgeTagAppender<T>
+public interface IForgeTagAppender<T> extends TagAppenderExtensions
 {
     private TagsProvider.TagAppender<T> self() {
         return (TagsProvider.TagAppender<T>) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default TagsProvider.TagAppender<T> addTags(TagKey<T>... values) {
-        TagsProvider.TagAppender<T> builder = self();
-        for (TagKey<T> value : values) {
-            builder.addTag(value);
-        }
-        return builder;
     }
 
     default TagsProvider.TagAppender<T> addOptionalTag(TagKey<T> value) {
@@ -43,7 +36,7 @@ public interface IForgeTagAppender<T>
     }
 
     default TagsProvider.TagAppender<T> replace(boolean value) {
-        self().getInternalBuilder().replace(value);
+        ((TagsProviderInjection.TagAppenderInjection) self()).getInternalBuilder().replace(value);
         return self();
     }
 
@@ -55,7 +48,7 @@ public interface IForgeTagAppender<T>
     default TagsProvider.TagAppender<T> remove(final ResourceLocation location)
     {
         TagsProvider.TagAppender<T> builder = self();
-        builder.getInternalBuilder().removeElement(location, builder.getModID());
+        ((TagsProviderInjection.TagAppenderInjection) builder).getInternalBuilder().removeElement(location, ((TagsProviderInjection.TagAppenderInjection) builder).getModID());
         return builder;
     }
 
@@ -111,7 +104,7 @@ public interface IForgeTagAppender<T>
     default TagsProvider.TagAppender<T> remove(TagKey<T> tag)
     {
         TagsProvider.TagAppender<T> builder = self();
-        builder.getInternalBuilder().removeTag(tag.location(), builder.getModID());
+        ((TagsProviderInjection.TagAppenderInjection) builder).getInternalBuilder().removeTag(tag.location(), ((TagsProviderInjection.TagAppenderInjection) builder).getModID());
         return builder;
     }
 

@@ -5,9 +5,9 @@
 
 package net.minecraftforge.common.extensions;
 
-import net.minecraft.core.Direction;
-
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.models.geometry.extensions.TransformationExtensions;
+import net.minecraft.core.Direction;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -15,7 +15,7 @@ import org.joml.Vector4f;
 /**
  * Extension interface for {@link Transformation}.
  */
-public interface IForgeTransformation
+public interface IForgeTransformation extends TransformationExtensions
 {
     private Transformation self()
     {

@@ -7,18 +7,17 @@ package net.minecraftforge.internal;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.stream.IntStream;
-
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.forge.snapshots.ForgeSnapshotsMod;
 import net.minecraftforge.versions.forge.ForgeVersion;
 import net.minecraftforge.versions.mcp.MCPVersion;
+
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.stream.IntStream;
 
 
 public class BrandingControl
@@ -32,7 +31,7 @@ public class BrandingControl
         if (brandings == null)
         {
             ImmutableList.Builder<String> brd = ImmutableList.builder();
-            brd.add(ForgeSnapshotsMod.BRANDING_NAME + ' ' + ForgeVersion.getVersion());
+            brd.add("NeoForge (Kilt)" + ' ' + ForgeVersion.getVersion());
             brd.add("Minecraft " + MCPVersion.getMCVersion());
             brd.add("MCP " + MCPVersion.getMCPVersion());
             int tModCount = ModList.get().size();
@@ -71,11 +70,11 @@ public class BrandingControl
     }
 
     public static String getClientBranding() {
-        return ForgeSnapshotsMod.BRANDING_ID;
+        return "NeoForge (Kilt)";
     }
 
     public static String getServerBranding() {
-        return ForgeSnapshotsMod.BRANDING_ID;
+        return "NeoForge (Kilt)";
     }
 
     public static ResourceManagerReloadListener resourceManagerReloadListener() {

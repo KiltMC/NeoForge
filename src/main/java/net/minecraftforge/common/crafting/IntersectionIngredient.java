@@ -101,7 +101,7 @@ public class IntersectionIngredient extends AbstractIngredient
     }
 
     @Override
-    protected void invalidate()
+    public void invalidate()
     {
         super.invalidate();
         this.intersectedMatchingStacks = null;

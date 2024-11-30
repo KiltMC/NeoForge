@@ -5,8 +5,6 @@
 
 package net.minecraftforge.client;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.world.item.CreativeModeTab;
@@ -15,6 +13,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.item.CreativeModeTabInjection;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class CreativeModeTabSearchRegistry
 {
@@ -57,7 +59,7 @@ public class CreativeModeTabSearchRegistry
         if (tab == CreativeModeTabs.searchTab())
             return SearchRegistry.CREATIVE_NAMES;
 
-        if (!tab.hasSearchBar())
+        if (!((CreativeModeTabInjection) tab).hasSearchBar())
             return null;
 
         return NAME_SEARCH_KEYS.computeIfAbsent(tab, k -> new SearchRegistry.Key<>());
@@ -69,7 +71,7 @@ public class CreativeModeTabSearchRegistry
         if (tab == CreativeModeTabs.searchTab())
             return SearchRegistry.CREATIVE_TAGS;
 
-        if (!tab.hasSearchBar())
+        if (!((CreativeModeTabInjection) tab).hasSearchBar())
             return null;
 
         return TAG_SEARCH_KEYS.computeIfAbsent(tab, k -> new SearchRegistry.Key<>());

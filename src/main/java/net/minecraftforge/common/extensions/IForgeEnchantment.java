@@ -6,11 +6,12 @@
 package net.minecraftforge.common.extensions;
 
 import net.minecraft.world.entity.MobType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import xyz.bluspring.kilt.injections.item.enchantment.EnchantmentInjection;
+
 import java.util.Set;
 
 public interface IForgeEnchantment
@@ -42,6 +43,6 @@ public interface IForgeEnchantment
         */
        default boolean allowedInCreativeTab(Item book, Set<EnchantmentCategory> allowedCategories)
        {
-           return self().isAllowedOnBooks() && allowedCategories.contains(self().category);
+           return ((EnchantmentInjection) self()).isAllowedOnBooks() && allowedCategories.contains(self().category);
        }
 }

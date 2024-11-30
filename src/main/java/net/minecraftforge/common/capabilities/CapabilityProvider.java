@@ -5,23 +5,23 @@
 
 package net.minecraftforge.common.capabilities;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
+import xyz.bluspring.kilt.workarounds.CapabilityInvalidationWorkaround;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> implements ICapabilityProviderImpl<B>
+public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> implements ICapabilityProviderImpl<B>, CapabilityInvalidationWorkaround
 {
     @VisibleForTesting
     static boolean SUPPORTS_LAZY_CAPABILITIES = true;
@@ -75,12 +75,13 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
 
     @SuppressWarnings("unchecked")
     @NotNull
-    B getProvider()
+    public B getProvider()
     {
         return (B)this;
     }
 
-    protected final @Nullable CapabilityDispatcher getCapabilities()
+    // Kilt: change protected to public
+    public final @Nullable CapabilityDispatcher getCapabilities()
     {
         if (isLazy && !initialized)
         {
@@ -157,12 +158,16 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
      * when they are finished.
      * Be sure to make your invalidate callbaks recursion safe.
      */
-    public void invalidateCaps()
+    public void kilt$invalidateCaps()
     {
         this.valid = false;
         final CapabilityDispatcher disp = getCapabilities();
         if (disp != null)
             disp.invalidate();
+    }
+
+    public void invalidateCaps() {
+        this.kilt$invalidateCaps();
     }
 
     /*
@@ -221,7 +226,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
 
         @Override
         @NotNull
-        B getProvider()
+        public B getProvider()
         {
             return owner;
         }

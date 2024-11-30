@@ -4,7 +4,7 @@
  */
 
 package net.minecraftforge.client.loading;
-
+/*
 import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -33,7 +33,7 @@ import org.lwjgl.opengl.GL30C;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Supplier;*/
 
 /**
  * This is an implementation of the LoadingOverlay that calls back into the early window rendering, as part of the
@@ -43,7 +43,7 @@ import java.util.function.Supplier;
  *
  * It is somewhat a copy of the superclass render method.
  */
-public class ForgeLoadingOverlay extends LoadingOverlay {
+/*public class ForgeLoadingOverlay extends LoadingOverlay {
     private final Minecraft minecraft;
     private final ReloadInstance reload;
     private final Consumer<Optional<Throwable>> onFinish;
@@ -161,3 +161,4 @@ public class ForgeLoadingOverlay extends LoadingOverlay {
         bufferbuilder.vertex(x1, y0, 0f).color(colour.redf(), colour.greenf(), colour.bluef(), fade).endVertex();
     }
 }
+*/

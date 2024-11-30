@@ -34,7 +34,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -47,7 +46,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.levelgen.DebugLevelSource;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.common.ForgeHooks;
@@ -69,6 +67,14 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
+import xyz.bluspring.kilt.injections.entity.SpawnPlacementsInjection;
+import xyz.bluspring.kilt.injections.world.item.ItemDisplayContextInjection;
+import xyz.bluspring.kilt.injections.world.level.levelgen.DebugLevelSourceInjection;
+
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 /**
  * INTERNAL ONLY
@@ -170,7 +176,7 @@ public class GameData {
         return new RegistryBuilder<ItemDisplayContext>()
                 .setMaxID(128 * 2) /* 0 -> 127 gets positive ID, 128 -> 256 gets negative ID */.disableOverrides().disableSaving()
                 .setDefaultKey(new ResourceLocation("minecraft:none"))
-                .onAdd(ItemDisplayContext.ADD_CALLBACK);
+                .onAdd(ItemDisplayContextInjection.ADD_CALLBACK);
     }
 
     private static <T> RegistryBuilder<T> makeRegistry(ResourceKey<? extends Registry<T>> key) {
@@ -187,7 +193,10 @@ public class GameData {
 
     public static <T> MappedRegistry<T> getWrapper(ResourceKey<? extends Registry<T>> key, Lifecycle lifecycle) {
         IForgeRegistry<T> reg = RegistryManager.ACTIVE.getRegistry(key);
-        Validate.notNull(reg, "Attempted to get vanilla wrapper for unknown registry: " + key.toString());
+
+        if (reg == null)
+            return null;
+
         @SuppressWarnings("unchecked")
         MappedRegistry<T> ret = reg.getSlaveMap(NamespacedWrapper.Factory.ID, NamespacedWrapper.class);
         Validate.notNull(ret, "Attempted to get vanilla wrapper for registry created incorrectly: " + key.toString());
@@ -196,7 +205,10 @@ public class GameData {
 
     public static <T> MappedRegistry<T> getWrapper(ResourceKey<? extends Registry<T>> key, Lifecycle lifecycle, String defKey) {
         IForgeRegistry<T> reg = RegistryManager.ACTIVE.getRegistry(key);
-        Validate.notNull(reg, "Attempted to get vanilla wrapper for unknown registry: " + key.toString());
+
+        if (reg == null)
+            return null;
+
         @SuppressWarnings("unchecked")
         MappedRegistry<T> ret = reg.getSlaveMap(NamespacedDefaultedWrapper.Factory.ID, NamespacedDefaultedWrapper.class);
         Validate.notNull(ret, "Attempted to get vanilla wrapper for registry created incorrectly: " + key.toString());
@@ -237,7 +249,7 @@ public class GameData {
     @SuppressWarnings("deprecation")
     public static void unfreezeData() {
         LOGGER.debug(REGISTRIES, "Unfreezing vanilla registries");
-        BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof MappedRegistry).forEach(r -> ((MappedRegistry<?>)r).unfreeze());
+        BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof MappedRegistry).forEach(r -> ((MappedRegistryInjection)r).unfreeze());
     }
 
     public static void freezeData()
@@ -307,8 +319,7 @@ public class GameData {
     {
         Set<ResourceLocation> keySet = new HashSet<>(RegistryManager.ACTIVE.registries.keySet());
         keySet.addAll(RegistryManager.getVanillaRegistryKeys());
-
-        Set<ResourceLocation> ordered = new LinkedHashSet<>(MappedRegistry.getKnownRegistries());
+        Set<ResourceLocation> ordered = new LinkedHashSet<>(MappedRegistryInjection.getKnownRegistries());
         ordered.retainAll(keySet);
         ordered.addAll(keySet.stream().sorted(ResourceLocation::compareNamespaced).toList());
 
@@ -348,7 +359,7 @@ public class GameData {
         } else
         {
             ForgeHooks.modifyAttributes();
-            SpawnPlacements.fireSpawnPlacementEvent();
+            SpawnPlacementsInjection.fireSpawnPlacementEvent();
             CreativeModeTabRegistry.sortTabs();
         }
     }
@@ -447,7 +458,7 @@ public class GameData {
 
                 block.getLootTable();
             }
-            DebugLevelSource.initValidStates();
+            DebugLevelSourceInjection.initValidStates();
         }
     }
 
@@ -641,8 +652,8 @@ public class GameData {
                 if (!lst.isEmpty())
                 {
                     LOGGER.error(REGISTRIES, () -> LogMessageAdapter.adapt(sb -> {
-                       sb.append("Unidentified mapping from registry ").append(name).append('\n');
-                       lst.stream().sorted().forEach(map -> sb.append('\t').append(map.key).append(": ").append(map.id).append('\n'));
+                        sb.append("Unidentified mapping from registry ").append(name).append('\n');
+                        lst.stream().sorted().forEach(map -> sb.append('\t').append(map.key).append(": ").append(map.id).append('\n'));
                     }));
                 }
                 event.getAllMappings(reg.getRegistryKey()).stream()

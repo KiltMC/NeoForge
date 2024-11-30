@@ -5,25 +5,16 @@
 
 package net.minecraftforge.registries;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -31,26 +22,18 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.util.LogMessageAdapter;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.registries.tags.ITagManager;
-import org.apache.commons.lang3.Validate;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Multimap;
-
-import io.netty.buffer.Unpooled;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
+import net.minecraft.tags.TagKey;
+import net.minecraftforge.common.util.LogMessageAdapter;
 import net.minecraftforge.common.util.TablePrinter;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.registries.tags.ITagManager;
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -58,6 +41,9 @@ import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Internal - use the public {@link IForgeRegistry} and {@link ForgeRegistries} APIs to get the data
@@ -701,9 +687,9 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         // Building a good looking table is not cheap, so only do it if the debug logger is enabled.
         if (LOGGER.isDebugEnabled(REGISTRYDUMP)) {
             TablePrinter<DumpRow> tab = new TablePrinter<DumpRow>()
-                .header("ID",    r -> r.id)
-                .header("Key",   r -> r.key)
-                .header("Value", r -> r.value);
+                    .header("ID",    r -> r.id)
+                    .header("Key",   r -> r.key)
+                    .header("Value", r -> r.value);
 
             LOGGER.debug(REGISTRYDUMP, ()-> LogMessageAdapter.adapt(sb -> {
                 sb.append("Registry Name: ").append(name).append('\n');

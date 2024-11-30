@@ -68,7 +68,7 @@ public final class GuiOverlayManager
     {
         for (var entry : VanillaGuiOverlay.values())
         {
-            overlays.put(entry.id(), entry.overlay);
+            overlays.put(entry.id(), (gui, guiGraphics, partialTick, width, height) -> {});
             orderedOverlays.add(entry.id());
         }
     }

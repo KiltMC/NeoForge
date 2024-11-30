@@ -5,29 +5,37 @@
 
 package net.minecraftforge.common;
 
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.DetectedVersion;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
-import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.commands.Commands;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.biome.Biome;
@@ -35,22 +43,13 @@ import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.item.Items;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.ExtraCodecs;
-import net.minecraft.core.RegistryCodecs;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.common.crafting.PartialNBTIngredient;
-import net.minecraftforge.common.crafting.DifferenceIngredient;
-import net.minecraftforge.common.crafting.IntersectionIngredient;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.common.data.ForgeBiomeTagsProvider;
-import net.minecraftforge.common.data.ForgeFluidTagsProvider;
-import net.minecraftforge.common.data.ForgeSpriteSourceProvider;
-import net.minecraftforge.common.data.VanillaSoundDefinitionsProvider;
+import net.minecraftforge.common.crafting.*;
+import net.minecraftforge.common.crafting.conditions.*;
+import net.minecraftforge.common.data.*;
 import net.minecraftforge.common.extensions.IForgeEntity;
 import net.minecraftforge.common.extensions.IForgePlayer;
 import net.minecraftforge.common.loot.CanToolPerformAction;
@@ -63,24 +62,23 @@ import net.minecraftforge.common.world.ForgeBiomeModifiers.RemoveSpawnsBiomeModi
 import net.minecraftforge.common.world.NoneBiomeModifier;
 import net.minecraftforge.common.world.NoneStructureModifier;
 import net.minecraftforge.common.world.StructureModifier;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fml.*;
+import net.minecraftforge.fml.CrashReportCallables;
+import net.minecraftforge.fml.IExtensionPoint;
+import net.minecraftforge.fml.StartupMessageManager;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.*;
-import net.minecraftforge.forge.snapshots.ForgeSnapshotsMod;
-import net.minecraftforge.registries.*;
-import net.minecraftforge.registries.holdersets.AndHolderSet;
-import net.minecraftforge.registries.holdersets.AnyHolderSet;
-import net.minecraftforge.registries.holdersets.HolderSetType;
-import net.minecraftforge.registries.holdersets.NotHolderSet;
-import net.minecraftforge.registries.holdersets.OrHolderSet;
-import net.minecraftforge.network.NetworkConstants;
-import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.network.NetworkConstants;
 import net.minecraftforge.network.filters.VanillaPacketSplitter;
+import net.minecraftforge.registries.*;
+import net.minecraftforge.registries.holdersets.*;
 import net.minecraftforge.server.command.EnumArgument;
 import net.minecraftforge.server.command.ModIdArgument;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
@@ -88,44 +86,23 @@ import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
 import net.minecraftforge.versions.forge.ForgeVersion;
 import net.minecraftforge.versions.mcp.MCPVersion;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import net.minecraft.data.DataGenerator;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.CompoundIngredient;
-import net.minecraftforge.common.crafting.ConditionalRecipe;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.StrictNBTIngredient;
-import net.minecraftforge.common.crafting.VanillaIngredientSerializer;
-import net.minecraftforge.common.crafting.conditions.AndCondition;
-import net.minecraftforge.common.crafting.conditions.FalseCondition;
-import net.minecraftforge.common.crafting.conditions.ItemExistsCondition;
-import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
-import net.minecraftforge.common.crafting.conditions.NotCondition;
-import net.minecraftforge.common.crafting.conditions.OrCondition;
-import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
-import net.minecraftforge.common.crafting.conditions.TrueCondition;
-import net.minecraftforge.common.data.ForgeBlockTagsProvider;
-import net.minecraftforge.common.data.ForgeEntityTypeTagsProvider;
-import net.minecraftforge.common.data.ForgeItemTagsProvider;
-import net.minecraftforge.common.data.ForgeLootTableProvider;
-import net.minecraftforge.common.data.ForgeRecipeProvider;
-import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-
-import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.commands.synchronization.ArgumentTypeInfosInjection;
+import xyz.bluspring.kilt.injections.data.DataGeneratorInjection;
+import xyz.bluspring.kilt.injections.item.crafting.IngredientInjection;
+import xyz.bluspring.kilt.injections.server.packs.metadata.pack.PackMetadataSectionInjection;
+import xyz.bluspring.kilt.injections.world.item.ItemDisplayContextInjection;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Mod("forge")
@@ -143,21 +120,21 @@ public class ForgeMod
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static final RegistryObject<EnumArgument.Info> ENUM_COMMAND_ARGUMENT_TYPE = COMMAND_ARGUMENT_TYPES.register("enum", () ->
-            ArgumentTypeInfos.registerByClass(EnumArgument.class, new EnumArgument.Info()));
+            ArgumentTypeInfosInjection.registerByClass(EnumArgument.class, new EnumArgument.Info()));
     private static final RegistryObject<SingletonArgumentInfo<ModIdArgument>> MODID_COMMAND_ARGUMENT_TYPE = COMMAND_ARGUMENT_TYPES.register("modid", () ->
-            ArgumentTypeInfos.registerByClass(ModIdArgument.class,
+            ArgumentTypeInfosInjection.registerByClass(ModIdArgument.class,
                     SingletonArgumentInfo.contextFree(ModIdArgument::modIdArgument)));
 
-    public static final RegistryObject<Attribute> SWIM_SPEED = ATTRIBUTES.register("swim_speed", () -> new RangedAttribute("forge.swim_speed", 1.0D, 0.0D, 1024.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> SWIM_SPEED = ATTRIBUTES.kilt$getValue("swim_speed");
     public static final RegistryObject<Attribute> NAMETAG_DISTANCE = ATTRIBUTES.register("nametag_distance", () -> new RangedAttribute("forge.name_tag_distance", 64.0D, 0.0D, 64.0).setSyncable(true));
-    public static final RegistryObject<Attribute> ENTITY_GRAVITY = ATTRIBUTES.register("entity_gravity", () -> new RangedAttribute("forge.entity_gravity", 0.08D, -8.0D, 8.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> ENTITY_GRAVITY = ATTRIBUTES.kilt$getValue("entity_gravity");
 
     /**
      * Reach Distance represents the distance at which a player may interact with the world.  The default is 4.5 blocks.  Players in creative mode have an additional 0.5 blocks of block reach.
      * @see IForgePlayer#getBlockReach()
      * @see IForgePlayer#canReach(BlockPos, double)
      */
-    public static final RegistryObject<Attribute> BLOCK_REACH = ATTRIBUTES.register("block_reach", () -> new RangedAttribute("forge.block_reach", 4.5D, 0.0D, 1024.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> BLOCK_REACH = ATTRIBUTES.kilt$getValue("block_reach");
 
     /**
      * Attack Range represents the distance at which a player may attack an entity.  The default is 3 blocks.  Players in creative mode have an additional 3 blocks of entity reach.
@@ -166,13 +143,13 @@ public class ForgeMod
      * @see IForgePlayer#canReach(Entity, double)
      * @see IForgePlayer#canReach(Vec3, double)
      */
-    public static final RegistryObject<Attribute> ENTITY_REACH = ATTRIBUTES.register("entity_reach", () -> new RangedAttribute("forge.entity_reach", 3.0D, 0.0D, 1024.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> ENTITY_REACH = ATTRIBUTES.kilt$getValue("entity_reach");
 
     /**
      * Step Height Addition modifies the amount of blocks an entity may walk up without jumping.
      * @see IForgeEntity#getStepHeight()
      */
-    public static final RegistryObject<Attribute> STEP_HEIGHT_ADDITION = ATTRIBUTES.register("step_height_addition", () -> new RangedAttribute("forge.step_height", 0.0D, -512.0D, 512.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> STEP_HEIGHT_ADDITION = ATTRIBUTES.kilt$getValue("step_height_addition");
 
     /**
      * Noop biome modifier. Can be used in a biome modifier json with "type": "forge:none".
@@ -417,7 +394,7 @@ public class ForgeMod
     public ForgeMod(FMLJavaModLoadingContext context)
     {
         LOGGER.info(FORGEMOD,"Forge mod loading, version {}, for MC {} with MCP {}", ForgeVersion.getVersion(), MCPVersion.getMCVersion(), MCPVersion.getMCPVersion());
-        ForgeSnapshotsMod.logStartupWarning();
+
         INSTANCE = this;
         MinecraftForge.initialize();
         CrashReportCallables.registerCrashCallable("Crash Report UUID", ()-> {
@@ -466,16 +443,24 @@ public class ForgeMod
         MinecraftForge.EVENT_BUS.addListener(this::mappingChanged);
         MinecraftForge.EVENT_BUS.addListener(this::registerPermissionNodes);
 
-        ForgeRegistries.ITEMS.tags().addOptionalTagDefaults(Tags.Items.ENCHANTING_FUELS, Set.of(ForgeRegistries.ITEMS.getDelegateOrThrow(Items.LAPIS_LAZULI)));
+        ForgeRegistries.ITEMS.tags().addOptionalTagDefaults(Tags.Items.ENCHANTING_FUELS, Set.of((Supplier<Item>) ForgeRegistries.ITEMS.getDelegateOrThrow(Items.LAPIS_LAZULI)));
 
         // TODO: Remove when addAlias becomes proper API, as this should be done in the DR's above.
         addAlias(ForgeRegistries.ATTRIBUTES, new ResourceLocation("forge", "reach_distance"), new ResourceLocation("forge", "block_reach"));
         addAlias(ForgeRegistries.ATTRIBUTES, new ResourceLocation("forge", "attack_range"), new ResourceLocation("forge", "entity_reach"));
+
+        // Kilt: Add aliases between Fabric and Forge values
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "block_reach"), new ResourceLocation("reach-entity-attributes", "reach"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "entity_reach"), new ResourceLocation("reach-entity-attributes", "attack_range"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "step_height"), new ResourceLocation("porting_lib", "step_height_addition"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "step_height_addition"), new ResourceLocation("porting_lib", "step_height_addition"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "entity_gravity"), new ResourceLocation("porting_lib", "entity_gravity"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "swim_speed"), new ResourceLocation("porting_lib", "swim_speed"));
     }
 
     public void preInit(FMLCommonSetupEvent evt)
     {
-        VersionChecker.startVersionCheck();
+        //VersionChecker.startVersionCheck();
         VanillaPacketSplitter.register();
     }
 
@@ -490,34 +475,34 @@ public class ForgeMod
 
     public void mappingChanged(IdMappingEvent evt)
     {
-        Ingredient.invalidateAll();
+        IngredientInjection.invalidateAll();
     }
 
     public void gatherData(GatherDataEvent event)
     {
         DataGenerator gen = event.getGenerator();
-        PackOutput packOutput = gen.getPackOutput();
+        PackOutput packOutput = ((DataGeneratorInjection) gen).getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-        gen.addProvider(true, new PackMetadataGenerator(packOutput)
-                .add(PackMetadataSection.TYPE, new PackMetadataSection(
+        ((DataGeneratorInjection) gen).addProvider(true, new PackMetadataGenerator(packOutput)
+                .add(PackMetadataSection.TYPE, PackMetadataSectionInjection.create(
                         Component.translatable("pack.forge.description"),
                         DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES),
                         Arrays.stream(PackType.values()).collect(Collectors.toMap(Function.identity(), DetectedVersion.BUILT_IN::getPackVersion))
                 ))
         );
         ForgeBlockTagsProvider blockTags = new ForgeBlockTagsProvider(packOutput, lookupProvider, existingFileHelper);
-        gen.addProvider(event.includeServer(), blockTags);
-        gen.addProvider(event.includeServer(), new ForgeItemTagsProvider(packOutput, lookupProvider, blockTags.contentsGetter(), existingFileHelper));
-        gen.addProvider(event.includeServer(), new ForgeEntityTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
-        gen.addProvider(event.includeServer(), new ForgeFluidTagsProvider(packOutput, lookupProvider, existingFileHelper));
-        gen.addProvider(event.includeServer(), new ForgeRecipeProvider(packOutput));
-        gen.addProvider(event.includeServer(), new ForgeLootTableProvider(packOutput));
-        gen.addProvider(event.includeServer(), new ForgeBiomeTagsProvider(packOutput, lookupProvider, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), blockTags);
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeItemTagsProvider(packOutput, lookupProvider, blockTags.contentsGetter(), existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeEntityTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeFluidTagsProvider(packOutput, lookupProvider, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeRecipeProvider(packOutput));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeLootTableProvider(packOutput));
+        ((DataGeneratorInjection) gen).addProvider(event.includeServer(), new ForgeBiomeTagsProvider(packOutput, lookupProvider, existingFileHelper));
 
-        gen.addProvider(event.includeClient(), new ForgeSpriteSourceProvider(packOutput, existingFileHelper));
-        gen.addProvider(event.includeClient(), new VanillaSoundDefinitionsProvider(packOutput, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeClient(), new ForgeSpriteSourceProvider(packOutput, existingFileHelper));
+        ((DataGeneratorInjection) gen).addProvider(event.includeClient(), new VanillaSoundDefinitionsProvider(packOutput, existingFileHelper));
     }
 
     public void missingSoundMapping(MissingMappingsEvent event)
@@ -603,7 +588,7 @@ public class ForgeMod
                 throw new IllegalStateException("Item display context was not a forge registry, wtf???");
 
             Arrays.stream(ItemDisplayContext.values())
-                    .filter(Predicate.not(ItemDisplayContext::isModded))
+                    .filter(Predicate.not((ctx) -> ((ItemDisplayContextInjection) (Object) ctx).isModded()))
                     .forEach(ctx -> forgeRegistry.register(ctx.getId(), new ResourceLocation("minecraft", ctx.getSerializedName()), ctx));
         }
     }

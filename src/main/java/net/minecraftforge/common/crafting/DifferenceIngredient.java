@@ -74,7 +74,7 @@ public class DifferenceIngredient extends AbstractIngredient
     }
 
     @Override
-    protected void invalidate()
+    public void invalidate()
     {
         super.invalidate();
         this.filteredMatchingStacks = null;

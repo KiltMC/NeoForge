@@ -11,7 +11,6 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -23,8 +22,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
+import xyz.bluspring.kilt.injections.client.gui.screens.MenuScreensInjection;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -287,8 +288,8 @@ public class PlayMessages
             ctx.get().enqueueWork(() -> {
                 try
                 {
-                    MenuScreens.getScreenFactory(msg.getType(), Minecraft.getInstance(), msg.getWindowId(), msg.getName()).ifPresent(f -> {
-                        AbstractContainerMenu c = msg.getType().create(msg.getWindowId(), Minecraft.getInstance().player.getInventory(), msg.getAdditionalData());
+                    MenuScreensInjection.getScreenFactory(msg.getType(), Minecraft.getInstance(), msg.getWindowId(), msg.getName()).ifPresent(f -> {
+                        AbstractContainerMenu c = (AbstractContainerMenu) ((IForgeMenuType<?>) msg.getType()).create(msg.getWindowId(), Minecraft.getInstance().player.getInventory(), msg.getAdditionalData());
 
                         @SuppressWarnings("unchecked") Screen s = ((MenuScreens.ScreenConstructor<AbstractContainerMenu, ?>) f).create(c, Minecraft.getInstance().player.getInventory(), msg.getName());
                         Minecraft.getInstance().player.containerMenu = ((MenuAccess<?>) s).getMenu();

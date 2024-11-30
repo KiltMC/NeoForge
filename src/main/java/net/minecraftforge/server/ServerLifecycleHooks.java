@@ -5,6 +5,48 @@
 
 package net.minecraftforge.server;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.gametest.framework.GameTestServer;
+import net.minecraft.network.Connection;
+import net.minecraft.network.ConnectionProtocol;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
+import net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LogicalSidedProvider;
+import net.minecraftforge.common.world.BiomeModifier;
+import net.minecraftforge.common.world.StructureModifier;
+import net.minecraftforge.event.server.*;
+import net.minecraftforge.fml.*;
+import net.minecraftforge.fml.config.ConfigTracker;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.forgespi.language.IModInfo;
+import net.minecraftforge.forgespi.locating.IModFile;
+import net.minecraftforge.network.ConnectionType;
+import net.minecraftforge.network.NetworkConstants;
+import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
+import net.minecraftforge.registries.GameData;
+import net.minecraftforge.resource.PathPackResources;
+import net.minecraftforge.server.permission.PermissionAPI;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import org.jetbrains.annotations.ApiStatus;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,57 +57,6 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTestServer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.server.packs.repository.RepositorySource;
-import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.common.world.StructureModifier;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.Logging;
-import net.minecraftforge.common.util.LogicalSidedProvider;
-import net.minecraftforge.common.world.BiomeModifier;
-import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.fml.ModLoadingStage;
-import net.minecraftforge.fml.ModLoadingWarning;
-import net.minecraftforge.network.ConnectionType;
-import net.minecraftforge.network.NetworkConstants;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.forgespi.locating.IModFile;
-import net.minecraftforge.registries.ForgeRegistries.Keys;
-import net.minecraftforge.resource.PathPackResources;
-import net.minecraftforge.server.permission.PermissionAPI;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
-import net.minecraft.network.Connection;
-import net.minecraft.network.ConnectionProtocol;
-import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
-import net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.config.ConfigTracker;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.forgespi.language.IModInfo;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.GameData;
-import org.jetbrains.annotations.ApiStatus;
 
 public class ServerLifecycleHooks
 {
@@ -140,7 +131,8 @@ public class ServerLifecycleHooks
             latch.countDown();
             exitLatch = null;
         }
-        ConfigTracker.INSTANCE.unloadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
+        // Kilt: Handled by ForgeConfigAPIPort
+        //ConfigTracker.INSTANCE.unloadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
     }
 
     public static MinecraftServer getCurrentServer()

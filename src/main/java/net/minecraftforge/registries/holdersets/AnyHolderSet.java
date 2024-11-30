@@ -5,26 +5,25 @@
 
 package net.minecraftforge.registries.holdersets;
 
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import net.minecraft.Util;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderOwner;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
+import net.minecraftforge.common.ForgeMod;
+import xyz.bluspring.kilt.injections.resources.RegistryOpsInjection;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
-
-import net.minecraft.Util;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderOwner;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
-import net.minecraftforge.common.ForgeMod;
 
 /**
  * <p>Holderset that represents all elements of a registry. Json format:</p>
@@ -38,7 +37,7 @@ public record AnyHolderSet<T>(HolderLookup.RegistryLookup<T> registryLookup) imp
 {
     public static <T> Codec<? extends ICustomHolderSet<T>> codec(ResourceKey<? extends Registry<T>> registryKey, Codec<Holder<T>> holderCodec, boolean forceList)
     {
-        return RegistryOps.retrieveRegistryLookup(registryKey)
+        return RegistryOpsInjection.retrieveRegistryLookup(registryKey)
             .xmap(AnyHolderSet::new, AnyHolderSet::registryLookup)
             .codec();
     }

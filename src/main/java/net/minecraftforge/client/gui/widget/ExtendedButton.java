@@ -11,6 +11,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraftforge.client.extensions.IForgeFont;
+import net.minecraftforge.client.extensions.IForgeGuiGraphics;
+import xyz.bluspring.kilt.mixin.client.gui.components.ButtonBuilderAccessor;
 
 /**
  * This class provides a button that fixes several bugs present in the vanilla GuiButton drawing code.
@@ -36,7 +39,8 @@ public class ExtendedButton extends Button
 
     public ExtendedButton(Button.Builder builder)
     {
-        super(builder);
+        super(((ButtonBuilderAccessor) builder).getX(), ((ButtonBuilderAccessor) builder).getY(), ((ButtonBuilderAccessor) builder).getWidth(), ((ButtonBuilderAccessor) builder).getHeight(), ((ButtonBuilderAccessor) builder).getMessage(), ((ButtonBuilderAccessor) builder).getOnPress(), ((ButtonBuilderAccessor) builder).getCreateNarration());
+        this.setTooltip(((ButtonBuilderAccessor) builder).getTooltip());
     }
 
     /**
@@ -47,9 +51,9 @@ public class ExtendedButton extends Button
     {
         Minecraft mc = Minecraft.getInstance();
         int k = !this.active ? 0 : (this.isHoveredOrFocused() ? 2 : 1);
-        guiGraphics.blitWithBorder(WIDGETS_LOCATION, this.getX(), this.getY(), 0, 46 + k * 20, this.width, this.height, 200, 20, 2, 3, 2, 2);
+        ((IForgeGuiGraphics) guiGraphics).blitWithBorder(WIDGETS_LOCATION, this.getX(), this.getY(), 0, 46 + k * 20, this.width, this.height, 200, 20, 2, 3, 2, 2);
 
-        final FormattedText buttonText = mc.font.ellipsize(this.getMessage(), this.width - 6); // Remove 6 pixels so that the text is always contained within the button's borders
+        final FormattedText buttonText = ((IForgeFont) mc.font).ellipsize(this.getMessage(), this.width - 6); // Remove 6 pixels so that the text is always contained within the button's borders
         guiGraphics.drawCenteredString(mc.font, Language.getInstance().getVisualOrder(buttonText), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, getFGColor());
     }
 }
