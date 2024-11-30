@@ -5,30 +5,11 @@
 
 package net.minecraftforge.client.gui;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import com.mojang.logging.LogUtils;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.server.packs.resources.IoSupplier;
-import net.minecraftforge.client.ConfigScreenHandler;
-import net.minecraftforge.client.gui.widget.ModListWidget;
-import net.minecraftforge.client.gui.widget.ScrollPanel;
-import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
-import net.minecraftforge.resource.PathPackResources;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.maven.artifact.versioning.ComparableVersion;
-
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.logging.LogUtils;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -60,11 +41,22 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.StringUtils;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
-
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
+import net.minecraftforge.resource.PathPackResources;
+import net.minecraftforge.resource.ResourcePackLoader;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ModListScreen extends Screen
 {
