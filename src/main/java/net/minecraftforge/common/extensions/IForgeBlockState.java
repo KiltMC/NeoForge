@@ -5,6 +5,7 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.extensions.BaseBlockStateExtension;
 import io.github.fabricators_of_create.porting_lib.tool.extensions.BlockStateExtensions;
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
@@ -39,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-public interface IForgeBlockState extends BlockStateExtensions, io.github.fabricators_of_create.porting_lib.extensions.extensions.BlockStateExtensions
+public interface IForgeBlockState extends BlockStateExtensions, io.github.fabricators_of_create.porting_lib.extensions.extensions.BlockStateExtensions, BaseBlockStateExtension
 {
     private BlockState self()
     {
