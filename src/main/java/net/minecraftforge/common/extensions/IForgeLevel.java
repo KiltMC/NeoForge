@@ -5,9 +5,9 @@
 
 package net.minecraftforge.common.extensions;
 
-import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
 import io.github.fabricators_of_create.porting_lib.entity.extensions.LevelExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.entity.PartEntity;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +31,7 @@ public interface IForgeLevel extends ICapabilityProvider, LevelExtensions, io.gi
      * All part entities in this world. Used when collecting entities in an AABB to fix parts being
      * ignored whose parent entity is in a chunk that does not intersect with the AABB.
      */
-    public default Collection<PartEntity<?>> getPartEntities()
+    public default Collection<PartEntity<?>> kilt$getPartEntities()
     {
         return Collections.emptyList();
     }
