@@ -41,13 +41,14 @@ var replacements = [
 
 function initializeCoreMod() {
     var mergedTargets = [];
-    for(var i = 0; i < replacements.length; i++){
+    // Kilt: Architectury already handles these, we can implement these manually if needed.
+    /*for(var i = 0; i < replacements.length; i++){
         var r = replacements[i];
         r.targets = ASMAPI.loadData(r.targets);
         for(var k = 0; k < r.targets.length; k++){
             mergedTargets.push(r.targets[k]);
         }
-    }
+    }*/
 
     return {
         'forge_method_redirector': {
