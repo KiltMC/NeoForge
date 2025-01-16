@@ -7,6 +7,7 @@ package net.minecraftforge.common.extensions;
 
 import io.github.fabricators_of_create.porting_lib.extensions.BaseBlockStateExtension;
 import io.github.fabricators_of_create.porting_lib.tool.extensions.BlockStateExtensions;
+import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-public interface IForgeBlockState extends BlockStateExtensions, io.github.fabricators_of_create.porting_lib.extensions.extensions.BlockStateExtensions, BaseBlockStateExtension
+public interface IForgeBlockState extends BlockStateExtensions, io.github.fabricators_of_create.porting_lib.extensions.extensions.BlockStateExtensions, BaseBlockStateExtension, FabricBlockState
 {
     private BlockState self()
     {
@@ -757,6 +758,7 @@ public interface IForgeBlockState extends BlockStateExtensions, io.github.fabric
      * @return The appearance of this block from the given side
      * @see IForgeBlock#getAppearance(BlockState, BlockAndTintGetter, BlockPos, Direction, BlockState, BlockPos)
      */
+    @Override
     default BlockState getAppearance(BlockAndTintGetter level, BlockPos pos, Direction side, @Nullable BlockState queryState, @Nullable BlockPos queryPos)
     {
         return self().getBlock().getAppearance(self(), level, pos, side, queryState, queryPos);
