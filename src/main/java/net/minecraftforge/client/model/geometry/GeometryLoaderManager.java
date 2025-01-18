@@ -8,6 +8,7 @@ package net.minecraftforge.client.model.geometry;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.workarounds.FabricGeometryLoaderWrapper;
 
 /**
  * Manager for {@linkplain IGeometryLoader geometry loaders}.
@@ -22,7 +23,15 @@ public final class GeometryLoaderManager
     @Nullable
     public static IGeometryLoader<?> get(ResourceLocation name)
     {
-        return (IGeometryLoader<?>) io.github.fabricators_of_create.porting_lib.models.geometry.GeometryLoaderManager.get(name);
+        var geometryLoader = io.github.fabricators_of_create.porting_lib.models.geometry.GeometryLoaderManager.get(name);
+
+        if (geometryLoader == null)
+            return null;
+
+        if (geometryLoader instanceof IGeometryLoader<?> forgeGeometryLoader)
+            return forgeGeometryLoader;
+
+        return new FabricGeometryLoaderWrapper<>(geometryLoader);
     }
 
     /**
