@@ -6,8 +6,9 @@
 package net.minecraftforge.common.extensions;
 
 import net.minecraft.core.HolderSet.ListBacked;
+import xyz.bluspring.kilt.injections.HolderSetInjection;
 
-public interface IForgeHolderSet<T>
+public interface IForgeHolderSet<T> extends HolderSetInjection
 {
     /**
      * <p>Adds a callback to run when this holderset's contents invalidate (i.e. because tags were rebound).</p>

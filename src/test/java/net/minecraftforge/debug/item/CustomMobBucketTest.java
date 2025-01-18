@@ -9,7 +9,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,6 +17,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import xyz.bluspring.kilt.injections.world.item.MobBucketItemInjection;
 
 @Mod(CustomMobBucketTest.MODID)
 public class CustomMobBucketTest
@@ -27,7 +27,7 @@ public class CustomMobBucketTest
 
     public static final boolean ENABLED = true;
 
-    public static final RegistryObject<Item> COW_BUCKET = ITEMS.register("cow_bucket", () -> new MobBucketItem(
+    public static final RegistryObject<Item> COW_BUCKET = ITEMS.register("cow_bucket", () -> MobBucketItemInjection.create(
         () -> EntityType.COW,
         () -> Fluids.WATER,
         () -> SoundEvents.BUCKET_EMPTY_FISH,

@@ -130,7 +130,9 @@ public interface IForgeItem extends ItemExtensions, io.github.fabricators_of_cre
      *
      * @return True if reparable
      */
-    boolean isRepairable(ItemStack stack);
+    default boolean isRepairable(ItemStack stack) {
+        throw new IllegalStateException();
+    }
 
     /**
     * Determines the amount of durability the mending enchantment

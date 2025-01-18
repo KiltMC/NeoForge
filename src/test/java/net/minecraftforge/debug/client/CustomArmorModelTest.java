@@ -29,6 +29,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.item.ItemInjection;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -61,7 +62,7 @@ public class CustomArmorModelTest
         }
     }
 
-    private static class TintedArmorItem extends ArmorItem
+    private static class TintedArmorItem extends ArmorItem implements ItemInjection
     {
         public TintedArmorItem(ArmorMaterial material, ArmorItem.Type slot, Properties props)
         {
@@ -83,7 +84,7 @@ public class CustomArmorModelTest
         }
     }
 
-    private static class EndermanArmorItem extends ArmorItem
+    private static class EndermanArmorItem extends ArmorItem implements ItemInjection
     {
         public EndermanArmorItem(ArmorMaterial material, ArmorItem.Type slot, Properties props)
         {

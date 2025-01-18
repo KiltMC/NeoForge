@@ -5,33 +5,36 @@
 
 package net.minecraftforge.debug.item;
 
-import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.ElytraLayer;
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import net.minecraft.world.item.Item.Properties;
-
+import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.renderer.entity.EntityRenderDispatcherInjection;
+import xyz.bluspring.kilt.injections.client.renderer.entity.layer.ElytraLayerInjection;
 
 @Mod(CustomElytraTest.MOD_ID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = CustomElytraTest.MOD_ID)
@@ -65,7 +68,7 @@ public class CustomElytraTest
     private void registerElytraLayer()
     {
         Minecraft mc = Minecraft.getInstance();
-        mc.getEntityRenderDispatcher().getSkinMap().values()
+        ((EntityRenderDispatcherInjection) mc.getEntityRenderDispatcher()).getSkinMap().values()
                 .forEach(player -> ((LivingEntityRenderer) player).addLayer(new CustomElytraLayer((LivingEntityRenderer) player, mc.getEntityModels())));
     }
 
@@ -112,7 +115,7 @@ public class CustomElytraTest
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static class CustomElytraLayer extends ElytraLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>>
+    public static class CustomElytraLayer extends ElytraLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> implements ElytraLayerInjection<AbstractClientPlayer>
     {
         private static final ResourceLocation TEXTURE_ELYTRA = new ResourceLocation(MOD_ID, "textures/entity/custom_elytra.png");
 

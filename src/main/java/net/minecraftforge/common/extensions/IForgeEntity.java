@@ -53,12 +53,19 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
         return self().saveWithoutId(ret);
     }
 
-    boolean canUpdate();
-    void canUpdate(boolean value);
+    default boolean canUpdate() {
+        throw new IllegalStateException();
+    }
+    default void canUpdate(boolean value) {
+    }
 
     @Nullable
-    Collection<ItemEntity> captureDrops();
-    Collection<ItemEntity> captureDrops(@Nullable Collection<ItemEntity> captureDrops);
+    default Collection<ItemEntity> captureDrops() {
+        throw new IllegalStateException();
+    }
+    default Collection<ItemEntity> captureDrops(@Nullable Collection<ItemEntity> captureDrops) {
+        throw new IllegalStateException();
+    }
 
 
     /**
@@ -66,7 +73,9 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      * It will be written, and read from disc, so it persists over world saves.
      * @return A NBTTagCompound
      */
-    CompoundTag getPersistentData();
+    default CompoundTag getPersistentData() {
+        throw new IllegalStateException();
+    }
 
     /**
      * Used in model rendering to determine if the entity riding this entity should be in the 'sitting' position.
@@ -127,7 +136,9 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      * @param fallDistance The fall distance
      * @return {@code true} if this entity can trample, {@code false} otherwise
      */
-    boolean canTrample(BlockState state, BlockPos pos, float fallDistance);
+    default boolean canTrample(BlockState state, BlockPos pos, float fallDistance) {
+        throw new IllegalStateException();
+    }
 
     /**
      * Returns The classification of this entity
@@ -147,7 +158,9 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      * @return True if this entity is being tracked by a world
      */
     // TODO: rename in 1.19 to isAddedToLevel
-    boolean isAddedToWorld();
+    default boolean isAddedToWorld() {
+        throw new IllegalStateException();
+    }
 
     /**
      * Called after the entity has been added to the world's
@@ -155,7 +168,9 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      * to prevent MC-136995.
      */
     // TODO: rename in 1.19 to onAddedToLevel
-    void onAddedToWorld();
+    default void onAddedToWorld() {
+        throw new IllegalStateException();
+    }
 
     /**
      * Called after the entity has been removed to the world's
@@ -163,14 +178,18 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      * to prevent MC-136995.
      */
     // TODO: rename in 1.19 to onRemovedFromLevel
-    void onRemovedFromWorld();
+    default void onRemovedFromWorld() {
+        throw new IllegalStateException();
+    }
 
     /**
      * Revives an entity that has been removed from a world.
      * Used as replacement for entity.removed = true. Having it as a function allows
      * the entity to react to being revived.
      */
-    void revive();
+    default void revive() {
+        throw new IllegalStateException();
+    }
 
 
     /**
@@ -230,7 +249,9 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      * @param type the type of the fluid
      * @return the height of the fluid compared to the entity
      */
-    double getFluidTypeHeight(FluidType type);
+    default double getFluidTypeHeight(FluidType type) {
+        throw new IllegalStateException();
+    }
 
     /**
      * Returns the fluid type which is the highest on the bounding box of
@@ -239,7 +260,9 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      * @return the fluid type which is the highest on the bounding box of
      *         the entity
      */
-    FluidType getMaxHeightFluidType();
+    default FluidType getMaxHeightFluidType() {
+        throw new IllegalStateException();
+    }
 
     /**
      * Returns whether the entity is within the fluid type of the state.
@@ -288,21 +311,27 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      * @return {@code true} if a fluid type meets the condition, {@code false}
      *         otherwise
      */
-    boolean isInFluidType(BiPredicate<FluidType, Double> predicate, boolean forAllTypes);
+    default boolean isInFluidType(BiPredicate<FluidType, Double> predicate, boolean forAllTypes) {
+        throw new IllegalStateException();
+    }
 
     /**
      * Returns whether the entity is in a fluid.
      *
      * @return {@code true} if the entity is in a fluid, {@code false} otherwise
      */
-    boolean isInFluidType();
+    default boolean isInFluidType() {
+        throw new IllegalStateException();
+    }
 
     /**
      * Returns the fluid that is on the entity's eyes.
      *
      * @return the fluid that is on the entity's eyes
      */
-    FluidType getEyeInFluidType();
+    default FluidType getEyeInFluidType() {
+        throw new IllegalStateException();
+    }
 
     /**
      * Returns whether the fluid is on the entity's eyes.

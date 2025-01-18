@@ -5,7 +5,6 @@
 
 package net.minecraftforge.debug.block;
 
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,6 +25,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import xyz.bluspring.kilt.injections.client.renderer.ItemBlockRenderTypesInjection;
 
 @Mod(HideNeighborFaceTest.MOD_ID)
 public class HideNeighborFaceTest
@@ -94,7 +94,7 @@ public class HideNeighborFaceTest
         @SubscribeEvent
         public static void onClientSetup(final FMLClientSetupEvent event)
         {
-            ItemBlockRenderTypes.setRenderLayer(GLASS_SLAB.get(), RenderType.cutout());
+            ItemBlockRenderTypesInjection.setRenderLayer(GLASS_SLAB.get(), RenderType.cutout());
         }
     }
 }

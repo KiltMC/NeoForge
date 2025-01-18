@@ -37,18 +37,20 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.model.generators.*;
+import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.item.ItemDisplayContextInjection;
 
 /**
  * Test mod for the custom transform types feature.
@@ -67,7 +69,7 @@ public class CustomItemDisplayContextTest
      @Mod.EventBusSubscriber(value= Dist.CLIENT, modid = MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
     private static class RendererEvents
     {
-        public static final ItemDisplayContext HANGING = ItemDisplayContext.create("custom_transformtype_test_hanging",  new ResourceLocation("custom_transformtype_test", "hanging"), null);
+        public static final ItemDisplayContext HANGING = ItemDisplayContextInjection.create("custom_transformtype_test_hanging",  new ResourceLocation("custom_transformtype_test", "hanging"), null);
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event)
         {

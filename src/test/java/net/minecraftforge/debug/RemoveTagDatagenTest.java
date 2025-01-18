@@ -5,9 +5,9 @@
 
 package net.minecraftforge.debug;
 
+import io.github.fabricators_of_create.porting_lib.data.PortingLibItemTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -18,17 +18,18 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import xyz.bluspring.kilt.injections.tags.BlockTagsInjection;
 
 @Mod(RemoveTagDatagenTest.MODID)
 public class RemoveTagDatagenTest {
 
     public static final String MODID = "remove_tag_datagen_test";
-    public static final TagKey<Block> TEST_TAG = BlockTags.create(new ResourceLocation("test_tag"));
+    public static final TagKey<Block> TEST_TAG = BlockTagsInjection.create(new ResourceLocation("test_tag"));
 
     public RemoveTagDatagenTest() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -55,7 +56,7 @@ public class RemoveTagDatagenTest {
 
         generator.addProvider(event.includeServer(), blocks);
 
-        generator.addProvider(event.includeServer(), new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), blocks.contentsGetter(), MODID, helper) {
+        generator.addProvider(event.includeServer(), new PortingLibItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), blocks.contentsGetter(), MODID) {
             @Override
             protected void addTags(HolderLookup.Provider provider) {
                 // This is for testing if it is functional, remove spruce_planks from planks, which makes us unable to craft beds with them.

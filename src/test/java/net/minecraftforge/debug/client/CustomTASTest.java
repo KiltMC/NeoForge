@@ -5,15 +5,14 @@
 
 package net.minecraftforge.debug.client;
 
-import java.util.Random;
-
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.client.renderer.texture.*;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.SpriteTicker;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.event.RegisterTextureAtlasSpriteLoadersEvent;
 import net.minecraftforge.client.textures.ForgeTextureMetadata;
@@ -21,11 +20,14 @@ import net.minecraftforge.client.textures.ITextureAtlasSpriteLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.renderer.texture.SpriteContentsInjection;
+
+import java.util.Random;
 
 @Mod(CustomTASTest.MOD_ID)
 public class CustomTASTest
@@ -59,7 +61,8 @@ public class CustomTASTest
             final class TASSpriteContents extends SpriteContents {
 
                 public TASSpriteContents(ResourceLocation p_249787_, FrameSize p_251031_, NativeImage p_252131_, AnimationMetadataSection p_250432_, @Nullable ForgeTextureMetadata forgeMeta) {
-                    super(p_249787_, p_251031_, p_252131_, p_250432_, forgeMeta);
+                    super(p_249787_, p_251031_, p_252131_, p_250432_);
+                    ((SpriteContentsInjection) (Object) this).kilt$setForgeMeta(forgeMeta);
                 }
 
                 @Override

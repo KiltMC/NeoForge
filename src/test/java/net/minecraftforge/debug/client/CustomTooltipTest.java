@@ -18,11 +18,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
@@ -39,6 +35,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.gui.components.ButtonBuilderInjection;
+import xyz.bluspring.kilt.mixin.client.gui.components.ButtonBuilderAccessor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -224,11 +222,18 @@ public class CustomTooltipTest
             int y = 50;
             for (var test : tooltipTests)
             {
-                addRenderableWidget(new Button.Builder(Component.literal(test.getKey()), button -> {})
-                        .bounds(x, y, 100, 20).build(b -> new Button(b) {
+                addRenderableWidget(((ButtonBuilderInjection) new Button.Builder(Component.literal(test.getKey()), button -> {})
+                        .bounds(x, y, 100, 20)).build(builder -> new Button(((ButtonBuilderAccessor) builder).getX(), ((ButtonBuilderAccessor) builder).getY(), ((ButtonBuilderAccessor) builder).getWidth(), ((ButtonBuilderAccessor) builder).getHeight(), ((ButtonBuilderAccessor) builder).getMessage(), ((ButtonBuilderAccessor) builder).getOnPress(), ((ButtonBuilderAccessor) builder).getCreateNarration()) {
+                            private boolean wasInit = false;
+
                             @Override
                             public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
                             {
+                                if (!wasInit) {
+                                    this.setTooltip(((ButtonBuilderAccessor) builder).getTooltip());
+                                    wasInit = true;
+                                }
+
                                 super.renderWidget(graphics, mouseX, mouseY, partialTick);
 
                                 boolean showTooltip = this.isHovered || this.isFocused() && Minecraft.getInstance().getLastInputType().isKeyboard();

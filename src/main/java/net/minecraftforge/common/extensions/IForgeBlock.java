@@ -346,7 +346,9 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
     * @param plantable The plant that wants to check
     * @return True to allow the plant to be planted/stay.
     */
-    boolean canSustainPlant(BlockState state, BlockGetter level, BlockPos pos, Direction facing, IPlantable plantable);
+    default boolean canSustainPlant(BlockState state, BlockGetter level, BlockPos pos, Direction facing, IPlantable plantable) {
+        throw new IllegalStateException();
+    }
 
     /**
      * Called when a tree grows on top of this block and tries to set it to dirt by the trunk placer.

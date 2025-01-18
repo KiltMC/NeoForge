@@ -5,22 +5,18 @@
 
 package net.minecraftforge.debug.client.rendering;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.logging.LogUtils;
-
-import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterShadersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.slf4j.Logger;
+import xyz.bluspring.kilt.injections.client.renderer.ShaderInstanceInjection;
+
+import java.io.IOException;
 
 @Mod(ShaderResourcesTest.MODID)
 public class ShaderResourcesTest
@@ -57,7 +53,7 @@ public class ShaderResourcesTest
             try
             {
                 event.registerShader(
-                        new ShaderInstance(
+                         ShaderInstanceInjection.create(
                                 event.getResourceProvider(),
                                 new ResourceLocation(MODID, "vertex_cubemap"),
                                 DefaultVertexFormat.POSITION),

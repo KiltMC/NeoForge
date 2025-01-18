@@ -14,6 +14,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import xyz.bluspring.kilt.injections.world.item.RarityInjection;
 
 @Mod(CustomRarityTest.MOD_ID)
 public class CustomRarityTest {
@@ -21,7 +22,7 @@ public class CustomRarityTest {
     private static final boolean ENABLED = true;
     static final String MOD_ID = "custom_rarity_test";
 
-    private static final Rarity CUSTOM_RARITY = Rarity.create(MOD_ID + "_CUSTOM", style -> style.withItalic(true).withColor(ChatFormatting.DARK_AQUA));
+    private static final Rarity CUSTOM_RARITY = RarityInjection.create(MOD_ID + "_CUSTOM", style -> style.withItalic(true).withColor(ChatFormatting.DARK_AQUA));
 
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
     private static final RegistryObject<Item> CUSTOM_ITEM = ITEMS.register(

@@ -13,7 +13,6 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.MushroomCow;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SuspiciousStewItem;
@@ -30,6 +29,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.injections.world.item.CreativeModeTabInjection;
 
 import java.util.List;
 
@@ -90,7 +90,7 @@ public class ManyMobEffectsTest
         MOB_EFFECTS.register(modBus);
         MinecraftForge.EVENT_BUS.addListener(ManyMobEffectsTest::mobInteract);
         modBus.addListener((final RegisterEvent event) -> event.register(Registries.CREATIVE_MODE_TAB, helper ->
-            helper.register(new ResourceLocation(MODID, "many_mob_effects_test"), CreativeModeTab.builder().withSearchBar()
+            helper.register(new ResourceLocation(MODID, "many_mob_effects_test"), CreativeModeTabInjection.builder().withSearchBar()
                     .icon(() -> new ItemStack(Items.POTION))
                     .displayItems((params, output) -> {
                         var stack = new ItemStack(Items.POTION);

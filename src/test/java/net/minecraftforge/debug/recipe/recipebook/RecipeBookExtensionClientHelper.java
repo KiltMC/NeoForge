@@ -12,14 +12,15 @@ import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.client.event.RegisterRecipeBookCategoriesEvent;
+import xyz.bluspring.kilt.injections.client.RecipeBookCategoriesInjection;
 
 import java.util.function.Supplier;
 
 public class RecipeBookExtensionClientHelper
 {
-    public static final Supplier<RecipeBookCategories> TESTING_SEARCH = Suppliers.memoize(() -> RecipeBookCategories.create("TESTING_SEARCH", new ItemStack(Items.COMPASS)));
-    public static final Supplier<RecipeBookCategories> TESTING_CAT_1 = Suppliers.memoize(() -> RecipeBookCategories.create("TESTING_CAT_1", new ItemStack(Items.DIAMOND)));
-    public static final Supplier<RecipeBookCategories> TESTING_CAT_2 = Suppliers.memoize(() -> RecipeBookCategories.create("TESTING_CAT_2", new ItemStack(Items.NETHERITE_INGOT)));
+    public static final Supplier<RecipeBookCategories> TESTING_SEARCH = Suppliers.memoize(() -> RecipeBookCategoriesInjection.create("TESTING_SEARCH", new ItemStack(Items.COMPASS)));
+    public static final Supplier<RecipeBookCategories> TESTING_CAT_1 = Suppliers.memoize(() -> RecipeBookCategoriesInjection.create("TESTING_CAT_1", new ItemStack(Items.DIAMOND)));
+    public static final Supplier<RecipeBookCategories> TESTING_CAT_2 = Suppliers.memoize(() -> RecipeBookCategoriesInjection.create("TESTING_CAT_2", new ItemStack(Items.NETHERITE_INGOT)));
 
     public static void init(RegisterRecipeBookCategoriesEvent event)
     {

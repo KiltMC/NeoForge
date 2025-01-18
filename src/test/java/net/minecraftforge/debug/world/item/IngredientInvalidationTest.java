@@ -34,7 +34,7 @@ public class IngredientInvalidationTest
     private static final Ingredient TEST_INGREDIENT = new Ingredient(Stream.of(new Ingredient.ItemValue(new ItemStack(Items.WHEAT))))
     {
         @Override
-        protected void invalidate()
+        public void invalidate()
         {
             super.invalidate();
             gotInvalidate = true;

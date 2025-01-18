@@ -31,6 +31,8 @@ import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import xyz.bluspring.kilt.injections.item.crafting.RecipeTypeInjection;
+import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 
 @Mod(RecipeBookExtensionTest.MOD_ID)
 public class RecipeBookExtensionTest
@@ -38,7 +40,7 @@ public class RecipeBookExtensionTest
     public static final boolean ENABLED = false;
 
     public static final String MOD_ID = "recipe_book_extension_test";
-    public static final RecipeBookType TEST_TYPE = RecipeBookType.create("TESTING");
+    public static final RecipeBookType TEST_TYPE = RecipeBookTypeInjection.create("TESTING");
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, MOD_ID);
     public static final RegistryObject<RecipeSerializer<RecipeBookTestRecipe>> RECIPE_BOOK_TEST_RECIPE_SERIALIZER =
@@ -49,7 +51,7 @@ public class RecipeBookExtensionTest
             MENU_TYPE.register("test_recipe_menu", () -> IForgeMenuType.create(RecipeBookTestMenu::new));
 
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPE = DeferredRegister.create(ForgeRegistries.RECIPE_TYPES, MOD_ID);
-    public static final RegistryObject<RecipeType<RecipeBookTestRecipe>> RECIPE_BOOK_TEST_RECIPE_TYPE = RECIPE_TYPE.register("test_recipe", () -> RecipeType.simple(getId("test_recipe")));
+    public static final RegistryObject<RecipeType<RecipeBookTestRecipe>> RECIPE_BOOK_TEST_RECIPE_TYPE = RECIPE_TYPE.register("test_recipe", () -> RecipeTypeInjection.simple(getId("test_recipe")));
 
     public RecipeBookExtensionTest()
     {

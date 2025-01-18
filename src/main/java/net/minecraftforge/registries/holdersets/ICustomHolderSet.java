@@ -6,11 +6,13 @@
 package net.minecraftforge.registries.holdersets;
 
 import net.minecraft.core.HolderSet;
+import net.minecraftforge.common.extensions.IForgeHolderSet;
+import xyz.bluspring.kilt.injections.HolderSetInjection;
 
 /**
  * Interface for mods' custom holderset types
  */
-public interface ICustomHolderSet<T> extends HolderSet<T>
+public interface ICustomHolderSet<T> extends HolderSet<T>, HolderSetInjection
 {
     /**
      * {@return HolderSetType registered to {@link ForgeRegistries.HOLDER_SET_TYPES}}
@@ -18,8 +20,8 @@ public interface ICustomHolderSet<T> extends HolderSet<T>
     HolderSetType type();
 
     @Override
-    default SerializationType serializationType()
+    default IForgeHolderSet.SerializationType serializationType()
     {
-        return SerializationType.OBJECT;
+        return IForgeHolderSet.SerializationType.OBJECT;
     }
 }

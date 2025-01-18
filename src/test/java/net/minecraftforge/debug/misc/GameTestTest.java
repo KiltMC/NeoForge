@@ -7,12 +7,14 @@ package net.minecraftforge.debug.misc;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -39,6 +41,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.workarounds.GameTestWorkaround;
 
 import java.util.List;
 
@@ -96,7 +99,7 @@ public class GameTestTest
      * The default template name converts the containing class's name to all lowercase, and the method name to all lowercase.
      * In this example, the structure name would be "gametesttest.testwood" under the "gametest_test" namespace.
      */
-    @GameTest(templateNamespace = MODID)
+    @GameTestWorkaround(templateNamespace = MODID)
     public static void testWood(GameTestHelper helper)
     {
         // The woodPos is in the bottom center of the 3x3x3 structure
@@ -146,7 +149,7 @@ public class GameTestTest
     }
 
     @PrefixGameTestTemplate(false)
-    @GameTest(templateNamespace = MODID, template = "empty3x3x3")
+    @GameTestWorkaround(templateNamespace = MODID, template = "empty3x3x3")
     public static void testHopperPickup(GameTestHelper helper)
     {
         BlockPos hopperPos = new BlockPos(1, 1, 1);
@@ -163,7 +166,7 @@ public class GameTestTest
     }
 
     @PrefixGameTestTemplate(false)
-    @GameTest(templateNamespace = MODID, template = "empty3x3x3")
+    @GameTestWorkaround(templateNamespace = MODID, template = "empty3x3x3")
     public static void testEnergyStorage(GameTestHelper helper)
     {
         BlockPos energyPos = new BlockPos(1, 1, 1);

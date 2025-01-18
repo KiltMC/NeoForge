@@ -5,17 +5,12 @@
 
 package net.minecraftforge.debug;
 
-import java.util.List;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.CreativeModeTab.TabVisibility;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.DyeItem;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -24,6 +19,10 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
+import xyz.bluspring.kilt.injections.world.item.CreativeModeTabInjection;
+import xyz.bluspring.kilt.mixin.world.item.CreativeModeTabBuilderAccessor;
+
+import java.util.List;
 
 @Mod(CreativeModeTabTest.MOD_ID)
 public class CreativeModeTabTest
@@ -48,9 +47,8 @@ public class CreativeModeTabTest
     private static void onCreativeModeTabRegister(RegisterEvent event)
     {
         event.register(Registries.CREATIVE_MODE_TAB, helper -> {
-            helper.register(LOGS, CreativeModeTab.builder().icon(() -> new ItemStack(Blocks.ACACIA_LOG))
+            helper.register(LOGS, CreativeModeTabInjection.builder().icon(() -> new ItemStack(Blocks.ACACIA_LOG))
                     .title(Component.literal("Logs"))
-                    .withLabelColor(0x00FF00)
                     .displayItems((params, output) -> {
                         output.accept(new ItemStack(Blocks.ACACIA_LOG));
                         output.accept(new ItemStack(Blocks.BIRCH_LOG));
@@ -59,8 +57,9 @@ public class CreativeModeTabTest
                         output.accept(new ItemStack(Blocks.OAK_LOG));
                         output.accept(new ItemStack(Blocks.SPRUCE_LOG));
                     })
+                    .withLabelColor(0x00FF00)
                     .build());
-            helper.register(STONE, CreativeModeTab.builder().icon(() -> new ItemStack(Blocks.STONE))
+            helper.register(STONE, CreativeModeTabInjection.builder().icon(() -> new ItemStack(Blocks.STONE))
                     .title(Component.literal("Stone"))
                     .withLabelColor(0x0000FF)
                     .displayItems((params, output) -> {
@@ -72,7 +71,7 @@ public class CreativeModeTabTest
                     .withTabsAfter(CreativeModeTabs.BUILDING_BLOCKS)
                     .build());
 
-            helper.register(new ResourceLocation(MOD_ID, "colors"), CreativeModeTab.builder().title(Component.literal("Colors"))
+            helper.register(new ResourceLocation(MOD_ID, "colors"), CreativeModeTabInjection.builder().title(Component.literal("Colors"))
                     .displayItems((params, output) ->
                     {
                         for (DyeColor color : DyeColor.values())
@@ -89,7 +88,7 @@ public class CreativeModeTabTest
             for (int i = 0; i < blocks.size(); i++)
             {
                 Block block = blocks.get(i);
-                helper.register(new ResourceLocation(MOD_ID, "dummy" + i), CreativeModeTab.builder()
+                helper.register(new ResourceLocation(MOD_ID, "dummy" + i), CreativeModeTabInjection.builder()
                       .title(Component.literal("Dummy " + i))
                       .icon(() -> new ItemStack(block))
                       .displayItems((params, output) -> output.accept(block))
@@ -98,7 +97,7 @@ public class CreativeModeTabTest
             }
 
             final ResourceLocation custom_tabs_image = new ResourceLocation(MOD_ID, "textures/gui/container/creative_inventory/custom_tabs.png");
-            helper.register(new ResourceLocation(MOD_ID, "with_tabs_image"), CreativeModeTab.builder()
+            helper.register(new ResourceLocation(MOD_ID, "with_tabs_image"), CreativeModeTabInjection.builder()
                     .title(Component.translatable("itemGroup.with_tabs_image"))
                     .icon(() -> new ItemStack(Blocks.BRICKS))
                     .displayItems((params, output) -> output.accept(Blocks.BRICKS))
@@ -138,7 +137,9 @@ public class CreativeModeTabTest
 
         public CreativeModeColorTab(CreativeModeTab.Builder builder)
         {
-            super(builder);
+            super(((CreativeModeTabBuilderAccessor) builder).getRow(), ((CreativeModeTabBuilderAccessor) builder).getColumn(), ((CreativeModeTabBuilderAccessor) builder).getType(), ((CreativeModeTabBuilderAccessor) builder).getDisplayName(), ((CreativeModeTabBuilderAccessor) builder).getIconGenerator(), ((CreativeModeTabBuilderAccessor) builder).getDisplayItemsGenerator());
+
+            kilt$assignValues(builder);
 
             DyeColor[] colors = DyeColor.values();
             iconItems = new ItemStack[colors.length];

@@ -20,13 +20,14 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
+import xyz.bluspring.kilt.injections.client.resources.sounds.SoundInstanceInjection;
 
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Tests support for custom {@link AudioStream}s ({@link SoundInstance#getStream(SoundBufferLibrary, Sound, boolean)}.
+ * Tests support for custom {@link AudioStream}s ({@link xyz.bluspring.kilt.injections.client.resources.sounds.SoundInstanceInjection#getStream(SoundBufferLibrary, Sound, boolean)}.
  *
  * When the message "sine wave" is sent in chat, this should play a sine wave of 220Hz at the player's current position.
  */
@@ -57,7 +58,7 @@ public class AudioStreamTest
         }
     }
 
-    public static class SineSound extends AbstractSoundInstance
+    public static class SineSound extends AbstractSoundInstance implements SoundInstanceInjection
     {
         protected SineSound(Vec3 position)
         {

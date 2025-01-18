@@ -5,7 +5,6 @@
 
 package net.minecraftforge.debug.client.model;
 
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -26,6 +25,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import xyz.bluspring.kilt.injections.client.renderer.ItemBlockRenderTypesInjection;
 
 import java.util.function.ToIntFunction;
 
@@ -60,7 +60,7 @@ public class CalculateNormalsTest {
         @SubscribeEvent
         public static void onClientSetup(final FMLClientSetupEvent event)
         {
-            ItemBlockRenderTypes.setRenderLayer(fire_accurate_normals_test.get(), RenderType.cutout());
+            ItemBlockRenderTypesInjection.setRenderLayer(fire_accurate_normals_test.get(), RenderType.cutout());
         }
     }
 

@@ -28,15 +28,17 @@ import net.minecraftforge.common.ForgeTier;
 import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import xyz.bluspring.kilt.injections.data.loot.BlockLootSubProviderInjection;
+import xyz.bluspring.kilt.injections.tags.BlockTagsInjection;
 
 import java.util.List;
 import java.util.Set;
@@ -48,8 +50,8 @@ public class TagBasedToolTypesTest
 {
     static final String MODID = "tag_based_tool_types";
 
-    private static final TagKey<Block> MINEABLE_TAG = BlockTags.create(new ResourceLocation(MODID, "minable/my_tool"));
-    private static final TagKey<Block> REQUIRES_TAG = BlockTags.create(new ResourceLocation(MODID, "needs_my_tier_tool"));
+    private static final TagKey<Block> MINEABLE_TAG = BlockTagsInjection.create(new ResourceLocation(MODID, "minable/my_tool"));
+    private static final TagKey<Block> REQUIRES_TAG = BlockTagsInjection.create(new ResourceLocation(MODID, "needs_my_tier_tool"));
 
     private static final Tier MY_TIER = TierSortingRegistry.registerTier(
         new ForgeTier(5, 5000, 10, 100, 0, REQUIRES_TAG, () -> Ingredient.of(Items.BEDROCK)),
@@ -122,20 +124,20 @@ public class TagBasedToolTypesTest
             }
         });
 
-        final class TestBlockLootProvider extends BlockLootSubProvider {
+        final class TestBlockLootProvider extends BlockLootSubProvider implements BlockLootSubProviderInjection {
             public TestBlockLootProvider()
             {
                 super(Set.of(), FeatureFlags.REGISTRY.allFlags());
             }
 
             @Override
-            protected Iterable<Block> getKnownBlocks()
+            public Iterable<Block> getKnownBlocks()
             {
                 return BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList());
             }
 
             @Override
-            protected void generate()
+            public void generate()
             {
                 this.dropSelf(STONE.get());
             }

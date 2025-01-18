@@ -25,7 +25,9 @@ public interface IForgeBaseRailBlock extends BaseRailBlockExtensions
      * @param pos Block's position in level
      * @return True if the rail can make corners.
      */
-    boolean isFlexibleRail(BlockState state, BlockGetter level, BlockPos pos);
+    default boolean isFlexibleRail(BlockState state, BlockGetter level, BlockPos pos) {
+        throw new IllegalStateException();
+    }
 
     /**
      * Returns true if the rail can make up and down slopes.
@@ -51,7 +53,9 @@ public interface IForgeBaseRailBlock extends BaseRailBlockExtensions
     * @param cart The cart asking for the metadata, null if it is not called by EntityMinecart.
     * @return The direction.
     */
-    RailShape getRailDirection(BlockState state, BlockGetter level, BlockPos pos, @Nullable AbstractMinecart cart);
+    default RailShape getRailDirection(BlockState state, BlockGetter level, BlockPos pos, @Nullable AbstractMinecart cart) {
+        throw new IllegalStateException();
+    }
 
     /**
      * Returns the max speed of the rail at the specified position.

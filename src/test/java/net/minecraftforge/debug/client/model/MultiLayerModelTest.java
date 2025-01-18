@@ -5,13 +5,12 @@
 
 package net.minecraftforge.debug.client.model;
 
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -20,6 +19,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import xyz.bluspring.kilt.injections.client.renderer.ItemBlockRenderTypesInjection;
 
 @Mod(MultiLayerModelTest.MODID)
 public class MultiLayerModelTest
@@ -55,7 +55,7 @@ public class MultiLayerModelTest
 
     private void clientSetup(FMLClientSetupEvent event)
     {
-        ItemBlockRenderTypes.setRenderLayer(TEST_BLOCK.get(), (layer) -> {
+        ItemBlockRenderTypesInjection.setRenderLayer(TEST_BLOCK.get(), (layer) -> {
             return layer == RenderType.solid() || layer == RenderType.translucent();
         });
     }

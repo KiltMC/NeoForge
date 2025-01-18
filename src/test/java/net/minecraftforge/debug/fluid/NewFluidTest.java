@@ -5,43 +5,34 @@
 
 package net.minecraftforge.debug.fluid;
 
-import net.minecraft.world.item.*;
-import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.*;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.fluids.DispenseFluidContainer;
-import net.minecraftforge.fluids.FluidType;
-import org.apache.commons.lang3.Validate;
-
-import net.minecraft.world.level.material.FlowingFluid;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fluids.DispenseFluidContainer;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.RegistryObject;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.item.BucketItemInjection;
+import xyz.bluspring.kilt.injections.world.level.block.LiquidBlockInjection;
 
 import java.util.function.Consumer;
 
@@ -109,10 +100,10 @@ public class NewFluidTest
     );
 
     public static RegistryObject<LiquidBlock> test_fluid_block = BLOCKS.register("test_fluid_block", () ->
-            new LiquidBlock(test_fluid, Properties.of().noCollission().strength(100.0F).noLootTable())
+            LiquidBlockInjection.create(test_fluid, Properties.of().noCollission().strength(100.0F).noLootTable())
     );
     public static RegistryObject<Item> TEST_FLUID_BUCKET = ITEMS.register("test_fluid_bucket", () ->
-            new BucketItem(test_fluid, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1))
+            BucketItemInjection.create(test_fluid, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1))
     );
 
     // WARNING: this doesn't allow "any fluid", only the fluid from this test mod!
