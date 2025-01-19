@@ -149,6 +149,9 @@ public class ForgeHooksClient
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker CLIENTHOOKS = MarkerManager.getMarker("CLIENTHOOKS");
 
+    // Kilt: Allows checking if the returned event result is the default.
+    public static final AtomicBoolean kilt$isDefault = new AtomicBoolean(false);
+
     //private static final ResourceLocation ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
 
     /**
@@ -310,6 +313,10 @@ public class ForgeHooksClient
     {
         ComputeFovModifierEvent fovModifierEvent = new ComputeFovModifierEvent(entity, fovModifier);
         MinecraftForge.EVENT_BUS.post(fovModifierEvent);
+
+        if (fovModifierEvent.kilt$modifiedFovModifier == fovModifierEvent.getNewFovModifier())
+            kilt$isDefault.set(true);
+
         return fovModifierEvent.getNewFovModifier();
     }
 

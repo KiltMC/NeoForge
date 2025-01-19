@@ -30,12 +30,15 @@ public class ComputeFovModifierEvent extends Event
     private final float fovModifier;
     private float newFovModifier;
 
+    public final float kilt$modifiedFovModifier;
+
     @ApiStatus.Internal
     public ComputeFovModifierEvent(Player player, float fovModifier)
     {
         this.player = player;
         this.fovModifier = fovModifier;
         this.setNewFovModifier((float) Mth.lerp(Minecraft.getInstance().options.fovEffectScale().get(), 1.0F, fovModifier));
+        this.kilt$modifiedFovModifier = this.newFovModifier;
     }
 
     /**
