@@ -84,11 +84,14 @@ import java.io.File;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public class ForgeEventFactory
 {
+    // Kilt: Used to check if an event result is its default value
+    public static final AtomicBoolean kilt$isDefault = new AtomicBoolean(false);
 
     public static boolean onMultiBlockPlace(@Nullable Entity entity, List<BlockSnapshot> blockSnapshots, Direction direction)
     {
@@ -153,10 +156,12 @@ public class ForgeEventFactory
      */
     public static boolean checkSpawnPosition(Mob mob, ServerLevelAccessor level, MobSpawnType spawnType)
     {
+        kilt$isDefault.set(false);
         var event = new PositionCheck(mob, level, spawnType, null);
         MinecraftForge.EVENT_BUS.post(event);
         if (event.getResult() == Result.DEFAULT)
         {
+            kilt$isDefault.set(true);
             return mob.checkSpawnRules(level, spawnType) && mob.checkSpawnObstruction(level);
         }
         return event.getResult() == Result.ALLOW;
