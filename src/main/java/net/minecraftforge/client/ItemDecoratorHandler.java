@@ -8,13 +8,11 @@ package net.minecraftforge.client;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.gui.Font;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
 import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.fml.ModLoadingContext;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
@@ -42,7 +40,7 @@ public final class ItemDecoratorHandler
     {
         var decorators = new HashMap<Item, List<IItemDecorator>>();
         var event = new RegisterItemDecorationsEvent(decorators);
-        ModLoader.get().postEventWithWrapInModOrder(event, (mc, e) -> ModLoadingContext.get().setActiveContainer(mc), (mc, e) -> ModLoadingContext.get().setActiveContainer(null));
+        ModLoader.get().kiltPostEventWrappingMods(event);
         var builder = new ImmutableMap.Builder<Item, ItemDecoratorHandler>();
         decorators.forEach((item, itemDecorators) -> builder.put(item, new ItemDecoratorHandler(itemDecorators)));
         DECORATOR_LOOKUP = builder.build();

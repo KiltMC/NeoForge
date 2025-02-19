@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraftforge.client.textures.UnitTextureAtlasSprite;
+import xyz.bluspring.kilt.injections.client.render.model.BakedQuadInjection;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -129,7 +130,7 @@ public class QuadBakingVertexConsumer implements VertexConsumer
         if (++vertexIndex != 4)
             return;
         // We have a full quad, pass it to the consumer and reset
-        quadConsumer.accept(new BakedQuad(quadData, tintIndex, direction, sprite, shade, hasAmbientOcclusion));
+        quadConsumer.accept(BakedQuadInjection.withAo(quadData, tintIndex, direction, sprite, shade, hasAmbientOcclusion));
         vertexIndex = 0;
         quadData = new int[QUAD_DATA_SIZE];
     }

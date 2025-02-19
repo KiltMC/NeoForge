@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraftforge.fml.LogicalSide;
+import xyz.bluspring.kilt.injections.world.effect.MobEffectInjection;
 
 import java.util.function.Consumer;
 
@@ -30,7 +31,7 @@ public interface IClientMobEffectExtensions
 
     static IClientMobEffectExtensions of(MobEffect effect)
     {
-        return effect.getEffectRendererInternal() instanceof IClientMobEffectExtensions r ? r : DEFAULT;
+        return ((MobEffectInjection) effect).getEffectRendererInternal() instanceof IClientMobEffectExtensions r ? r : DEFAULT;
     }
 
     /**

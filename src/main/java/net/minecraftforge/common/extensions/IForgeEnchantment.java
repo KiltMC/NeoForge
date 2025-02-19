@@ -10,6 +10,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import xyz.bluspring.kilt.injections.item.enchantment.EnchantmentInjection;
 
 public interface IForgeEnchantment
 {
@@ -39,7 +40,7 @@ public interface IForgeEnchantment
      */
     default boolean allowedInCreativeTab(Item book, CreativeModeTab tab)
     {
-        if (!self().isAllowedOnBooks())
+        if (!((EnchantmentInjection) self()).isAllowedOnBooks())
         {
             return false;
         }

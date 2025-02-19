@@ -22,6 +22,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.level.block.entity.HopperBlockEntityInjection;
 
 import java.util.Optional;
 
@@ -182,7 +183,7 @@ public class VanillaInventoryCodeHooks
                         int k = 0;
                         if (source instanceof HopperBlockEntity)
                         {
-                            if (destinationHopper.getLastUpdateTime() >= ((HopperBlockEntity) source).getLastUpdateTime())
+                            if (((HopperBlockEntityInjection) destinationHopper).getLastUpdateTime() >= ((HopperBlockEntityInjection) source).getLastUpdateTime())
                             {
                                 k = 1;
                             }

@@ -31,8 +31,9 @@ import org.apache.logging.log4j.Logger;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Lifecycle;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
 
-class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistry, IHolderHelperHolder<T>
+class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistry, IHolderHelperHolder<T>, MappedRegistryInjection
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private final ForgeRegistry<T> delegate;

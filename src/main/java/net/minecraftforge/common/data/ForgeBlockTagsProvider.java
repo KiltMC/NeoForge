@@ -5,8 +5,9 @@
 
 package net.minecraftforge.common.data;
 
+import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -15,17 +16,19 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
 import java.util.Locale;
 import java.util.function.Consumer;
 
 import static net.minecraftforge.common.Tags.Blocks.*;
 
-public final class ForgeBlockTagsProvider extends BlockTagsProvider
+public final class ForgeBlockTagsProvider extends TagsProvider<Block> implements TagsProviderInjection
 {
     public ForgeBlockTagsProvider(DataGenerator gen, ExistingFileHelper existingFileHelper)
     {
-        super(gen, "forge", existingFileHelper);
+        super(gen, Registry.BLOCK);
+        this.kilt$addConstructorArgs("forge", existingFileHelper);
     }
 
     @SuppressWarnings("unchecked")

@@ -26,13 +26,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.data.recipes.RecipeProviderInjection;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 
-public final class ForgeRecipeProvider extends RecipeProvider
+public final class ForgeRecipeProvider extends RecipeProvider implements RecipeProviderInjection
 {
     private final Map<Item, TagKey<Item>> replacements = new HashMap<>();
     private final Set<ResourceLocation> excludes = new HashSet<>();
@@ -53,7 +54,7 @@ public final class ForgeRecipeProvider extends RecipeProvider
     }
 
     @Override
-    protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer)
+    public void kilt$buildCraftingRecipes(Consumer<FinishedRecipe> consumer)
     {
         replace(Items.STICK, Tags.Items.RODS_WOODEN);
         replace(Items.GOLD_INGOT, Tags.Items.INGOTS_GOLD);
@@ -84,7 +85,7 @@ public final class ForgeRecipeProvider extends RecipeProvider
         exclude(Blocks.COBBLED_DEEPSLATE_SLAB);
         exclude(Blocks.COBBLED_DEEPSLATE_WALL);
 
-        super.buildCraftingRecipes(vanilla -> {
+        RecipeProviderInjection.super.kilt$buildCraftingRecipes(vanilla -> {
             FinishedRecipe modified = enhance(vanilla);
             if (modified != null)
                 consumer.accept(modified);
@@ -119,7 +120,7 @@ public final class ForgeRecipeProvider extends RecipeProvider
     }
 
     @Override
-    protected void saveAdvancement(CachedOutput output, JsonObject advancementJson, Path pathIn)
+    public void kilt$saveAdvancement(CachedOutput output, JsonObject advancementJson, Path pathIn)
     {
         //NOOP - We dont replace any of the advancement things yet...
     }

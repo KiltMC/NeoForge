@@ -37,6 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.render.block.model.ItemTransformsTransformTypeInjection;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -207,9 +208,9 @@ public class SeparateTransformsModel implements IUnbakedGeometry<SeparateTransfo
             Map<ItemTransforms.TransformType, BlockModel> perspectives = new HashMap<>();
             for (ItemTransforms.TransformType transform : ItemTransforms.TransformType.values())
             {
-                if (perspectiveData.has(transform.getSerializeName()))
+                if (perspectiveData.has(((ItemTransformsTransformTypeInjection) (Object) transform).getSerializeName()))
                 {
-                    BlockModel perspectiveModel = deserializationContext.deserialize(GsonHelper.getAsJsonObject(perspectiveData, transform.getSerializeName()), BlockModel.class);
+                    BlockModel perspectiveModel = deserializationContext.deserialize(GsonHelper.getAsJsonObject(perspectiveData, ((ItemTransformsTransformTypeInjection) (Object) transform).getSerializeName()), BlockModel.class);
                     perspectives.put(transform, perspectiveModel);
                 }
             }

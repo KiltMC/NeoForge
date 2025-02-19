@@ -8,17 +8,16 @@ package net.minecraftforge.fluids;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.registries.ForgeRegistries;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -149,12 +148,12 @@ public class FluidStack
 
     public final Fluid getFluid()
     {
-        return isEmpty ? Fluids.EMPTY : fluidDelegate.get();
+        return isEmpty ? Fluids.EMPTY : fluidDelegate.value();
     }
 
     public final Fluid getRawFluid()
     {
-        return fluidDelegate.get();
+        return fluidDelegate.value();
     }
 
     public boolean isEmpty() {

@@ -8,6 +8,7 @@ package net.minecraftforge.common.extensions;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
 public interface IForgeTagAppender<T>
 {
@@ -29,7 +30,7 @@ public interface IForgeTagAppender<T>
     }
 
     default TagsProvider.TagAppender<T> replace(boolean value) {
-        self().getInternalBuilder().replace(value);
+        ((TagsProviderInjection.TagAppenderInjection) self()).getInternalBuilder().replace(value);
         return self();
     }
 
@@ -67,7 +68,7 @@ public interface IForgeTagAppender<T>
     default TagsProvider.TagAppender<T> remove(final ResourceLocation location)
     {
         TagsProvider.TagAppender<T> builder = self();
-        builder.getInternalBuilder().removeElement(location, builder.getModID());
+        ((TagsProviderInjection.TagAppenderInjection) builder).getInternalBuilder().removeElement(location, ((TagsProviderInjection.TagAppenderInjection) builder).getModID());
         return builder;
     }
 
@@ -94,7 +95,7 @@ public interface IForgeTagAppender<T>
     default TagsProvider.TagAppender<T> remove(TagKey<T> tag)
     {
         TagsProvider.TagAppender<T> builder = self();
-        builder.getInternalBuilder().removeTag(tag.location(), builder.getModID());
+        ((TagsProviderInjection.TagAppenderInjection) builder).getInternalBuilder().removeTag(tag.location(), ((TagsProviderInjection.TagAppenderInjection) builder).getModID());
         return builder;
     }
 

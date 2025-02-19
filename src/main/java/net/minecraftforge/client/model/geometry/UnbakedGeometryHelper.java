@@ -32,6 +32,7 @@ import net.minecraftforge.client.model.QuadTransformers;
 import net.minecraftforge.client.model.SimpleModelState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockModelInjection;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -97,9 +98,9 @@ public class UnbakedGeometryHelper
     @ApiStatus.Internal
     public static BakedModel bake(BlockModel blockModel, ModelBakery modelBakery, BlockModel owner, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ResourceLocation modelLocation, boolean guiLight3d)
     {
-        IUnbakedGeometry<?> customModel = blockModel.customData.getCustomGeometry();
+        IUnbakedGeometry<?> customModel = ((BlockModelInjection) blockModel).kilt$getCustomData().getCustomGeometry();
         if (customModel != null)
-            return customModel.bake(blockModel.customData, modelBakery, spriteGetter, modelState, blockModel.getOverrides(modelBakery, owner, spriteGetter), modelLocation);
+            return customModel.bake(((BlockModelInjection) blockModel).kilt$getCustomData(), modelBakery, spriteGetter, modelState, blockModel.getOverrides(modelBakery, owner, spriteGetter), modelLocation);
 
         // Handle vanilla item models here, since vanilla has a shortcut for them
         if (blockModel.getRootModel() == ModelBakery.GENERATION_MARKER)
@@ -124,7 +125,7 @@ public class UnbakedGeometryHelper
         }
 
         var elementsModel = new ElementsModel(blockModel.getElements());
-        return elementsModel.bake(blockModel.customData, modelBakery, spriteGetter, modelState, blockModel.getOverrides(modelBakery, owner, spriteGetter), modelLocation);
+        return elementsModel.bake(((BlockModelInjection) blockModel).kilt$getCustomData(), modelBakery, spriteGetter, modelState, blockModel.getOverrides(modelBakery, owner, spriteGetter), modelLocation);
     }
 
     /**

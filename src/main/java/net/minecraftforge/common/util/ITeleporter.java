@@ -5,16 +5,16 @@
 
 package net.minecraftforge.common.util;
 
-import java.util.function.Function;
-
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.portal.PortalInfo;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.portal.PortalForcer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.portal.PortalForcer;
+import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Function;
 
 /**
  * Interface for handling the placement of entities during dimension change.
@@ -74,7 +74,7 @@ public interface ITeleporter
      */
     default boolean isVanilla()
     {
-        return this.getClass() == PortalForcer.class;
+        return ((Object) this).getClass() == PortalForcer.class;
     }
 
     /**

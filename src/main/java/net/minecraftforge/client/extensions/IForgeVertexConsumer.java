@@ -5,12 +5,11 @@
 
 package net.minecraftforge.client.extensions;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Vector3f;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import io.github.fabricators_of_create.porting_lib.extensions.VertexConsumerExtension;
 import net.minecraftforge.client.model.IQuadTransformer;
 
 import java.nio.ByteBuffer;
@@ -18,7 +17,7 @@ import java.nio.ByteBuffer;
 /**
  * Extension interface for {@link VertexConsumer}.
  */
-public interface IForgeVertexConsumer
+public interface IForgeVertexConsumer extends VertexConsumerExtension
 {
     private VertexConsumer self()
     {
@@ -38,10 +37,10 @@ public interface IForgeVertexConsumer
     /**
      * Variant with no per-vertex shading.
      */
-    default void putBulkData(PoseStack.Pose pose, BakedQuad bakedQuad, float red, float green, float blue, float alpha, int packedLight, int packedOverlay, boolean readExistingColor)
+    /*default void putBulkData(PoseStack.Pose pose, BakedQuad bakedQuad, float red, float green, float blue, float alpha, int packedLight, int packedOverlay, boolean readExistingColor)
     {
         self().putBulkData(pose, bakedQuad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F }, red, green, blue, alpha, new int[] { packedLight, packedLight, packedLight, packedLight }, packedOverlay, readExistingColor);
-    }
+    }*/
 
     default int applyBakedLighting(int packedLight, ByteBuffer data)
     {

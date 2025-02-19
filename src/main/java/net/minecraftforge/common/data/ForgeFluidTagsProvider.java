@@ -5,17 +5,21 @@
 
 package net.minecraftforge.common.data;
 
+import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.FluidTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.ForgeMod;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
 import static net.minecraftforge.common.Tags.Fluids.MILK;
 
-public final class ForgeFluidTagsProvider extends FluidTagsProvider
+public final class ForgeFluidTagsProvider extends TagsProvider<Fluid> implements TagsProviderInjection
 {
     public ForgeFluidTagsProvider(DataGenerator gen, ExistingFileHelper existingFileHelper)
     {
-        super(gen, "forge", existingFileHelper);
+        super(gen, Registry.FLUID);
+        this.kilt$addConstructorArgs("forge", existingFileHelper);
     }
 
     @Override

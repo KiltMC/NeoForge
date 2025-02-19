@@ -5,10 +5,10 @@
 
 package net.minecraftforge.common.extensions;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.IContainerFactory;
 
 public interface IForgeMenuType<T>
@@ -17,6 +17,8 @@ public interface IForgeMenuType<T>
     {
         return new MenuType<>(factory);
     }
-    
-    T create(int windowId, Inventory playerInv, FriendlyByteBuf extraData);
+
+    default T create(int windowId, Inventory playerInv, FriendlyByteBuf extraData) {
+        throw new IllegalStateException();
+    }
 }

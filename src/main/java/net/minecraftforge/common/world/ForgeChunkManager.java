@@ -10,28 +10,25 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import javax.annotation.ParametersAreNonnullByDefault;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.ForcedChunksSavedData;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.injections.server.level.ServerChunkCacheInjection;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 public class ForgeChunkManager
@@ -152,9 +149,9 @@ public class ForgeChunkManager
           boolean ticking)
     {
         if (add)
-            level.getChunkSource().addRegionTicket(type, pos, 2, owner, ticking);
+            ((ServerChunkCacheInjection) level.getChunkSource()).addRegionTicket(type, pos, 2, owner, ticking);
         else
-            level.getChunkSource().removeRegionTicket(type, pos, 2, owner, ticking);
+            ((ServerChunkCacheInjection) level.getChunkSource()).removeRegionTicket(type, pos, 2, owner, ticking);
     }
 
     /**

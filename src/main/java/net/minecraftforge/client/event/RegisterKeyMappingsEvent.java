@@ -14,6 +14,7 @@ import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.mixin.OptionsAccessor;
 
 /**
  * Allows users to register custom {@link net.minecraft.client.KeyMapping key mappings}.
@@ -38,6 +39,6 @@ public class RegisterKeyMappingsEvent extends Event implements IModBusEvent
      */
     public void register(KeyMapping key)
     {
-        options.keyMappings = ArrayUtils.add(options.keyMappings, key);
+        ((OptionsAccessor) options).setKeyMappings(ArrayUtils.add(options.keyMappings, key));
     }
 }

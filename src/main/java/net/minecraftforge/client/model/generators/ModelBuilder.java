@@ -5,36 +5,30 @@
 
 package net.minecraftforge.client.model.generators;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
-import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.block.model.BlockModel.GuiLight;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
-import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import com.mojang.math.Vector3f;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.render.block.model.BlockElementFaceInjection;
+import xyz.bluspring.kilt.injections.client.render.block.model.ItemTransformInjection;
+import xyz.bluspring.kilt.injections.client.render.block.model.ItemTransformsTransformTypeInjection;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * General purpose model builder, contains all the commonalities between item
@@ -236,7 +230,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
         }
 
         if (this.guiLight != null) {
-            root.addProperty("gui_light", this.guiLight.getSerializedName());
+            root.addProperty("gui_light", this.guiLight.name);
         }
 
         if (this.renderType != null) {
@@ -250,7 +244,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 JsonObject transform = new JsonObject();
                 ItemTransform vec = e.getValue();
                 if (vec.equals(ItemTransform.NO_TRANSFORM)) continue;
-                var hasRightRotation = !vec.rightRotation.equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
+                var hasRightRotation = !((ItemTransformInjection) vec).getRightRotation().equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
                 if (!vec.translation.equals(ItemTransform.Deserializer.DEFAULT_TRANSLATION)) {
                     transform.add("translation", serializeVector3f(e.getValue().translation));
                 }
@@ -261,9 +255,9 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     transform.add("scale", serializeVector3f(e.getValue().scale));
                 }
                 if (hasRightRotation) {
-                    transform.add("right_rotation", serializeVector3f(vec.rightRotation));
+                    transform.add("right_rotation", serializeVector3f(((ItemTransformInjection) vec).getRightRotation()));
                 }
-                display.add(e.getKey().getSerializeName(), transform);
+                display.add(((ItemTransformsTransformTypeInjection) (Object) e.getKey()).getSerializeName(), transform);
             }
             root.add("display", display);
         }
@@ -317,11 +311,11 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     if (face.tintIndex != -1) {
                         faceObj.addProperty("tintindex", face.tintIndex);
                     }
-                    if (face.emissivity > 0) {
-                        faceObj.addProperty("emissivity", face.emissivity);
+                    if (face.getEmissivity() > 0) {
+                        faceObj.addProperty("emissivity", face.getEmissivity());
                     }
-                    if (!face.hasAmbientOcclusion) {
-                        faceObj.addProperty("ambientocclusion", face.hasAmbientOcclusion);
+                    if (!((BlockElementFaceInjection) face).hasAmbientOcclusion()) {
+                        faceObj.addProperty("ambientocclusion", ((BlockElementFaceInjection) face).hasAmbientOcclusion());
                     }
                     faces.add(dir.getSerializedName(), faceObj);
                 }
@@ -602,7 +596,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 if (this.texture == null) {
                     throw new IllegalStateException("A model face must have a texture");
                 }
-                return new BlockElementFace(cullface, tintindex, texture, new BlockFaceUV(uvs, rotation.rotation), emissivity, hasAmbientOcclusion);
+                return BlockElementFaceInjection.create(cullface, tintindex, texture, new BlockFaceUV(uvs, rotation.rotation), emissivity, hasAmbientOcclusion);
             }
 
             public ElementBuilder end() { return ElementBuilder.this; }
@@ -733,7 +727,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
             }
 
             ItemTransform build() {
-                return new ItemTransform(rotation, translation, scale, rightRotation);
+                return ItemTransformInjection.create(rotation, translation, scale, rightRotation);
             }
 
             public TransformsBuilder end() { return TransformsBuilder.this; }

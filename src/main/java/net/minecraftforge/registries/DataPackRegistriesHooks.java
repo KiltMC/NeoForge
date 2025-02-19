@@ -5,20 +5,13 @@
 
 package net.minecraftforge.registries;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-
-import com.google.common.collect.ImmutableMap;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 @ApiStatus.Internal
 public final class DataPackRegistriesHooks
@@ -30,9 +23,9 @@ public final class DataPackRegistriesHooks
     private static final Set<ResourceKey<? extends Registry<?>>> SYNCED_CUSTOM_REGISTRIES_VIEW = Collections.unmodifiableSet(SYNCED_CUSTOM_REGISTRIES); 
 
     /* Internal forge hook for retaining mutable access to RegistryAccess's codec registry when it bootstraps. */
-    public static Map<ResourceKey<? extends Registry<?>>, RegistryAccess.RegistryData<?>> grabBuiltinRegistries(ImmutableMap.Builder<ResourceKey<? extends Registry<?>>, RegistryAccess.RegistryData<?>> builder)
+    public static Map<ResourceKey<? extends Registry<?>>, RegistryAccess.RegistryData<?>> grabBuiltinRegistries(Map<ResourceKey<? extends Registry<?>>, RegistryAccess.RegistryData<?>> map)
     {
-        REGISTRY_ACCESS_REGISTRIES_COPY = new HashMap<>(builder.build());
+        REGISTRY_ACCESS_REGISTRIES_COPY = new HashMap<>(map);
         SYNCED_CUSTOM_REGISTRIES.clear();
         return Collections.unmodifiableMap(REGISTRY_ACCESS_REGISTRIES_COPY);
     }

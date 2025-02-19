@@ -187,7 +187,7 @@ public class ForgeGui extends Gui
         }
     }
 
-    void renderHelmet(float partialTick, PoseStack poseStack)
+    public void renderHelmet(float partialTick, PoseStack poseStack)
     {
         ItemStack itemstack = this.minecraft.player.getInventory().getArmor(3);
 
@@ -245,7 +245,7 @@ public class ForgeGui extends Gui
     }
 
     @Override
-    protected void renderPortalOverlay(float partialTick)
+    public void renderPortalOverlay(float partialTick)
     {
         float f1 = Mth.lerp(partialTick, this.minecraft.player.oPortalTime, this.minecraft.player.portalTime);
 

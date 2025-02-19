@@ -5,51 +5,54 @@
 
 package net.minecraftforge.client.loading;
 
-import static net.minecraftforge.fml.Logging.CORE;
-import static net.minecraftforge.fml.Logging.LOADING;
-
-import java.io.File;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.*;
-import java.util.function.Consumer;
-
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.packs.repository.RepositorySource;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.world.level.DataPackConfig;
-import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.fml.*;
-import net.minecraftforge.internal.BrandingControl;
-import net.minecraftforge.logging.CrashReportExtender;
-import net.minecraftforge.common.util.LogicalSidedProvider;
-import net.minecraftforge.forgespi.locating.IModFile;
-import net.minecraftforge.resource.PathPackResources;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.ClientPackSource;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.DataPackConfig;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.gui.LoadingErrorScreen;
 import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.client.gui.LoadingErrorScreen;
+import net.minecraftforge.common.util.LogicalSidedProvider;
+import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.fml.*;
+import net.minecraftforge.forgespi.language.IModInfo;
+import net.minecraftforge.forgespi.locating.IModFile;
+import net.minecraftforge.internal.BrandingControl;
+import net.minecraftforge.logging.CrashReportExtender;
 import net.minecraftforge.resource.DelegatingPackResources;
+import net.minecraftforge.resource.PathPackResources;
 import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.server.LanguageHook;
-import net.minecraftforge.forgespi.language.IModInfo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+
+import static net.minecraftforge.fml.Logging.CORE;
+import static net.minecraftforge.fml.Logging.LOADING;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientModLoader
@@ -126,7 +129,7 @@ public class ClientModLoader
         loading = false;
         loadingComplete = true;
         // reload game settings on main thread
-        syncExecutor.execute(()->mc.options.load(true));
+        syncExecutor.execute(()->mc.options.load());
     }
 
     public static VersionChecker.Status checkForUpdates()

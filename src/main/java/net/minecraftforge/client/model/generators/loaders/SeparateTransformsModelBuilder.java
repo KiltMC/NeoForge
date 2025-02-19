@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import xyz.bluspring.kilt.injections.client.render.block.model.ItemTransformsTransformTypeInjection;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class SeparateTransformsModelBuilder<T extends ModelBuilder<T>> extends C
     {
         Preconditions.checkNotNull(perspective, "layer must not be null");
         Preconditions.checkNotNull(modelBuilder, "modelBuilder must not be null");
-        childModels.put(perspective.getSerializeName(), modelBuilder);
+        childModels.put(((ItemTransformsTransformTypeInjection) (Object) perspective).getSerializeName(), modelBuilder);
         return this;
     }
 

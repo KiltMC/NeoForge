@@ -19,6 +19,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.resources.model.ModelManagerInjection;
 
 import java.util.Arrays;
 
@@ -40,7 +41,7 @@ public class BakedModelRenderable implements IRenderable<BakedModelRenderable.Co
      */
     public static BakedModelRenderable of(ResourceLocation model)
     {
-        return of(Minecraft.getInstance().getModelManager().getModel(model));
+        return of(((ModelManagerInjection) Minecraft.getInstance().getModelManager()).getModel(model));
     }
 
     /**

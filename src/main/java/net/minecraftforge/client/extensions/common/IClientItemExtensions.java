@@ -26,6 +26,8 @@ import net.minecraftforge.client.IArmPoseTransformer;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.render.RenderPropertiesInjection;
+import xyz.bluspring.kilt.mixin.ItemRendererAccessor;
 
 import java.util.function.Consumer;
 
@@ -45,7 +47,7 @@ public interface IClientItemExtensions
 
     static IClientItemExtensions of(Item item)
     {
-        return item.getRenderPropertiesInternal() instanceof IClientItemExtensions e ? e : DEFAULT;
+        return ((RenderPropertiesInjection<Object>) item).getRenderPropertiesInternal() instanceof IClientItemExtensions e ? e : DEFAULT;
     }
 
     /**
@@ -160,7 +162,7 @@ public interface IClientItemExtensions
      */
     default BlockEntityWithoutLevelRenderer getCustomRenderer()
     {
-        return Minecraft.getInstance().getItemRenderer().getBlockEntityRenderer();
+        return ((ItemRendererAccessor) Minecraft.getInstance().getItemRenderer()).getBlockEntityRenderer();
     }
 
     enum FontContext

@@ -12,8 +12,9 @@ import net.minecraft.data.tags.TagsProvider;
 import net.minecraftforge.registries.GameData;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.data.tags.TagsProviderInjection;
 
-public abstract class ForgeRegistryTagsProvider<T> extends TagsProvider<T>
+public abstract class ForgeRegistryTagsProvider<T> extends TagsProvider<T> implements TagsProviderInjection
 {
     private static <T> Registry<T> wrapRegistry(IForgeRegistry<T> forgeRegistry)
     {
@@ -26,6 +27,7 @@ public abstract class ForgeRegistryTagsProvider<T> extends TagsProvider<T>
 
     public ForgeRegistryTagsProvider(DataGenerator generator, IForgeRegistry<T> forgeRegistry, String modId, @Nullable ExistingFileHelper existingFileHelper)
     {
-        super(generator, wrapRegistry(forgeRegistry), modId, existingFileHelper);
+        super(generator, wrapRegistry(forgeRegistry));
+        this.kilt$addConstructorArgs(modId, existingFileHelper);
     }
 }

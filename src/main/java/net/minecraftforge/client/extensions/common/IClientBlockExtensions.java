@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.fml.LogicalSide;
+import xyz.bluspring.kilt.injections.client.render.RenderPropertiesInjection;
 
 import java.util.function.Consumer;
 
@@ -38,7 +39,7 @@ public interface IClientBlockExtensions
 
     static IClientBlockExtensions of(Block block)
     {
-        return block.getRenderPropertiesInternal() instanceof IClientBlockExtensions e ? e : DEFAULT;
+        return ((RenderPropertiesInjection<Object>) block).getRenderPropertiesInternal() instanceof IClientBlockExtensions e ? e : DEFAULT;
     }
 
     /**

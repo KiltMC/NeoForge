@@ -5,23 +5,22 @@
 
 package net.minecraftforge.common.extensions;
 
-import java.util.Collection;
-import java.util.function.BiPredicate;
-
+import io.github.fabricators_of_create.porting_lib.attributes.extensions.EntityAttributes;
+import io.github.fabricators_of_create.porting_lib.extensions.EntityExtensions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.ForgeMod;
@@ -32,7 +31,10 @@ import net.minecraftforge.entity.PartEntity;
 import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.Nullable;
 
-public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>
+import java.util.Collection;
+import java.util.function.BiPredicate;
+
+public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, EntityExtensions, EntityAttributes
 {
     private Entity self() { return (Entity) this; }
 

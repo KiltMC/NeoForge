@@ -29,8 +29,9 @@ import net.minecraft.core.DefaultedRegistry;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Lifecycle;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
 
-class NamespacedDefaultedWrapper<T> extends DefaultedRegistry<T> implements ILockableRegistry, IHolderHelperHolder<T>
+class NamespacedDefaultedWrapper<T> extends DefaultedRegistry<T> implements ILockableRegistry, IHolderHelperHolder<T>, MappedRegistryInjection
 {
     private final ForgeRegistry<T> delegate;
     private final NamespacedHolderHelper<T> holders;
