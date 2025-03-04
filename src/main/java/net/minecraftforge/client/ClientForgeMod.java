@@ -10,11 +10,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterNamedRenderTypesEvent;
-import net.minecraftforge.client.model.CompositeModel;
-import net.minecraftforge.client.model.DynamicFluidContainerModel;
-import net.minecraftforge.client.model.ElementsModel;
 import net.minecraftforge.client.model.EmptyModel;
-import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.client.model.SeparateTransformsModel;
 import net.minecraftforge.client.model.obj.ObjLoader;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,16 +23,17 @@ public class ClientForgeMod
     public static void onRegisterGeometryLoaders(ModelEvent.RegisterGeometryLoaders event)
     {
         event.register("empty", EmptyModel.LOADER);
-        event.register("elements", ElementsModel.Loader.INSTANCE);
-        event.register("obj", ObjLoader.INSTANCE);
-        event.register("fluid_container", DynamicFluidContainerModel.Loader.INSTANCE);
-        event.register("composite", CompositeModel.Loader.INSTANCE);
-        event.register("item_layers", ItemLayerModel.Loader.INSTANCE);
+        // Kilt: implemented by Porting Lib
+        //event.register("elements", ElementsModel.Loader.INSTANCE);
+        //event.register("obj", ObjLoader.INSTANCE);
+        //event.register("fluid_container", DynamicFluidContainerModel.Loader.INSTANCE);
+        //event.register("composite", CompositeModel.Loader.INSTANCE);
+        //event.register("item_layers", ItemLayerModel.Loader.INSTANCE);
         event.register("separate_transforms", SeparateTransformsModel.Loader.INSTANCE);
 
         // TODO: Deprecated. To be removed in 1.20
-        event.register("bucket", DynamicFluidContainerModel.Loader.INSTANCE_DEPRECATED);
-        event.register("item-layers", ItemLayerModel.Loader.INSTANCE_DEPRECATED);
+        //event.register("bucket", DynamicFluidContainerModel.Loader.INSTANCE_DEPRECATED);
+        //event.register("item-layers", ItemLayerModel.Loader.INSTANCE_DEPRECATED);
         event.register("separate-perspective", SeparateTransformsModel.Loader.INSTANCE_DEPRECATED);
     }
 

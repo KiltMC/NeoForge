@@ -5,7 +5,11 @@
 
 package net.minecraftforge.common.capabilities;
 
+import com.google.common.reflect.TypeToken;
 import net.minecraftforge.fml.common.asm.CapabilityTokenSubclass;
+import xyz.bluspring.kilt.Kilt;
+
+import java.lang.reflect.Type;
 
 /**
  * Inspired by {@link com.google.common.reflect.TypeToken TypeToken}, use a subclass to capture
@@ -23,9 +27,28 @@ import net.minecraftforge.fml.common.asm.CapabilityTokenSubclass;
  */
 public abstract class CapabilityToken<T>
 {
+    private TypeToken<T> typeToken;
+
+    public CapabilityToken() {
+        try {
+            typeToken = new TypeToken<>(this.getClass()) {};
+            type = typeToken.getType();
+        } catch (Exception ignored) {
+            typeToken = null;
+            type = null;
+        }
+    }
+
+    private Type type;
+
     protected final String getType()
     {
-        throw new RuntimeException("This will be implemented by a transformer");
+        if (this.type == null) {
+            Kilt.Companion.getLogger().error("ruh roh, a type is unknown");
+            return "UNKNOWN";
+        }
+
+        return this.type.getTypeName().replace(".", "/");
     }
 
     @Override

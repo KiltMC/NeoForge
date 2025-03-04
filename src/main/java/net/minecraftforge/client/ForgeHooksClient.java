@@ -17,7 +17,6 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import net.minecraft.ChatFormatting;
-import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.minecraft.FileUtil;
 import net.minecraft.client.*;
 import net.minecraft.client.color.block.BlockColors;
@@ -83,9 +82,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -128,6 +125,7 @@ import xyz.bluspring.kilt.injections.client.render.model.BakedQuadInjection;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
@@ -877,6 +875,14 @@ public class ForgeHooksClient
 
     public static void handleClientLevelClosing(ClientLevel level)
     {
+        try {
+            // Call ForgeConfigAPIPort's handler
+            ForgeHooksClient.class.getDeclaredMethod("handleClientLevelClosing2", ClientLevel.class)
+                    .invoke(null, level);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
         Connection client = getClientConnection();
         // ONLY revert a non-local connection
         if (client != null && !client.isMemoryConnection())
