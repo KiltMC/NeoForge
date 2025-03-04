@@ -32,7 +32,7 @@ public class MinecraftForge
      * Events marked with {@link net.minecraftforge.fml.event.IModBusEvent}
      * belong on the ModBus and not this bus
      */
-    public static final IEventBus EVENT_BUS = BusBuilder.builder().startShutdown().useModLauncher().build();
+    public static final IEventBus EVENT_BUS = BusBuilder.builder().startShutdown().build();
 
     static final ForgeInternalHandler INTERNAL_HANDLER = new ForgeInternalHandler();
     private static final Logger LOGGER = LogManager.getLogger();

@@ -5,33 +5,26 @@
 
 package net.minecraftforge.registries;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
-
 import net.minecraft.util.RandomSource;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Lifecycle;
 import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistry, IHolderHelperHolder<T>, MappedRegistryInjection
 {
@@ -52,8 +45,8 @@ class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistr
     @Override
     public Holder<T> registerMapping(int id, ResourceKey<T> key, T value, Lifecycle lifecycle)
     {
-        if (locked)
-            throw new IllegalStateException("Can not register to a locked registry. Modder should use Forge Register methods.");
+        //if (locked)
+            //throw new IllegalStateException("Can not register to a locked registry. Modder should use Forge Register methods.");
 
         Validate.notNull(value);
         markKnown();
