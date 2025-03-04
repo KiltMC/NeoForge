@@ -6,12 +6,12 @@
 package net.minecraftforge.client.extensions;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.core.Direction;
-
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
+import io.github.fabricators_of_create.porting_lib.extensions.TransformationExtensions;
+import net.minecraft.core.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,7 +19,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * Extension interface for {@link Transformation}.
  */
 // TODO - 1.20: Transformation is not client-only, move this extension outside the client package
-public interface IForgeTransformation
+public interface IForgeTransformation extends TransformationExtensions
 {
     private Transformation self()
     {

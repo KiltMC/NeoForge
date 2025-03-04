@@ -20,7 +20,6 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.level.DataPackConfig;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.LoadingErrorScreen;
@@ -35,7 +34,6 @@ import net.minecraftforge.internal.BrandingControl;
 import net.minecraftforge.logging.CrashReportExtender;
 import net.minecraftforge.resource.DelegatingPackResources;
 import net.minecraftforge.resource.PathPackResources;
-import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.server.LanguageHook;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -93,9 +91,10 @@ public class ClientModLoader
         earlyLoaderGUI = new EarlyLoaderGUI(minecraft);
         createRunnableWithCatch(()->ModLoader.get().gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), new SpacedRunnable(earlyLoaderGUI::renderTick))).run();
         if (error == null) {
-            ResourcePackLoader.loadResourcePacks(defaultResourcePacks, ClientModLoader::buildPackFinder);
+            // Kilt: Already handled by Fabric
+            //ResourcePackLoader.loadResourcePacks(defaultResourcePacks, ClientModLoader::buildPackFinder);
             ModLoader.get().postEvent(new AddPackFindersEvent(PackType.CLIENT_RESOURCES, defaultResourcePacks::addPackFinder));
-            DataPackConfig.DEFAULT.addModPacks(ResourcePackLoader.getPackNames());
+            //DataPackConfig.DEFAULT.addModPacks(ResourcePackLoader.getPackNames());
             mcResourceManager.registerReloadListener(ClientModLoader::onResourceReload);
             mcResourceManager.registerReloadListener(BrandingControl.resourceManagerReloadListener());
         }
