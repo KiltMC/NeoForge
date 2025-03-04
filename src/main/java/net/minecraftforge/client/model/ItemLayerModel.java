@@ -54,11 +54,12 @@ public class ItemLayerModel implements IUnbakedGeometry<ItemLayerModel>
     private ImmutableList<Material> textures;
     private final IntSet emissiveLayers;
     private final Int2ObjectMap<ResourceLocation> renderTypeNames;
+    private final Int2ObjectMap<ResourceLocation> renderTypeNamesFast;
     private final boolean deprecatedLoader, logWarning;
 
     public ItemLayerModel(@Nullable ImmutableList<Material> textures, IntSet emissiveLayers, Int2ObjectMap<ResourceLocation> renderTypeNames)
     {
-        this(textures, emissiveLayers, renderTypeNames, false, false);
+        this(textures, emissiveLayers, renderTypeNames, new Int2ObjectOpenHashMap<>(), false, false);
     }
 
     private ItemLayerModel(@Nullable ImmutableList<Material> textures, IntSet emissiveLayers, Int2ObjectMap<ResourceLocation> renderTypeNames, boolean deprecatedLoader, boolean logWarning)
@@ -66,6 +67,17 @@ public class ItemLayerModel implements IUnbakedGeometry<ItemLayerModel>
         this.textures = textures;
         this.emissiveLayers = emissiveLayers;
         this.renderTypeNames = renderTypeNames;
+        this.renderTypeNamesFast = new Int2ObjectOpenHashMap<>();
+        this.deprecatedLoader = deprecatedLoader;
+        this.logWarning = logWarning;
+    }
+
+    private ItemLayerModel(@Nullable ImmutableList<Material> textures, IntSet emissiveLayers, Int2ObjectMap<ResourceLocation> renderTypeNames, Int2ObjectMap<ResourceLocation> renderTypeNamesFast, boolean deprecatedLoader, boolean logWarning)
+    {
+        this.textures = textures;
+        this.emissiveLayers = emissiveLayers;
+        this.renderTypeNames = renderTypeNames;
+        this.renderTypeNamesFast = renderTypeNamesFast;
         this.deprecatedLoader = deprecatedLoader;
         this.logWarning = logWarning;
     }
@@ -98,7 +110,9 @@ public class ItemLayerModel implements IUnbakedGeometry<ItemLayerModel>
             if (emissiveLayers.contains(i)) QuadTransformers.settingMaxEmissivity().processInPlace(quads);
             var renderTypeName = renderTypeNames.get(i);
             var renderTypes = renderTypeName != null ? context.getRenderType(renderTypeName) : null;
-            builder.addQuads(renderTypes != null ? renderTypes : normalRenderTypes, quads);
+            var renderTypeNameFast = renderTypeNamesFast.get(i);
+            var renderTypesFast = renderTypeNameFast != null ? context.getRenderType(renderTypeNameFast) : null;
+            builder.addQuads(renderTypes != null ? renderTypes : normalRenderTypes, renderTypesFast != null ? renderTypesFast : RenderTypeGroup.EMPTY, quads);
         }
 
         return builder.build();
@@ -158,6 +172,12 @@ public class ItemLayerModel implements IUnbakedGeometry<ItemLayerModel>
 
         private boolean readUnlit(JsonObject jsonObject, String name, Int2ObjectOpenHashMap<ResourceLocation> renderTypeNames, IntOpenHashSet litLayers, boolean logWarning)
         {
+            return this.readUnlit(jsonObject, name, renderTypeNames, new Int2ObjectOpenHashMap<>(), litLayers, logWarning);
+        }
+
+        @Deprecated(forRemoval = true, since = "1.21.4")
+        private boolean readUnlit(JsonObject jsonObject, String name, Int2ObjectOpenHashMap<ResourceLocation> renderTypeNames, Int2ObjectOpenHashMap<ResourceLocation> renderTypeNamesFast, IntOpenHashSet litLayers, boolean logWarning)
+        {
             if (!jsonObject.has(name))
                 return false;
             var fullbrightLayers = jsonObject.getAsJsonArray(name);
@@ -166,6 +186,7 @@ public class ItemLayerModel implements IUnbakedGeometry<ItemLayerModel>
             {
                 litLayers.add(layer.getAsInt());
                 renderTypeNames.putIfAbsent(layer.getAsInt(), renderType);
+                renderTypeNamesFast.putIfAbsent(layer.getAsInt(), renderType);
             }
             return logWarning && !fullbrightLayers.isEmpty();
         }

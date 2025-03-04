@@ -672,7 +672,7 @@ public interface IForgeItem extends ItemExtensions, io.github.fabricators_of_cre
      */
     default boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker)
     {
-        return this instanceof AxeItem;
+        return attacker.canDisableShield();
     }
 
     /**

@@ -21,6 +21,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 import java.util.Optional;
 
 public class FMLModContainer extends ModContainer
@@ -31,6 +34,7 @@ public class FMLModContainer extends ModContainer
     private final IEventBus eventBus;
     private Object modInstance;
     private final Class<?> modClass;
+    private final FMLJavaModLoadingContext context = new FMLJavaModLoadingContext(this);
 
     public FMLModContainer(IModInfo info, String className, ModFileScanData modFileScanResults, ModuleLayer gameLayer)
     {
@@ -40,8 +44,7 @@ public class FMLModContainer extends ModContainer
         activityMap.put(ModLoadingStage.CONSTRUCT, this::constructMod);
         this.eventBus = BusBuilder.builder().setExceptionHandler(this::onEventFailed).setTrackPhases(false).markerType(IModBusEvent.class).useModLauncher().build();
         this.configHandler = Optional.of(ce->this.eventBus.post(ce.self()));
-        final FMLJavaModLoadingContext contextExtension = new FMLJavaModLoadingContext(this);
-        this.contextExtension = () -> contextExtension;
+        this.contextExtension = () -> context;
         try
         {
             var layer = gameLayer.findModule(info.getOwningFile().moduleName()).orElseThrow();
@@ -65,11 +68,22 @@ public class FMLModContainer extends ModContainer
         try
         {
             LOGGER.trace(LOADING, "Loading mod instance {} of type {}", getModId(), modClass.getName());
-            this.modInstance = modClass.getDeclaredConstructor().newInstance();
+            Constructor<?> constructor;
+            try {
+                constructor = modClass.getDeclaredConstructor(context.getClass());
+            } catch (NoSuchMethodException | SecurityException exception) {
+                constructor = modClass.getDeclaredConstructor();
+            }
+            this.modInstance = constructor.getParameterCount() == 0 ? constructor.newInstance() : constructor.newInstance(context);
             LOGGER.trace(LOADING, "Loaded mod instance {} of type {}", getModId(), modClass.getName());
         }
         catch (Throwable e)
         {
+            // When a mod constructor throws an exception, it's wrapped in an InvocationTargetException which hides the
+            // actual exception from the mod loading error screen.
+            if (e instanceof InvocationTargetException wrapped)
+                e = Objects.requireNonNullElse(wrapped.getCause(), e); // unwrap the exception
+
             LOGGER.error(LOADING,"Failed to create mod instance. ModID: {}, class {}", getModId(), modClass.getName(), e);
             throw new ModLoadingException(modInfo, ModLoadingStage.CONSTRUCT, "fml.modloading.failedtoloadmod", e, modClass);
         }
