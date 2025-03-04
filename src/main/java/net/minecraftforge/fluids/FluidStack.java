@@ -32,7 +32,7 @@ import java.util.Optional;
  * equal.
  *
  */
-public class FluidStack
+public class FluidStack extends io.github.fabricators_of_create.porting_lib.util.FluidStack
 {
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -41,7 +41,7 @@ public class FluidStack
     public static final Codec<FluidStack> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     Registry.FLUID.byNameCodec().fieldOf("FluidName").forGetter(FluidStack::getFluid),
-                    Codec.INT.fieldOf("Amount").forGetter(FluidStack::getAmount),
+                    Codec.INT.fieldOf("Amount").forGetter(FluidStack::forge$getAmount),
                     CompoundTag.CODEC.optionalFieldOf("Tag").forGetter(stack -> Optional.ofNullable(stack.getTag()))
             ).apply(instance, (fluid, amount, tag) -> {
                 FluidStack stack = new FluidStack(fluid, amount);
@@ -57,6 +57,8 @@ public class FluidStack
 
     public FluidStack(Fluid fluid, int amount)
     {
+        super(fluid, amount);
+
         if (fluid == null)
         {
             LOGGER.fatal("Null fluid supplied to fluidstack. Did you try and create a stack for an unregistered fluid?");
@@ -133,7 +135,7 @@ public class FluidStack
     public void writeToPacket(FriendlyByteBuf buf)
     {
         buf.writeRegistryId(ForgeRegistries.FLUIDS, getFluid());
-        buf.writeVarInt(getAmount());
+        buf.writeVarInt(forge$getAmount());
         buf.writeNbt(tag);
     }
 
@@ -164,9 +166,9 @@ public class FluidStack
         isEmpty = getRawFluid() == Fluids.EMPTY || amount <= 0;
     }
 
-    public int getAmount()
+    public int forge$getAmount()
     {
-        return isEmpty ? 0 : amount ;
+        return isEmpty ? 0 : amount;
     }
 
     public void setAmount(int amount)

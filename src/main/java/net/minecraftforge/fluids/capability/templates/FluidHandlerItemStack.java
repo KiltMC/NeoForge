@@ -5,16 +5,15 @@
 
 package net.minecraftforge.fluids.capability.templates;
 
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.*;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,7 +112,7 @@ public class FluidHandlerItemStack implements IFluidHandlerItem, ICapabilityProv
         FluidStack contained = getFluid();
         if (contained.isEmpty())
         {
-            int fillAmount = Math.min(capacity, resource.getAmount());
+            int fillAmount = Math.min(capacity, resource.forge$getAmount());
 
             if (doFill.execute())
             {
@@ -128,7 +127,7 @@ public class FluidHandlerItemStack implements IFluidHandlerItem, ICapabilityProv
         {
             if (contained.isFluidEqual(resource))
             {
-                int fillAmount = Math.min(capacity - contained.getAmount(), resource.getAmount());
+                int fillAmount = Math.min(capacity - contained.forge$getAmount(), resource.forge$getAmount());
 
                 if (doFill.execute() && fillAmount > 0) {
                     contained.grow(fillAmount);
@@ -150,7 +149,7 @@ public class FluidHandlerItemStack implements IFluidHandlerItem, ICapabilityProv
         {
             return FluidStack.EMPTY;
         }
-        return drain(resource.getAmount(), action);
+        return drain(resource.forge$getAmount(), action);
     }
 
     @NotNull
@@ -168,7 +167,7 @@ public class FluidHandlerItemStack implements IFluidHandlerItem, ICapabilityProv
             return FluidStack.EMPTY;
         }
 
-        final int drainAmount = Math.min(contained.getAmount(), maxDrain);
+        final int drainAmount = Math.min(contained.forge$getAmount(), maxDrain);
 
         FluidStack drained = contained.copy();
         drained.setAmount(drainAmount);

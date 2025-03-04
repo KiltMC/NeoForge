@@ -7,7 +7,6 @@ package net.minecraftforge.fluids.capability.templates;
 
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,7 +35,7 @@ public class VoidFluidHandler implements IFluidHandler
     @Override
     public int fill(FluidStack resource, FluidAction action)
     {
-        return resource.getAmount();
+        return resource.forge$getAmount();
     }
 
     @NotNull
