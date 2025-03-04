@@ -5,13 +5,14 @@
 
 package net.minecraftforge.common.extensions;
 
-import java.util.Collection;
-import java.util.Collections;
-
+import io.github.fabricators_of_create.porting_lib.extensions.LevelExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.entity.PartEntity;
 
-public interface IForgeLevel extends ICapabilityProvider
+import java.util.Collection;
+import java.util.Collections;
+
+public interface IForgeLevel extends ICapabilityProvider, LevelExtensions, io.github.fabricators_of_create.porting_lib.extensions.entity.LevelExtensions, io.github.fabricators_of_create.porting_lib.extensions.transfer.LevelExtensions
 {
     /**
      * The maximum radius to scan for entities when trying to check bounding boxes. Vanilla's default is
@@ -30,7 +31,7 @@ public interface IForgeLevel extends ICapabilityProvider
      * All part entities in this world. Used when collecting entities in an AABB to fix parts being
      * ignored whose parent entity is in a chunk that does not intersect with the AABB.
      */
-    public default Collection<PartEntity<?>> getPartEntities()
+    public default Collection<PartEntity<?>> kilt$getPartEntities()
     {
         return Collections.emptyList();
     }
