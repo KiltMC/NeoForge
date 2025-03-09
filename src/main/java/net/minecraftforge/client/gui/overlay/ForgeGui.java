@@ -142,7 +142,8 @@ public class ForgeGui extends Gui
             {
                 IGuiOverlay overlay = entry.overlay();
                 if (pre(entry, poseStack)) return;
-                overlay.render(this, poseStack, partialTick, screenWidth, screenHeight);
+                if (!entry.id().getNamespace().equals("minecraft")) // Kilt: Ignore rendering Vanilla-specific overlays
+                    overlay.render(this, poseStack, partialTick, screenWidth, screenHeight);
                 post(entry, poseStack);
             } catch (Exception e)
             {
