@@ -75,6 +75,10 @@ public class ForgeGui extends Gui
         return minecraft;
     }
 
+    public void kilt$setFont(Font font) {
+        this.font = font;
+    }
+
     public void setupOverlayRenderState(boolean blend, boolean depthText)
     {
         setupOverlayRenderState(blend, depthText, Gui.GUI_ICONS_LOCATION);
