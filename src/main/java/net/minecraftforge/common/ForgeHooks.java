@@ -15,6 +15,7 @@ import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
+import io.github.fabricators_of_create.porting_lib.loot.LootHooks;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.ResourceLocationException;
@@ -72,7 +73,6 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -326,9 +326,7 @@ public class ForgeHooks
 
     public static int getLootingLevel(Entity target, @Nullable Entity killer, @Nullable DamageSource cause)
     {
-        int looting = 0;
-        if (killer instanceof LivingEntity)
-            looting = EnchantmentHelper.getMobLooting((LivingEntity)killer);
+        int looting = LootHooks.getLootingLevel(target, killer, cause);
         if (target instanceof LivingEntity)
             looting = getLootingLevel((LivingEntity)target, cause, looting);
         return looting;
