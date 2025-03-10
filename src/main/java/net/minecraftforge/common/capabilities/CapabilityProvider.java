@@ -80,7 +80,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         return (B)this;
     }
 
-    protected final @Nullable CapabilityDispatcher getCapabilities()
+    public final @Nullable CapabilityDispatcher getCapabilities()
     {
         if (isLazy && !initialized)
         {
