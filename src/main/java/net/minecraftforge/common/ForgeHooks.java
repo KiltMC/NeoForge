@@ -17,6 +17,8 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import io.github.fabricators_of_create.porting_lib.loot.LootHooks;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.advancements.Advancement;
@@ -919,6 +921,12 @@ public class ForgeHooks
             return ForgeMod.LAVA_TYPE.get();
         if (ForgeMod.MILK.filter(milk -> milk == fluid).isPresent() || ForgeMod.FLOWING_MILK.filter(milk -> milk == fluid).isPresent())
             return ForgeMod.MILK_TYPE.get();
+
+        var handler = FluidVariantAttributes.getHandler(fluid);
+        if (handler != null) {
+            return FluidType.kilt$tryGetWrappingFluidType(FluidVariant.of(fluid), handler);
+        }
+
         throw new RuntimeException("Mod fluids must override getFluidType.");
     }
 

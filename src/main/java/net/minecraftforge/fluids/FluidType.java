@@ -6,10 +6,13 @@
 package net.minecraftforge.fluids;
 
 import com.google.common.collect.ImmutableMap;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributeHandler;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -44,6 +47,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
@@ -63,6 +67,25 @@ public class FluidType
      * The number of fluid units that a bucket represents.
      */
     public static final int BUCKET_VOLUME = 1000;
+
+    // Kilt: Try to replicate Fabric fluid types
+    private static final Map<FluidVariantAttributeHandler, FluidType> kilt$fluidTypes = new ConcurrentHashMap<>();
+    public static FluidType kilt$tryGetWrappingFluidType(FluidVariant fluidVariant, FluidVariantAttributeHandler handler) {
+        return kilt$fluidTypes.computeIfAbsent(handler, $ -> {
+            var name = handler.getName(fluidVariant);
+            var properties = Properties.create()
+                .descriptionId(name.getContents() instanceof TranslatableContents translatable ? translatable.getKey() : name.getString())
+                .lightLevel(handler.getLuminance(fluidVariant))
+                .temperature(handler.getTemperature(fluidVariant))
+                .viscosity(handler.getViscosity(fluidVariant, null))
+                .density(handler.isLighterThanAir(fluidVariant) ? 0 : 100);
+
+            handler.getFillSound(fluidVariant).ifPresent(sound -> properties.sound(SoundActions.BUCKET_FILL, sound));
+            handler.getEmptySound(fluidVariant).ifPresent(sound -> properties.sound(SoundActions.BUCKET_EMPTY, sound));
+
+            return new FluidType(properties);
+        });
+    }
 
     /**
      * A lazy value which computes the number of fluid types within the
