@@ -68,7 +68,7 @@ public class FluidType
      */
     public static final int BUCKET_VOLUME = 1000;
 
-    // Kilt: Try to replicate Fabric fluid types
+    // Kilt: Try to replicate fluid types for Fabric
     private static final Map<FluidVariantAttributeHandler, FluidType> kilt$fluidTypes = new ConcurrentHashMap<>();
     public static FluidType kilt$tryGetWrappingFluidType(FluidVariant fluidVariant, FluidVariantAttributeHandler handler) {
         return kilt$fluidTypes.computeIfAbsent(handler, $ -> {

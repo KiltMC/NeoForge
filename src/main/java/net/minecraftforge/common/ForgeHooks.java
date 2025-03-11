@@ -922,7 +922,7 @@ public class ForgeHooks
         if (ForgeMod.MILK.filter(milk -> milk == fluid).isPresent() || ForgeMod.FLOWING_MILK.filter(milk -> milk == fluid).isPresent())
             return ForgeMod.MILK_TYPE.get();
 
-        var handler = FluidVariantAttributes.getHandler(fluid);
+        var handler = FluidVariantAttributes.getHandlerOrDefault(fluid);
         if (handler != null) {
             return FluidType.kilt$tryGetWrappingFluidType(FluidVariant.of(fluid), handler);
         }
