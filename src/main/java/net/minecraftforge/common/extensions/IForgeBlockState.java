@@ -6,6 +6,7 @@
 package net.minecraftforge.common.extensions;
 
 import io.github.fabricators_of_create.porting_lib.extensions.BlockStateExtensions;
+import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-public interface IForgeBlockState extends BlockStateExtensions
+public interface IForgeBlockState extends BlockStateExtensions, FabricBlockState
 {
     private BlockState self()
     {
