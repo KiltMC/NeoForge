@@ -446,11 +446,18 @@ public class ForgeHooksClient
     {
         IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluidStateIn);
         ResourceLocation overlayTexture = props.getOverlayTexture(fluidStateIn, level, pos);
-        return new TextureAtlasSprite[] {
+
+        if (overlayTexture != null)
+            return new TextureAtlasSprite[] {
+                    Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(props.getStillTexture(fluidStateIn, level, pos)),
+                    Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(props.getFlowingTexture(fluidStateIn, level, pos)),
+                    Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(overlayTexture),
+            };
+        else
+            return new TextureAtlasSprite[]{
                 Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(props.getStillTexture(fluidStateIn, level, pos)),
                 Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(props.getFlowingTexture(fluidStateIn, level, pos)),
-                overlayTexture == null ? null : Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(overlayTexture),
-        };
+            };
     }
 
     public static void gatherFluidTextures(Set<Material> textures)
