@@ -7,12 +7,12 @@ package net.minecraftforge.client.model;
 
 import com.google.gson.*;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraftforge.client.model.geometry.GeometryLoaderManager;
 import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
-import net.minecraftforge.common.util.TransformationHelper;
 import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockModelInjection;
 
@@ -27,20 +27,16 @@ import java.util.Map;
  */
 public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer
 {
-    public static final Gson INSTANCE = (new GsonBuilder())
-            .registerTypeAdapter(BlockModel.class, new ExtendedBlockModelDeserializer())
-            .registerTypeAdapter(BlockElement.class, new BlockElement.Deserializer())
-            .registerTypeAdapter(BlockElementFace.class, new BlockElementFace.Deserializer())
-            .registerTypeAdapter(BlockFaceUV.class, new BlockFaceUV.Deserializer())
-            .registerTypeAdapter(ItemTransform.class, new ItemTransform.Deserializer())
-            .registerTypeAdapter(ItemTransforms.class, new ItemTransforms.Deserializer())
-            .registerTypeAdapter(ItemOverride.class, new ItemOverride.Deserializer())
-            .registerTypeAdapter(Transformation.class, new TransformationHelper.Deserializer())
-            .create();
+    public static Gson INSTANCE;
 
     public BlockModel deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext) throws JsonParseException
     {
         BlockModel model = super.deserialize(element, targetType, deserializationContext);
+        return this.kilt$deserialize(element, targetType, deserializationContext, model);
+    }
+
+    public BlockModel kilt$deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext, BlockModel model) throws JsonParseException
+    {
         JsonObject jsonobject = element.getAsJsonObject();
         IUnbakedGeometry<?> geometry = deserializeGeometry(deserializationContext, jsonobject);
 
