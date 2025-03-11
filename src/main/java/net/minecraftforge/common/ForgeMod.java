@@ -296,6 +296,9 @@ public class ForgeMod
                         @Override
                         public int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos)
                         {
+                            if (getter == null)
+                                return 0xFFFFFFFF;
+
                             return BiomeColors.getAverageWaterColor(getter, pos) | 0xFF000000;
                         }
                     });

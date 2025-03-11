@@ -83,7 +83,7 @@ public class FluidType
             handler.getFillSound(fluidVariant).ifPresent(sound -> properties.sound(SoundActions.BUCKET_FILL, sound));
             handler.getEmptySound(fluidVariant).ifPresent(sound -> properties.sound(SoundActions.BUCKET_EMPTY, sound));
 
-            return new FluidType(properties);
+            return new FluidType(properties, true);
         });
     }
 
@@ -111,10 +111,19 @@ public class FluidType
     private final int viscosity;
     private final Rarity rarity;
 
+    public boolean kilt$isWrapped = false;
+
     /**
      * A map of actions performed to sound that should be played.
      */
     protected final Map<SoundAction, SoundEvent> sounds;
+
+    // Kilt: Add flag to know that a fluid type is wrapped.
+    public FluidType(final Properties properties, boolean isWrapped)
+    {
+        this(properties);
+        this.kilt$isWrapped = isWrapped;
+    }
 
     /**
      * Default constructor.
