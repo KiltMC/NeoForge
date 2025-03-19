@@ -14,7 +14,6 @@ import com.google.gson.JsonParseException;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import io.github.fabricators_of_create.porting_lib.fluids.extensions.FluidExtension;
-import io.github.fabricators_of_create.porting_lib.fluids.wrapper.FluidAttributeFluidType;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
@@ -884,9 +883,9 @@ public class ForgeHooks
             return FluidType.kilt$tryGetWrappingFluidType(fabricFluidType);
         }
 
-        var handler = FluidVariantAttributes.getHandler(fluid);
+        var handler = FluidVariantAttributes.getHandlerOrDefault(fluid);
         if (handler != null) {
-            return FluidType.kilt$tryGetWrappingFluidType(new FluidAttributeFluidType(FluidVariant.of(fluid), handler));
+            return FluidType.kilt$tryGetWrappingFluidType(FluidVariant.of(fluid), handler);
         }
 
         throw new RuntimeException("Mod fluids must override getFluidType.");

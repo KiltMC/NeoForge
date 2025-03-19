@@ -5,9 +5,12 @@
 
 package net.minecraftforge.fluids;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributeHandler;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -26,6 +29,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.SoundAction;
+import net.minecraftforge.common.SoundActions;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
@@ -54,6 +58,25 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public static final int BUCKET_VOLUME = 1000;
 
+    // Kilt: Try to replicate fluid types for Fabric
+    private static final Map<FluidVariantAttributeHandler, FluidType> kilt$fluidTypes = new ConcurrentHashMap<>();
+    public static FluidType kilt$tryGetWrappingFluidType(FluidVariant fluidVariant, FluidVariantAttributeHandler handler) {
+        return kilt$fluidTypes.computeIfAbsent(handler, $ -> {
+            var name = handler.getName(fluidVariant);
+            var properties = Properties.create()
+                .descriptionId(name.getContents() instanceof TranslatableContents translatable ? translatable.getKey() : name.getString())
+                .lightLevel(handler.getLuminance(fluidVariant))
+                .temperature(handler.getTemperature(fluidVariant))
+                .viscosity(handler.getViscosity(fluidVariant, null))
+                .density(handler.isLighterThanAir(fluidVariant) ? 0 : 100);
+
+            handler.getFillSound(fluidVariant).ifPresent(sound -> properties.sound(SoundActions.BUCKET_FILL, sound));
+            handler.getEmptySound(fluidVariant).ifPresent(sound -> properties.sound(SoundActions.BUCKET_EMPTY, sound));
+
+            return new FluidType(properties, true);
+        });
+    }
+
     /**
      * A lazy value which computes the number of fluid types within the
      * registry.
@@ -70,6 +93,14 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
     }
 
     private io.github.fabricators_of_create.porting_lib.fluids.FluidType kilt$wrapped;
+    public boolean kilt$isWrapped = false;
+
+    // Kilt: Add flag to know that a fluid type is wrapped.
+    public FluidType(final Properties properties, boolean isWrapped)
+    {
+        this(properties);
+        this.kilt$isWrapped = isWrapped;
+    }
 
     // Kilt: Wrap around the existing Porting Lib fluid type if possible
     private FluidType(io.github.fabricators_of_create.porting_lib.fluids.FluidType wrapped)
