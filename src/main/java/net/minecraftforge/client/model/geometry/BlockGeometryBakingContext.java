@@ -187,7 +187,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
         }
 
         public boolean kilt$hasAnyData() {
-            return data.isEmpty();
+            return !data.isEmpty();
         }
     }
 }
