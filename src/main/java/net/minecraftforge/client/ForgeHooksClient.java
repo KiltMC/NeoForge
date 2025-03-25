@@ -16,6 +16,7 @@ import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Constants;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.minecraft.FileUtil;
 import net.minecraft.client.*;
 import net.minecraft.client.color.block.BlockColors;
@@ -437,6 +438,15 @@ public class ForgeHooksClient
     public static TextureAtlasSprite[] getFluidSprites(BlockAndTintGetter level, BlockPos pos, FluidState fluidStateIn)
     {
         IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluidStateIn);
+
+        // Kilt: Fallback to Fabric fluid rendering where possible
+        if (props == IClientFluidTypeExtensions.DEFAULT) {
+            var handler = FluidRenderHandlerRegistry.INSTANCE.get(fluidStateIn.getType());
+
+            if (handler != null)
+                return handler.getFluidSprites(level, pos, fluidStateIn);
+        }
+
         ResourceLocation overlayTexture = props.getOverlayTexture(fluidStateIn, level, pos);
         return new TextureAtlasSprite[] {
                 Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(props.getStillTexture(fluidStateIn, level, pos)),
