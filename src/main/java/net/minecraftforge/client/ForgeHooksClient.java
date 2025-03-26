@@ -134,6 +134,7 @@ import xyz.bluspring.kilt.injections.client.renderer.ShaderInstanceInjection;
 import xyz.bluspring.kilt.injections.client.renderer.block.ModelBlockRendererInjection;
 import xyz.bluspring.kilt.injections.client.renderer.block.model.BakedQuadInjection;
 import xyz.bluspring.kilt.injections.client.renderer.texture.SpriteContentsInjection;
+import xyz.bluspring.kilt.workarounds.ForgeFluidRenderHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -443,7 +444,7 @@ public class ForgeHooksClient
         if (props == IClientFluidTypeExtensions.DEFAULT) {
             var handler = FluidRenderHandlerRegistry.INSTANCE.get(fluidStateIn.getType());
 
-            if (handler != null)
+            if (handler != null && !(handler instanceof ForgeFluidRenderHandler))
                 return handler.getFluidSprites(level, pos, fluidStateIn);
         }
 
