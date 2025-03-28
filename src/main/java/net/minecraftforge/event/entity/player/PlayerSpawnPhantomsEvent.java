@@ -5,8 +5,8 @@
 
 package net.minecraftforge.event.entity.player;
 
-import net.minecraft.world.level.levelgen.PhantomSpawner;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.levelgen.PhantomSpawner;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.NotNull;
@@ -25,12 +25,13 @@ import org.jetbrains.annotations.NotNull;
 @Event.HasResult
 public class PlayerSpawnPhantomsEvent extends PlayerEvent
 {
+    private int kilt$oldPhantomsToSpawn;
     private int phantomsToSpawn;
 
     public PlayerSpawnPhantomsEvent(Player player, int phantomsToSpawn)
     {
         super(player);
-        this.phantomsToSpawn = phantomsToSpawn;
+        this.phantomsToSpawn = this.kilt$oldPhantomsToSpawn = phantomsToSpawn;
     }
 
     /**
@@ -39,6 +40,10 @@ public class PlayerSpawnPhantomsEvent extends PlayerEvent
     public int getPhantomsToSpawn()
     {
         return phantomsToSpawn;
+    }
+
+    public int kilt$getOldPhantomsToSpawn() {
+        return this.kilt$oldPhantomsToSpawn;
     }
 
     /**
