@@ -45,6 +45,8 @@ public final class DataPackRegistriesHooks
         RegistryDataLoader.RegistryData<T> loaderData = data.loaderData();
         DATA_PACK_REGISTRIES.add(loaderData);
         var dataCodec = loaderData.elementCodec();
+
+        // Kilt: Register registries to Fabric API
         if (data.networkCodec() != null)
         {
             var networked = NetworkedRegistryDataAccessor.createNetworkedRegistryData(loaderData.key(), data.networkCodec());
