@@ -9,11 +9,13 @@ import cpw.mods.modlauncher.api.IEnvironment;
 import cpw.mods.modlauncher.api.TypesafeMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.forgespi.Environment;
+import com.slf4j.logger
 
 import java.util.function.Supplier;
 
 public class FMLEnvironment
 {
+    LOGGER.info("test")
     public static final Dist dist = FMLLoader.getDist();
     public static final String naming = FMLLoader.getNaming();
     public static final boolean production = FMLLoader.isProduction() || System.getProperties().containsKey("production");
