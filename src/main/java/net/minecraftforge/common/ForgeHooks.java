@@ -146,6 +146,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -320,8 +321,15 @@ public class ForgeHooks
     @Nullable
     public static ItemEntity onPlayerTossEvent(@NotNull Player player, @NotNull ItemStack item, boolean includeName)
     {
+        return kilt$onPlayerTossEvent(player, item, includeName, () -> player.drop(item, false, includeName));
+    }
+
+    // Kilt: Call original for better mod compatibility
+    @Nullable
+    public static ItemEntity kilt$onPlayerTossEvent(@NotNull Player player, @NotNull ItemStack item, boolean includeName, Supplier<ItemEntity> original)
+    {
         player.captureDrops(Lists.newArrayList());
-        ItemEntity ret = player.drop(item, false, includeName);
+        ItemEntity ret = original.get();
         player.captureDrops(null);
 
         if (ret == null)
