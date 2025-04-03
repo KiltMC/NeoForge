@@ -37,9 +37,11 @@ import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.util.KiltHelper;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /*
  * Extension added to ItemStack that bounces to ItemSack sensitive Item methods. Typically this is just for convince.
@@ -194,6 +196,15 @@ public interface IForgeItemStack extends ICapabilitySerializable<CompoundTag>, I
     default Map<Enchantment, Integer> getAllEnchantments()
     {
         return self().getItem().getAllEnchantments(self());
+    }
+
+    default Map<Enchantment, Integer> kilt$getAllEnchantments(Supplier<Map<Enchantment, Integer>> original)
+    {
+        if (KiltHelper.INSTANCE.hasMethodOverride(this.getClass(), ItemStack.class, "getAllEnchantments")) {
+            return this.getAllEnchantments();
+        }
+
+        return self().getItem().kilt$getAllEnchantments(self(), original);
     }
 
     /**

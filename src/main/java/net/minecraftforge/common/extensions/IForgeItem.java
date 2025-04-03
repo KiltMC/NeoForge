@@ -41,12 +41,14 @@ import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.item.enchantment.EnchantmentHelperInjection;
+import xyz.bluspring.kilt.util.KiltHelper;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 // TODO systemic review of all extension functions. lots of unused -C
 public interface IForgeItem extends ItemExtensions, io.github.fabricators_of_create.porting_lib.entity.extensions.ItemExtensions, UseFirstBehaviorItem
@@ -571,6 +573,15 @@ public interface IForgeItem extends ItemExtensions, io.github.fabricators_of_cre
     default Map<Enchantment, Integer> getAllEnchantments(ItemStack stack)
     {
         return EnchantmentHelper.deserializeEnchantments(stack.getEnchantmentTags());
+    }
+
+    default Map<Enchantment, Integer> kilt$getAllEnchantments(ItemStack stack, Supplier<Map<Enchantment, Integer>> original)
+    {
+        if (KiltHelper.INSTANCE.hasMethodOverride(this.getClass(), Item.class, "getAllEnchantments", ItemStack.class)) {
+            return this.getAllEnchantments(stack);
+        }
+
+        return original.get();
     }
 
     /**
