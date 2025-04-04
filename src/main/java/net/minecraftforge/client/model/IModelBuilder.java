@@ -36,6 +36,16 @@ public interface IModelBuilder<T extends IModelBuilder<T>>
     }
 
     /**
+     * Creates a new model builder that uses the provided attributes in the final baked model.
+     */
+    static IModelBuilder<?> of(boolean hasAmbientOcclusion, boolean usesBlockLight, boolean isGui3d,
+                               ItemTransforms transforms, ItemOverrides overrides, TextureAtlasSprite particle,
+                               RenderTypeGroup renderTypes, RenderTypeGroup renderTypesFast)
+    {
+        return new Simple(hasAmbientOcclusion, usesBlockLight, isGui3d, transforms, overrides, particle, renderTypes, renderTypesFast);
+    }
+
+    /**
      * Creates a new model builder that collects quads to the provided list, returning
      * {@linkplain EmptyModel#BAKED an empty model} if you call {@link #build()}.
      */
@@ -54,13 +64,22 @@ public interface IModelBuilder<T extends IModelBuilder<T>>
     {
         private final SimpleBakedModel.Builder builder;
         private final RenderTypeGroup renderTypes;
+        private final RenderTypeGroup renderTypesFast;
 
         private Simple(boolean hasAmbientOcclusion, boolean usesBlockLight, boolean isGui3d,
                        ItemTransforms transforms, ItemOverrides overrides, TextureAtlasSprite particle,
                        RenderTypeGroup renderTypes)
         {
+            this(hasAmbientOcclusion, usesBlockLight, isGui3d, transforms, overrides, particle, renderTypes, RenderTypeGroup.EMPTY);
+        }
+
+        private Simple(boolean hasAmbientOcclusion, boolean usesBlockLight, boolean isGui3d,
+                       ItemTransforms transforms, ItemOverrides overrides, TextureAtlasSprite particle,
+                       RenderTypeGroup renderTypes, RenderTypeGroup renderTypesFast)
+        {
             this.builder = new SimpleBakedModel.Builder(hasAmbientOcclusion, usesBlockLight, isGui3d, transforms, overrides).particle(particle);
             this.renderTypes = renderTypes;
+            this.renderTypesFast = renderTypesFast;
         }
 
         @Override
@@ -81,7 +100,7 @@ public interface IModelBuilder<T extends IModelBuilder<T>>
         @Override
         public BakedModel build()
         {
-            return ((SimpleBakedModelBuilderInjection) builder).build(renderTypes);
+            return ((SimpleBakedModelBuilderInjection) builder).build(renderTypes, renderTypesFast);
         }
     }
 

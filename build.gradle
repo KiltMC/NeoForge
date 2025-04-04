@@ -54,7 +54,7 @@ ext {
     SPI_VERSION = '7.0.1'
     MERGETOOL_VERSION = '1.1.5'
     ACCESSTRANSFORMERS_VERSION = '8.0.4'
-    COREMODS_VERSION = '5.2.1'
+    COREMODS_VERSION = '5.2.4'
     EVENTBUS_VERSION = '6.0.5'
     MODLAUNCHER_VERSION = '10.0.9'
     SECUREJARHANDLER_VERSION = '2.1.10'
@@ -227,45 +227,47 @@ project(':mcp') {
     }
 }
 
-project(':clean') {
-    evaluationDependsOn(':mcp')
-    apply plugin: 'net.minecraftforge.gradle.patcher'
-    tasks.withType(AbstractPublishToMaven.class).forEach{tsk -> tsk.enabled = false } // We don't want to publish anything
+if (!System.env.TEAMCITY_VERSION) {
+    project(':clean') {
+        evaluationDependsOn(':mcp')
+        apply plugin: 'net.minecraftforge.gradle.patcher'
+        tasks.withType(AbstractPublishToMaven.class).forEach{tsk -> tsk.enabled = false } // We don't want to publish anything
 
-    dependencies {
-        implementation 'net.minecraftforge:forgespi:' + SPI_VERSION
-    }
+        dependencies {
+            implementation 'net.minecraftforge:forgespi:' + SPI_VERSION
+        }
 
-    patcher {
-        parent = project(':mcp')
-        mcVersion = MC_VERSION
-        patchedSrc = file('src/main/java')
+        patcher {
+            parent = project(':mcp')
+            mcVersion = MC_VERSION
+            patchedSrc = file('src/main/java')
 
-        mappings channel: MAPPING_CHANNEL, version: MAPPING_VERSION
+            mappings channel: MAPPING_CHANNEL, version: MAPPING_VERSION
 
-        runs {
-            clean_client {
-                client true
-                taskName 'clean_client'
-                ideaModule "${rootProject.name}.${project.name}.main"
+            runs {
+                clean_client {
+                    client true
+                    taskName 'clean_client'
+                    ideaModule "${rootProject.name}.${project.name}.main"
 
-                main 'net.minecraft.client.main.Main'
-                workingDirectory project.file('run')
+                    main 'net.minecraft.client.main.Main'
+                    workingDirectory project.file('run')
 
-                args '--gameDir', '.'
-                args '--version', MC_VERSION
-                args '--assetsDir', downloadAssets.output
-                args '--assetIndex', '{asset_index}'
-                args '--accessToken', '0'
-            }
+                    args '--gameDir', '.'
+                    args '--version', MC_VERSION
+                    args '--assetsDir', downloadAssets.output
+                    args '--assetIndex', '{asset_index}'
+                    args '--accessToken', '0'
+                }
 
-            clean_server {
-                client false
-                taskName 'clean_server'
-                ideaModule "${rootProject.name}.${project.name}.main"
+                clean_server {
+                    client false
+                    taskName 'clean_server'
+                    ideaModule "${rootProject.name}.${project.name}.main"
 
-                main 'net.minecraft.server.Main'
-                workingDirectory project.file('run')
+                    main 'net.minecraft.server.Main'
+                    workingDirectory project.file('run')
+                }
             }
         }
     }
@@ -888,7 +890,7 @@ project(':fmlonly') {
 }
 
 project(':forge') {
-    evaluationDependsOn(':clean')
+    evaluationDependsOn(System.env.TEAMCITY_VERSION ? ':mcp' : ':clean')
     apply plugin: 'java-library'
     apply plugin: 'net.minecraftforge.gradle.patcher'
     apply plugin: 'org.cadixdev.licenser'
@@ -968,12 +970,18 @@ project(':forge') {
 
     patcher {
         excs.from file("$rootDir/src/main/resources/forge.exc")
-        parent = project(':clean')
+        parent = project(System.env.TEAMCITY_VERSION ? ':mcp' : ':clean')
         patches = file("$rootDir/patches/minecraft")
         patchedSrc = file('src/main/java')
         srgPatches = true
         accessTransformers.from file("$rootDir/src/main/resources/META-INF/accesstransformer.cfg")
         sideAnnotationStrippers.from file("$rootDir/src/main/resources/forge.sas")
+
+        // the clean project provides these. if we're not using it, we need to provide them ourselves
+        if (System.env.TEAMCITY_VERSION) {
+            mappings channel: MAPPING_CHANNEL, version: MAPPING_VERSION
+            mcVersion = MC_VERSION
+        }
 
         runs {
             forge_client {
@@ -1795,7 +1803,8 @@ project(':forge') {
 
 //evaluationDependsOnChildren()
 task setup() {  //These must be strings so that we can do lazy resolution. Else we need evaluationDependsOnChildren above
-    dependsOn ':clean:extractMapped'
+    if (!System.env.TEAMCITY_VERSION)
+        dependsOn ':clean:extractMapped'
     if (symlinkValid)
         dependsOn ':fmlonly:extractMapped'
     dependsOn ':forge:extractMapped'
@@ -1808,7 +1817,9 @@ task doChecks {
 
 if (symlinkValid)
     project.gradle.startParameter.excludedTaskNames.add(':fmlonly:genPatches')
-project.gradle.startParameter.excludedTaskNames.add(':clean:genPatches')
+
+if (!System.env.TEAMCITY_VERSION)
+    project.gradle.startParameter.excludedTaskNames.add(':clean:genPatches')
 
 //Also output FMLOnly when building a version.
 if (System.env.TEAMCITY_VERSION) {
