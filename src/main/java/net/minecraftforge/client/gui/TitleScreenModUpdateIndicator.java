@@ -12,10 +12,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.loading.FMLConfig;
-import net.minecraftforge.versions.forge.ForgeVersion;
-import net.minecraftforge.fml.VersionChecker;
 import net.minecraftforge.client.loading.ClientModLoader;
+import net.minecraftforge.fml.VersionChecker;
+import net.minecraftforge.versions.forge.ForgeVersion;
 
 public class TitleScreenModUpdateIndicator extends Screen
 {

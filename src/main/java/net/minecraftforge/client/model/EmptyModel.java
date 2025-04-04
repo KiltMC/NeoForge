@@ -58,8 +58,8 @@ public class EmptyModel extends SimpleUnbakedGeometry<EmptyModel>
         public Baked()
         {
             super(List.of(), Map.of(), false, false, false, UnitTextureAtlasSprite.INSTANCE, ItemTransforms.NO_TRANSFORMS, ItemOverrides.EMPTY);
-            ((SimpleBakedModelInjection) this).addRenderTypes(RenderTypeGroup.EMPTY);
-            ((SimpleBakedModelInjection) this).addRenderTypesFast(RenderTypeGroup.EMPTY);
+            ((SimpleBakedModelInjection) this).kilt$addRenderTypes(RenderTypeGroup.EMPTY);
+            ((SimpleBakedModelInjection) this).kilt$addRenderTypesFast(RenderTypeGroup.EMPTY);
         }
 
         @Override

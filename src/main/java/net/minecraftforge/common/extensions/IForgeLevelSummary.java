@@ -6,6 +6,7 @@
 package net.minecraftforge.common.extensions;
 
 import net.minecraft.world.level.storage.LevelSummary;
+import xyz.bluspring.kilt.injections.world.level.LevelSettingsInjection;
 
 public interface IForgeLevelSummary {
     private LevelSummary self() {
@@ -22,6 +23,6 @@ public interface IForgeLevelSummary {
         // NOTE: Because SymlinkLevelSummary can have null settings, we need to check it
         var settings = this.self().getSettings();
 
-        return settings != null && settings.getLifecycle().equals(com.mojang.serialization.Lifecycle.experimental());
+        return settings != null && ((LevelSettingsInjection) (Object) settings).getLifecycle().equals(com.mojang.serialization.Lifecycle.experimental());
     }
 }

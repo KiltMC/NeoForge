@@ -142,7 +142,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext
     {
         if (renderTypeFastHint != null)
             return renderTypeFastHint;
-        return owner.parent != null ? owner.parent.customData.getRenderTypeFastHint() : null;
+        return owner.parent != null ? ((BlockModelInjection) owner.parent).kilt$getCustomData().getRenderTypeFastHint() : null;
     }
 
     public void setRenderTypeHint(ResourceLocation renderTypeHint)

@@ -63,7 +63,7 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer
         if (jsonobject.has("render_type_fast"))
         {
             var renderTypeHintName = GsonHelper.getAsString(jsonobject, "render_type_fast");
-            model.customData.setRenderTypeFastHint(new ResourceLocation(renderTypeHintName));
+            ((BlockModelInjection) model).kilt$getCustomData().setRenderTypeFastHint(new ResourceLocation(renderTypeHintName));
         }
 
         if (jsonobject.has("visibility"))
