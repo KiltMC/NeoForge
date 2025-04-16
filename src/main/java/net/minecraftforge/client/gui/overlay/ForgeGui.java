@@ -39,6 +39,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,6 +174,13 @@ public class ForgeGui extends Gui
 
     public void renderHelmet(float partialTick, GuiGraphics guiGraphics)
     {
+        this.kilt$renderHelmet(partialTick, guiGraphics, false);
+    }
+
+    // Kilt: Compatibility method to allow better mod compatibility
+    @ApiStatus.Internal
+    public boolean kilt$renderHelmet(float partialTick, GuiGraphics guiGraphics, boolean kilt$isKiltCall)
+    {
         ItemStack itemstack = this.minecraft.player.getInventory().getArmor(3);
 
         if (this.minecraft.options.getCameraType().isFirstPerson() && !itemstack.isEmpty())
@@ -180,6 +188,9 @@ public class ForgeGui extends Gui
             Item item = itemstack.getItem();
             if (item == Blocks.CARVED_PUMPKIN.asItem())
             {
+                if (kilt$isKiltCall)
+                    return true;
+
                 renderTextureOverlay(guiGraphics, PUMPKIN_BLUR_LOCATION, 1.0F);
             }
             else
@@ -187,6 +198,8 @@ public class ForgeGui extends Gui
                 IClientItemExtensions.of(item).renderHelmetOverlay(itemstack, minecraft.player, this.screenWidth, this.screenHeight, partialTick);
             }
         }
+
+        return false;
     }
 
     void renderFrostbite(GuiGraphics guiGraphics)
