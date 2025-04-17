@@ -53,6 +53,8 @@ public class ForgeGui extends Gui
 
     private static final int WHITE = 0xFFFFFF;
 
+    public static final List<NamedGuiOverlay> kilt$alreadyProcessedOverlays = new ArrayList<>();
+
     /*
      * If the Euclidean distance to the moused-over block in meters is less than this value, the "Looking at" text will appear on the debug overlay.
      */
@@ -122,6 +124,16 @@ public class ForgeGui extends Gui
         GuiOverlayManager.getOverlays().forEach(entry -> {
             try
             {
+                // Kilt: Avoid double-rendering Minecraft overlays
+                if (entry.id().getNamespace().equals("minecraft"))
+                    return;
+
+                // Kilt: Try to avoid rendering twice
+                if (kilt$alreadyProcessedOverlays.contains(entry))
+                    return;
+
+                kilt$alreadyProcessedOverlays.add(entry);
+
                 IGuiOverlay overlay = entry.overlay();
                 if (pre(entry, guiGraphics)) return;
                 overlay.render(this, guiGraphics, partialTick, screenWidth, screenHeight);
