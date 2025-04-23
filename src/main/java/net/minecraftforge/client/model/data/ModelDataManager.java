@@ -58,24 +58,31 @@ public class ModelDataManager
 
     private void refreshAt(long chunk)
     {
-        Set<BlockPos> needUpdate = needModelDataRefresh.remove(chunk);
+        try {
+            // Kilt: Catch exceptions with ModelData
+            // TODO: remove in 1.21+
+            if (!needModelDataRefresh.containsKey(chunk))
+                return;
 
-        if (needUpdate != null)
-        {
-            Map<BlockPos, ModelData> data = modelDataCache.computeIfAbsent(chunk, $ -> new ConcurrentHashMap<>());
-            for (BlockPos pos : needUpdate)
+            Set<BlockPos> needUpdate = needModelDataRefresh.remove(chunk);
+
+            if (needUpdate != null)
             {
-                BlockEntity toUpdate = level.getBlockEntity(pos);
-                if (toUpdate != null && !toUpdate.isRemoved())
+                Map<BlockPos, ModelData> data = modelDataCache.computeIfAbsent(chunk, $ -> new ConcurrentHashMap<>());
+                for (BlockPos pos : needUpdate)
                 {
-                    data.put(pos, toUpdate.getModelData());
-                }
-                else
-                {
-                    data.remove(pos);
+                    BlockEntity toUpdate = level.getBlockEntity(pos);
+                    if (toUpdate != null && !toUpdate.isRemoved())
+                    {
+                        data.put(pos, toUpdate.getModelData());
+                    }
+                    else
+                    {
+                        data.remove(pos);
+                    }
                 }
             }
-        }
+        } catch (ArrayIndexOutOfBoundsException ignored) {}
     }
 
     public @Nullable ModelData getAt(BlockPos pos)
