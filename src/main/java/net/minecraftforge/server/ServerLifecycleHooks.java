@@ -161,7 +161,7 @@ public class ServerLifecycleHooks
             }
 
             if (connectionType == ConnectionType.VANILLA && !NetworkRegistry.acceptsVanillaClientConnections()) {
-                rejectConnection(manager, connectionType, "This server has mods that require Forge to be installed on the client. Contact your server admin for more details.");
+                rejectConnection(manager, connectionType, "This server has mods that require Forge or Kilt to be installed on the client. Contact your server admin for more details.");
                 return false;
             }
         }

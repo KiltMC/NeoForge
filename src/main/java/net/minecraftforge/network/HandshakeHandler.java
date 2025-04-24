@@ -6,7 +6,6 @@
 package net.minecraftforge.network;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.Registry;
 import net.minecraft.network.Connection;
@@ -18,13 +17,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LogMessageAdapter;
 import net.minecraftforge.event.entity.player.PlayerNegotiationEvent;
 import net.minecraftforge.network.ConnectionData.ModMismatchData;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 import net.minecraftforge.registries.ForgeRegistry;
-import net.minecraftforge.registries.GameData;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,11 +30,8 @@ import org.apache.logging.log4j.MarkerManager;
 
 import java.util.*;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
@@ -262,7 +256,7 @@ public class HandshakeHandler
         }
     }
 
-    void handleRegistryMessage(final HandshakeMessages.S2CRegistry registryPacket, final Supplier<NetworkEvent.Context> contextSupplier){
+    void handleRegistryMessage(final HandshakeMessages.S2CRegistry registryPacket, final Supplier<NetworkEvent.Context> contextSupplier){/* // Kilt: Try to focus Fabric's registry sync
         LOGGER.debug(FMLHSMARKER,"Received registry packet for {}", registryPacket.getRegistryName());
         this.registriesToReceive.remove(registryPacket.getRegistryName());
         this.registrySnapshots.put(registryPacket.getRegistryName(), registryPacket.getSnapshot());
@@ -278,9 +272,9 @@ public class HandshakeHandler
         } else {
             NetworkConstants.handshakeChannel.reply(new HandshakeMessages.C2SAcknowledge(), contextSupplier.get());
         }
-    }
+    */}
 
-    private boolean handleRegistryLoading(final Supplier<NetworkEvent.Context> contextSupplier) {
+    private boolean handleRegistryLoading(final Supplier<NetworkEvent.Context> contextSupplier) {/* // Kilt: Try to focus Fabric's registry sync
         // We use a countdown latch to suspend the impl thread pending the client thread processing the registry data
         AtomicBoolean successfulConnection = new AtomicBoolean(false);
         AtomicReference<Multimap<ResourceLocation, ResourceLocation>> registryMismatches = new AtomicReference<>();
@@ -312,7 +306,7 @@ public class HandshakeHandler
             this.manager.disconnect(Component.literal("Failed to synchronize registry data from server, closing connection"));
         }
         return successfulConnection.get();
-    }
+    */}
 
     void handleClientAck(final HandshakeMessages.C2SAcknowledge msg, final Supplier<NetworkEvent.Context> contextSupplier) {
         LOGGER.debug(FMLHSMARKER, "Received acknowledgement from client");
