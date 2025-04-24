@@ -272,7 +272,10 @@ public class HandshakeHandler
         } else {
             NetworkConstants.handshakeChannel.reply(new HandshakeMessages.C2SAcknowledge(), contextSupplier.get());
         }
-    */}
+    */
+        contextSupplier.get().setPacketHandled(true);
+        NetworkConstants.handshakeChannel.reply(new HandshakeMessages.C2SAcknowledge(), contextSupplier.get());
+    }
 
     private boolean handleRegistryLoading(final Supplier<NetworkEvent.Context> contextSupplier) {/* // Kilt: Try to focus Fabric's registry sync
         // We use a countdown latch to suspend the impl thread pending the client thread processing the registry data
