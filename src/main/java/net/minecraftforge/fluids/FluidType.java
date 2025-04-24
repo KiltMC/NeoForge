@@ -92,7 +92,7 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
         return kilt$wrappedFluidTypes.computeIfAbsent(fabricFluidType, FluidType::new);
     }
 
-    private io.github.fabricators_of_create.porting_lib.fluids.FluidType kilt$wrapped;
+    public io.github.fabricators_of_create.porting_lib.fluids.FluidType kilt$wrapped;
     public boolean kilt$isWrapped = false;
 
     // Kilt: Add flag to know that a fluid type is wrapped.

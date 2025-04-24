@@ -7,11 +7,13 @@ package net.minecraftforge.client.extensions.common;
 
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fabricators_of_create.porting_lib.fluids.PortingLibFluids;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.material.Fluid;
@@ -24,7 +26,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.bluspring.kilt.injections.client.renderer.ScreenEffectRendererInjection;
+import xyz.bluspring.kilt.workarounds.FabricFluidTypeExtensions;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -35,19 +41,53 @@ import java.util.function.Consumer;
 public interface IClientFluidTypeExtensions
 {
     IClientFluidTypeExtensions DEFAULT = new IClientFluidTypeExtensions() { };
+    Map<FluidType, IClientFluidTypeExtensions> kilt$fabricFluidExtensions = Collections.synchronizedMap(new HashMap<>());
 
     static IClientFluidTypeExtensions of(FluidState state)
     {
-        return of(state.getFluidType());
+        var fluidType = state.getFluidType();
+
+        // Kilt: Try to handle Fabric fluid types
+        if (fluidType.kilt$isWrapped) {
+            return kilt$fabricFluidExtensions.computeIfAbsent(fluidType, $ -> new FabricFluidTypeExtensions(state.getType()));
+        }
+
+        return of(fluidType);
     }
 
     static IClientFluidTypeExtensions of(Fluid fluid)
     {
-        return of(fluid.getFluidType());
+        var fluidType = fluid.getFluidType();
+
+        // Kilt: Try to handle Fabric fluid types
+        if (fluidType.kilt$isWrapped) {
+            return kilt$fabricFluidExtensions.computeIfAbsent(fluidType, $ -> new FabricFluidTypeExtensions(fluid));
+        }
+
+        return of(fluidType);
     }
 
     static IClientFluidTypeExtensions of(FluidType type)
     {
+        if (type.kilt$isWrapped) { // Kilt: Try to handle Fabric fluid types
+            if (kilt$fabricFluidExtensions.containsKey(type)) {
+                return kilt$fabricFluidExtensions.get(type);
+            }
+
+            // Kilt: Try to derive the fluid type
+            if (type.kilt$wrapped != null) {
+                var key = PortingLibFluids.FLUID_TYPES.getKey(type.kilt$wrapped);
+                var fluid = BuiltInRegistries.FLUID.getOptional(key).orElse(null);
+
+                if (fluid != null) {
+                    var fabricExt = new FabricFluidTypeExtensions(fluid);
+                    kilt$fabricFluidExtensions.put(type, fabricExt);
+
+                    return fabricExt;
+                }
+            }
+        }
+
         return type.getRenderPropertiesInternal() instanceof IClientFluidTypeExtensions props ? props : DEFAULT;
     }
 
