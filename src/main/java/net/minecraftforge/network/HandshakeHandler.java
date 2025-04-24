@@ -306,7 +306,9 @@ public class HandshakeHandler
             this.manager.disconnect(Component.literal("Failed to synchronize registry data from server, closing connection"));
         }
         return successfulConnection.get();
-    */}
+    */
+        return false;
+    }
 
     void handleClientAck(final HandshakeMessages.C2SAcknowledge msg, final Supplier<NetworkEvent.Context> contextSupplier) {
         LOGGER.debug(FMLHSMARKER, "Received acknowledgement from client");
