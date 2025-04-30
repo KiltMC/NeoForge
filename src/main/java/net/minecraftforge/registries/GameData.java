@@ -297,6 +297,10 @@ public class GameData {
         LOGGER.debug(REGISTRIES, "Reverting complete");
     }
 
+    public static void kilt$rebuildBlockMaps() {
+
+    }
+
     @SuppressWarnings("deprecation")
     public static void postRegisterEvents()
     {
