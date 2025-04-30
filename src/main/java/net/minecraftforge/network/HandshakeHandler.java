@@ -5,9 +5,9 @@
 
 package net.minecraftforge.network;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
-
 import net.minecraft.core.Registry;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
@@ -30,8 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-
-import com.google.common.collect.Maps;
 
 import java.util.*;
 import java.util.concurrent.CancellationException;
@@ -267,7 +265,8 @@ public class HandshakeHandler
     }
 
     void handleRegistryMessage(final HandshakeMessages.S2CRegistry registryPacket, final Supplier<NetworkEvent.Context> contextSupplier){
-        LOGGER.debug(FMLHSMARKER,"Received registry packet for {}", registryPacket.getRegistryName());
+        // Kilt: focus on Fabric registry sync
+        /*LOGGER.debug(FMLHSMARKER,"Received registry packet for {}", registryPacket.getRegistryName());
         this.registriesToReceive.remove(registryPacket.getRegistryName());
         this.registrySnapshots.put(registryPacket.getRegistryName(), registryPacket.getSnapshot());
 
@@ -281,7 +280,10 @@ public class HandshakeHandler
             LOGGER.error(FMLHSMARKER, "Connection closed, not continuing handshake");
         } else {
             NetworkConstants.handshakeChannel.reply(new HandshakeMessages.C2SAcknowledge(), contextSupplier.get());
-        }
+        }*/
+
+        contextSupplier.get().setPacketHandled(true);
+        NetworkConstants.handshakeChannel.reply(new HandshakeMessages.C2SAcknowledge(), contextSupplier.get());
     }
 
     private boolean handleRegistryLoading(final Supplier<NetworkEvent.Context> contextSupplier) {
