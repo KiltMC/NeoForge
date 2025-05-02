@@ -24,7 +24,6 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -107,9 +106,9 @@ public class ForgeMod
             ArgumentTypeInfosInjection.registerByClass(ModIdArgument.class,
                     SingletonArgumentInfo.contextFree(ModIdArgument::modIdArgument)));
 
-    public static final RegistryObject<Attribute> SWIM_SPEED = ATTRIBUTES.register("swim_speed", () -> new RangedAttribute("forge.swimSpeed", 1.0D, 0.0D, 1024.0D).setSyncable(true));
-    public static final RegistryObject<Attribute> NAMETAG_DISTANCE = ATTRIBUTES.register("nametag_distance", () -> new RangedAttribute("forge.nameTagDistance", 64.0D, 0.0D, 64.0).setSyncable(true));
-    public static final RegistryObject<Attribute> ENTITY_GRAVITY = ATTRIBUTES.register("entity_gravity", () -> new RangedAttribute("forge.entity_gravity", 0.08D, -8.0D, 8.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> SWIM_SPEED = ATTRIBUTES.kilt$getValue("swim_speed");
+    public static final RegistryObject<Attribute> NAMETAG_DISTANCE = ATTRIBUTES.kilt$getValue("nametag_distance");
+    public static final RegistryObject<Attribute> ENTITY_GRAVITY = ATTRIBUTES.kilt$getValue("entity_gravity");
 
     /**
      * Reach Distance represents the distance at which a player may interact with the world.  The default is 4.5 blocks.  Players in creative mode have an additional 0.5 blocks of reach distance.
@@ -117,20 +116,20 @@ public class ForgeMod
      * @see IForgePlayer#canInteractWith(BlockPos, double)
      * @see IForgePlayer#canInteractWith(Entity, double)
      */
-    public static final RegistryObject<Attribute> REACH_DISTANCE = ATTRIBUTES.register("reach_distance", () -> new RangedAttribute("generic.reachDistance", 4.5D, 0.0D, 1024.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> REACH_DISTANCE = ATTRIBUTES.kilt$getValue("reach_distance");
 
     /**
      * Attack Range represents the distance at which a player may attack an entity.  The default is 3 blocks.  Players in creative mode have an additional 3 blocks of attack reach.
      * @see IForgePlayer#getAttackRange()
      * @see IForgePlayer#canHit(Entity, double)
      */
-    public static final RegistryObject<Attribute> ATTACK_RANGE = ATTRIBUTES.register("attack_range", () -> new RangedAttribute("generic.attack_range", 3.0D, 0.0D, 1024.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> ATTACK_RANGE = ATTRIBUTES.kilt$getValue("attack_range");
 
     /**
      * Step Height Addition modifies the amount of blocks an entity may walk up without jumping.
      * @see IForgeEntity#getStepHeight()
      */
-    public static final RegistryObject<Attribute> STEP_HEIGHT_ADDITION = ATTRIBUTES.register("step_height_addition", () -> new RangedAttribute("forge.stepHeight", 0.0D, -512.0D, 512.0D).setSyncable(true));
+    public static final RegistryObject<Attribute> STEP_HEIGHT_ADDITION = ATTRIBUTES.kilt$getValue("step_height_addition");
 
     /**
      * Noop biome modifier. Can be used in a biome modifier json with "type": "forge:none".
@@ -438,6 +437,14 @@ public class ForgeMod
         MinecraftForge.EVENT_BUS.addListener(this::registerPermissionNodes);
 
         ForgeRegistries.ITEMS.tags().addOptionalTagDefaults(Tags.Items.ENCHANTING_FUELS, Set.of(ForgeRegistries.ITEMS.getDelegateOrThrow(Items.LAPIS_LAZULI)));
+
+        // Kilt: Add aliases between Fabric and Forge values
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "reach_distance"), new ResourceLocation("reach-entity-attributes", "reach"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "attack_range"), new ResourceLocation("reach-entity-attributes", "attack_range"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "step_height"), new ResourceLocation("porting_lib", "step_height_addition"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "step_height_addition"), new ResourceLocation("porting_lib", "step_height_addition"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "entity_gravity"), new ResourceLocation("porting_lib", "entity_gravity"));
+        ((ForgeRegistry<Attribute>) ForgeRegistries.ATTRIBUTES).addAlias(new ResourceLocation("forge", "swim_speed"), new ResourceLocation("porting_lib", "swim_speed"));
     }
 
     public void preInit(FMLCommonSetupEvent evt)

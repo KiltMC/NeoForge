@@ -33,6 +33,8 @@ public final class RegistryObject<T> implements Supplier<T>
     @Nullable
     private Holder<T> holder;
 
+    boolean kilt$isRedirect = false;
+
     /**
      * Factory for a {@link RegistryObject} that stores the value of an object from the provided forge registry once it is ready.
      *
@@ -208,7 +210,7 @@ public final class RegistryObject<T> implements Supplier<T>
     @SuppressWarnings("unchecked")
     void updateReference(IForgeRegistry<? extends T> registry)
     {
-        if (this.name == null || this.key == null)
+        if (this.name == null || this.key == null || this.kilt$isRedirect)
             return;
         if (registry.containsKey(this.name))
         {
@@ -225,7 +227,7 @@ public final class RegistryObject<T> implements Supplier<T>
     @SuppressWarnings("unchecked")
     void updateReference(Registry<? extends T> registry)
     {
-        if (this.name == null || this.key == null)
+        if (this.name == null || this.key == null || this.kilt$isRedirect)
             return;
         if (registry.containsKey(this.name))
         {
@@ -242,7 +244,7 @@ public final class RegistryObject<T> implements Supplier<T>
     @SuppressWarnings("unchecked")
     void updateReference(ResourceLocation registryName)
     {
-        if (this.name == null)
+        if (this.name == null || this.kilt$isRedirect)
             return;
         IForgeRegistry<? extends T> forgeRegistry = RegistryManager.ACTIVE.getRegistry(registryName);
         if (forgeRegistry != null)
@@ -283,6 +285,23 @@ public final class RegistryObject<T> implements Supplier<T>
             updateReference(vanillaRegistry);
         else
             this.value = null;
+    }
+
+    // Kilt: try handling redirects
+    void kilt$updateReferenceRedirect(RegisterEvent event) {
+        ForgeRegistry<? extends T> forgeRegistry = (ForgeRegistry<? extends T>) event.getForgeRegistry();
+        Registry<? extends T> vanillaRegistry = event.getVanillaRegistry();
+        if (forgeRegistry != null) {
+            var alias = forgeRegistry.kilt$getAlias(this.name);
+
+            if (vanillaRegistry != null) {
+                this.value = vanillaRegistry.get(alias);
+            } else {
+                this.value = forgeRegistry.getValue(alias);
+            }
+        } else if (vanillaRegistry != null) {
+            this.value = vanillaRegistry.get(this.name);
+        }
     }
 
     private static boolean registryExists(ResourceLocation registryName)

@@ -5,47 +5,38 @@
 
 package net.minecraftforge.registries;
 
-import java.util.*;
-import java.util.Map.Entry;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.common.util.LogMessageAdapter;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.registries.tags.ITagManager;
-import org.apache.commons.lang3.Validate;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-
-import io.netty.buffer.Unpooled;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
+import net.minecraft.tags.TagKey;
+import net.minecraftforge.common.util.LogMessageAdapter;
 import net.minecraftforge.common.util.TablePrinter;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.registries.tags.ITagManager;
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegistryModifiable<V>
 {
@@ -215,6 +206,10 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             key = this.aliases.get(key);
         }
         return ret == null ? this.defaultValue : ret;
+    }
+
+    public ResourceLocation kilt$getAlias(ResourceLocation key) {
+        return this.aliases.get(key);
     }
 
     @Override
@@ -485,7 +480,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return ret;
     }
 
-    void addAlias(ResourceLocation from, ResourceLocation to)
+    public void addAlias(ResourceLocation from, ResourceLocation to)
     {
         if (this.isLocked())
             throw new IllegalStateException(String.format(Locale.ENGLISH, "Attempted to register the alias %s -> %s to late", from, to));

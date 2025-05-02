@@ -7,6 +7,7 @@ package net.minecraftforge.registries;
 
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -18,15 +19,8 @@ import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -147,6 +141,7 @@ public class DeferredRegister<T>
     private final boolean optionalRegistry;
     private final Map<RegistryObject<T>, Supplier<? extends T>> entries = new LinkedHashMap<>();
     private final Set<RegistryObject<T>> entriesView = Collections.unmodifiableSet(entries.keySet());
+    private final Set<RegistryObject<T>> kilt$entries = new HashSet<>();
 
     @Nullable
     private Supplier<RegistryBuilder<?>> registryFactory;
@@ -195,6 +190,19 @@ public class DeferredRegister<T>
         }
 
         return ret;
+    }
+
+    // Kilt: Handle aliased values
+    public <I extends T> RegistryObject<I> kilt$getValue(final String name) {
+        if (seenRegisterEvent)
+            throw new IllegalStateException("Cannot register new entries to DeferredRegister after RegisterEvent has been fired.");
+        Objects.requireNonNull(name);
+        final ResourceLocation key = new ResourceLocation(modid, name);
+
+        return Util.make(RegistryObject.create(key, this.registryKey, this.modid), obj -> {
+            this.kilt$entries.add((RegistryObject<T>) obj);
+            obj.kilt$isRedirect = true;
+        });
     }
 
     /**
@@ -387,6 +395,11 @@ public class DeferredRegister<T>
             {
                 event.register(this.registryKey, e.getKey().getId(), () -> e.getValue().get());
                 e.getKey().updateReference(event);
+            }
+
+            // Kilt: handle custom aliased redirects
+            for (RegistryObject<T> e : this.kilt$entries){
+                e.kilt$updateReferenceRedirect(event);
             }
         }
     }
