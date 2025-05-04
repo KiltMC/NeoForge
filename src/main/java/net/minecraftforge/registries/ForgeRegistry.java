@@ -782,7 +782,16 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     //Public for tests
     public Snapshot makeSnapshot() {
         Snapshot ret = new Snapshot();
-        this.ids.forEach((id, value) -> ret.ids.put(getKey(value), id));
+        this.ids.forEach((id, value) -> {
+            // Kilt: validate keys and ensure they're not null
+            var key = getKey(value);
+
+            if (key == null) {
+                throw new IllegalStateException("Key for value " + value + " (type: " + value.getClass().getName() + ") is null! (ID: " + id + ")");
+            }
+
+            ret.ids.put(key, id);
+        });
         ret.aliases.putAll(this.aliases);
         ret.blocked.addAll(this.blocked);
         ret.overrides.putAll(getOverrideOwners());
