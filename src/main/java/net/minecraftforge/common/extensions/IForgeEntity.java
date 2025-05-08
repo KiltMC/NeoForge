@@ -32,6 +32,7 @@ import xyz.bluspring.kilt.injections.world.entity.EntityInjection;
 
 import java.util.Collection;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
 public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, EntityExtensions
 {
@@ -229,7 +230,13 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
      */
     default float getStepHeight()
     {
-        float vanillaStep = self().maxUpStep();
+        return this.kilt$getStepHeight(() -> self().maxUpStep());
+    }
+
+    // Kilt: Custom provider to allow compat with other mods :D
+    default float kilt$getStepHeight(Supplier<Float> vanillaStepProvider)
+    {
+        float vanillaStep = vanillaStepProvider.get();
         if (self() instanceof LivingEntity living)
         {
             AttributeInstance stepHeightAttribute = living.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get());
