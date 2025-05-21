@@ -37,41 +37,38 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer
 
     public BlockModel kilt$deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext, BlockModel model) throws JsonParseException
     {
-        JsonObject jsonobject = element.getAsJsonObject();
-        IUnbakedGeometry<?> geometry = deserializeGeometry(deserializationContext, jsonobject);
+        try {
+            JsonObject jsonobject = element.getAsJsonObject();
+            IUnbakedGeometry<?> geometry = deserializeGeometry(deserializationContext, jsonobject);
 
-        List<BlockElement> elements = model.getElements();
-        if (geometry != null)
-        {
-            elements.clear();
-            ((BlockModelInjection) model).kilt$getCustomData().setCustomGeometry(geometry);
-        }
-
-        if (jsonobject.has("transform"))
-        {
-            JsonObject transform = GsonHelper.getAsJsonObject(jsonobject, "transform");
-            ((BlockModelInjection) model).kilt$getCustomData().setRootTransform(deserializationContext.deserialize(transform, Transformation.class));
-        }
-
-        if (jsonobject.has("render_type"))
-        {
-            var renderTypeHintName = GsonHelper.getAsString(jsonobject, "render_type");
-            ((BlockModelInjection) model).kilt$getCustomData().setRenderTypeHint(new ResourceLocation(renderTypeHintName));
-        }
-
-        if (jsonobject.has("render_type_fast"))
-        {
-            var renderTypeHintName = GsonHelper.getAsString(jsonobject, "render_type_fast");
-            ((BlockModelInjection) model).kilt$getCustomData().setRenderTypeFastHint(new ResourceLocation(renderTypeHintName));
-        }
-
-        if (jsonobject.has("visibility"))
-        {
-            JsonObject visibility = GsonHelper.getAsJsonObject(jsonobject, "visibility");
-            for (Map.Entry<String, JsonElement> part : visibility.entrySet())
-            {
-                ((BlockModelInjection) model).kilt$getCustomData().visibilityData.setVisibilityState(part.getKey(), part.getValue().getAsBoolean());
+            List<BlockElement> elements = model.getElements();
+            if (geometry != null) {
+                elements.clear();
+                ((BlockModelInjection) model).kilt$getCustomData().setCustomGeometry(geometry);
             }
+
+            if (jsonobject.has("transform")) {
+                JsonObject transform = GsonHelper.getAsJsonObject(jsonobject, "transform");
+                ((BlockModelInjection) model).kilt$getCustomData().setRootTransform(deserializationContext.deserialize(transform, Transformation.class));
+            }
+
+            if (jsonobject.has("render_type")) {
+                var renderTypeHintName = GsonHelper.getAsString(jsonobject, "render_type");
+                ((BlockModelInjection) model).kilt$getCustomData().setRenderTypeHint(new ResourceLocation(renderTypeHintName));
+            }
+
+            if (jsonobject.has("render_type_fast")) {
+                var renderTypeHintName = GsonHelper.getAsString(jsonobject, "render_type_fast");
+                ((BlockModelInjection) model).kilt$getCustomData().setRenderTypeFastHint(new ResourceLocation(renderTypeHintName));
+            }
+
+            if (jsonobject.has("visibility")) {
+                JsonObject visibility = GsonHelper.getAsJsonObject(jsonobject, "visibility");
+                for (Map.Entry<String, JsonElement> part : visibility.entrySet()) {
+                    ((BlockModelInjection) model).kilt$getCustomData().visibilityData.setVisibilityState(part.getKey(), part.getValue().getAsBoolean());
+                }
+            }
+        } catch (JsonParseException ignored) {
         }
 
         return model;
