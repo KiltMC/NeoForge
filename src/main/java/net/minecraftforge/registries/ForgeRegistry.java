@@ -161,6 +161,8 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     @Override
     public Iterator<V> iterator() {
+        // Kilt: use Vanilla registry
+        /*
         return new Iterator<V>() {
             int cur = -1;
             V next = null;
@@ -182,6 +184,8 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             }
             //TODO add remove support?
         };
+         */
+        return kilt$vanillaRegistry.iterator();
     }
 
     @Override
@@ -512,7 +516,12 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
         return idToUse;*/
 
-        return this.kilt$vanillaRegistry.getId(Registry.register(this.kilt$vanillaRegistry, key, value));
+        var currentId = this.kilt$vanillaRegistry.getId(Registry.register(this.kilt$vanillaRegistry, key, value));
+
+        if (this.add != null)
+            this.add.onAdd(this, this.stage, currentId, kilt$vanillaRegistry.getResourceKey(value).orElseThrow(), value, null);
+
+        return currentId;
     }
 
     public V getRaw(ResourceLocation key) {
@@ -621,6 +630,10 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     void validateContent(ResourceLocation registryName) {
+        // Kilt: if this is a datapack registry, don't even bother
+        if (kilt$vanillaRegistry == null)
+            return;
+
         for (V obj : this) {
             int id = getID(obj);
             ResourceLocation name = getKey(obj);
@@ -800,6 +813,9 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     void dump(ResourceLocation name) {
         // Building a good looking table is not cheap, so only do it if the debug logger is enabled.
         if (LOGGER.isDebugEnabled(REGISTRYDUMP)) {
+            if (kilt$vanillaRegistry == null)
+                return;
+
             TablePrinter<DumpRow> tab = new TablePrinter<DumpRow>()
                     .header("ID",    r -> r.id)
                     .header("Key",   r -> r.key)
