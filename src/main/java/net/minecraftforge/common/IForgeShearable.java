@@ -5,15 +5,16 @@
 
 package net.minecraftforge.common;
 
-import java.util.Collections;
-import java.util.List;
-
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.IShearable;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * to support mod-shears as well.
  *
  */
-public interface IForgeShearable
+public interface IForgeShearable extends IShearable
 {
     /**
      * Checks if the object is currently shearable
@@ -34,6 +35,7 @@ public interface IForgeShearable
      * @param pos Block's position in level.
      * @return If this is shearable, and onSheared should be called.
      */
+    @Override
     default boolean isShearable(@NotNull ItemStack item, Level level, BlockPos pos)
     {
         return true;
@@ -58,6 +60,7 @@ public interface IForgeShearable
      * @return A List containing all items from this shearing. May be empty.
      */
     @NotNull
+    @Override
     default List<ItemStack> onSheared(@Nullable Player player, @NotNull ItemStack item, Level level, BlockPos pos, int fortune)
     {
         return Collections.emptyList();
