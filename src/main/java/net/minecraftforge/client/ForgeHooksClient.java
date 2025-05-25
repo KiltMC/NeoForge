@@ -6,6 +6,7 @@
 package net.minecraftforge.client;
 
 import com.google.common.collect.ImmutableMap;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.shaders.FogShape;
@@ -17,7 +18,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Constants;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
-import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.minecraft.FileUtil;
 import net.minecraft.client.*;
 import net.minecraft.client.color.block.BlockColors;
@@ -82,18 +82,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.FogType;
@@ -369,20 +365,28 @@ public class ForgeHooksClient
 
     public static void drawScreen(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
+        kilt$drawScreen(screen, guiGraphics, mouseX, mouseY, partialTick, (s) -> {
+            ((Screen) s[0]).renderWithTooltip((GuiGraphics) s[1], (int) s[2], (int) s[3], (float) s[4]);
+            return null;
+        });
+    }
+
+    public static void kilt$drawScreen(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, Operation<Void> original)
+    {
         guiGraphics.pose().pushPose();
         guiLayers.forEach(layer -> {
             // Prevent the background layers from thinking the mouse is over their controls and showing them as highlighted.
-            drawScreenInternal(layer, guiGraphics, Integer.MAX_VALUE, Integer.MAX_VALUE, partialTick);
+            drawScreenInternal(layer, guiGraphics, Integer.MAX_VALUE, Integer.MAX_VALUE, partialTick, original);
             guiGraphics.pose().translate(0,0,2000);
         });
-        drawScreenInternal(screen, guiGraphics, mouseX, mouseY, partialTick);
+        drawScreenInternal(screen, guiGraphics, mouseX, mouseY, partialTick, original);
         guiGraphics.pose().popPose();
     }
 
-    private static void drawScreenInternal(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
+    private static void drawScreenInternal(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, Operation<Void> original)
     {
         if (!MinecraftForge.EVENT_BUS.post(new ScreenEvent.Render.Pre(screen, guiGraphics, mouseX, mouseY, partialTick)))
-            screen.renderWithTooltip(guiGraphics, mouseX, mouseY, partialTick);
+            original.call(screen, guiGraphics, mouseX, mouseY, partialTick);
         MinecraftForge.EVENT_BUS.post(new ScreenEvent.Render.Post(screen, guiGraphics, mouseX, mouseY, partialTick));
     }
 
