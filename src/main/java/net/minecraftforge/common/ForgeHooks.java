@@ -528,14 +528,14 @@ public class ForgeHooks
             nbt = itemstack.getTag().copy();
 
         if (!(itemstack.getItem() instanceof BucketItem)) // if not bucket
-            ((LevelInjection) level).kilt$setCapturingSnapshots(true);
+            ((LevelInjection) level).kilt$setCapturingBlockSnapshots(true);
 
         ItemStack copy = itemstack.copy();
         InteractionResult ret = itemstack.getItem().useOn(context);
         if (itemstack.isEmpty())
             ForgeEventFactory.onPlayerDestroyItem(player, copy, context.getHand());
 
-        ((LevelInjection) level).kilt$setCapturingSnapshots(false);
+        ((LevelInjection) level).kilt$setCapturingBlockSnapshots(false);
 
         if (ret.consumesAction())
         {
@@ -572,9 +572,9 @@ public class ForgeHooks
                 // revert back all captured blocks
                 for (BlockSnapshot blocksnapshot : Lists.reverse(blockSnapshots))
                 {
-                    ((LevelInjection) level).kilt$setRestoringSnapshots(true);
+                    ((LevelInjection) level).kilt$setRestoringBlockSnapshots(true);
                     blocksnapshot.restore(true, false);
-                    ((LevelInjection) level).kilt$setRestoringSnapshots(false);
+                    ((LevelInjection) level).kilt$setRestoringBlockSnapshots(false);
                 }
             }
             else
