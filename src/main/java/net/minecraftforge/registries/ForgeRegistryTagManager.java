@@ -28,6 +28,11 @@ class ForgeRegistryTagManager<V> implements ITagManager<V>
         this.owner = owner;
     }
 
+    @Override
+    public void kilt$bindTags(Map<TagKey<V>, HolderSet.Named<V>> holderTags) {
+        this.bind(holderTags, null);
+    }
+
     void bind(Map<TagKey<V>, HolderSet.Named<V>> holderTags, Set<TagKey<V>> defaultedTags)
     {
         IdentityHashMap<TagKey<V>, ITag<V>> newTags = new IdentityHashMap<>(this.tags);

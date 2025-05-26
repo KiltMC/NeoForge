@@ -6,11 +6,13 @@
 package net.minecraftforge.registries.tags;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -88,4 +90,6 @@ public interface ITagManager<V> extends Iterable<ITag<V>>
      * @see DeferredRegister#addOptionalTagDefaults(TagKey, Set)
      */
     void addOptionalTagDefaults(@NotNull TagKey<V> name, @NotNull Set<? extends Supplier<V>> defaults);
+
+    void kilt$bindTags(Map<TagKey<V>, HolderSet.Named<V>> holderTags);
 }
