@@ -59,6 +59,10 @@ class ForgeRegistryTagManager<V> implements ITagManager<V>
             // Create empty tag
             tag = new ForgeRegistryTag<>(name);
 
+            // Kilt: Bind automatically based on the Vanilla registry
+            if (this.owner.kilt$vanillaRegistry != null)
+                ((ForgeRegistryTag<V>) tag).bind(this.owner.kilt$vanillaRegistry.getOrCreateTag(name));
+
             // Mojang uses volatile and sets the tag map this way to not have the performance penalties of synced read access.
             // However, this can generate a lot of new maps. We should look into performance alternatives.
             IdentityHashMap<TagKey<V>, ITag<V>> map = new IdentityHashMap<>(this.tags);

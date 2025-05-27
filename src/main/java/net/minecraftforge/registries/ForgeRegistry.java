@@ -94,7 +94,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     private final Codec<V> codec = new RegistryCodec();
 
-    private Registry<V> kilt$vanillaRegistry;
+    Registry<V> kilt$vanillaRegistry;
 
     ForgeRegistry(RegistryManager stage, ResourceLocation name, RegistryBuilder<V> builder, Registry<V> vanillaRegistry) {
         this.name = name;
