@@ -42,6 +42,7 @@ import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.StartupMessageManager;
 import net.minecraftforge.fml.util.EnhancedRuntimeException;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.registries.ForgeRegistries.Keys;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
@@ -570,8 +571,6 @@ public class GameData {
 
     public static Multimap<ResourceLocation, ResourceLocation> injectSnapshot(Map<ResourceLocation, ForgeRegistry.Snapshot> snapshot, boolean injectFrozenData, boolean isLocalWorld)
     {
-        // Kilt: avoid snapshots entirely
-        /*
         LOGGER.info(REGISTRIES, "Injecting existing registry data into this {} instance", EffectiveSide.get());
         RegistryManager.ACTIVE.registries.forEach((name, reg) -> reg.validateContent(name));
         RegistryManager.ACTIVE.registries.forEach((name, reg) -> reg.dump(name));
@@ -709,7 +708,6 @@ public class GameData {
 
         // The id map changed, ensure we apply object holders
         ObjectHolderRegistry.applyObjectHolders();
-         */
 
         // Return an empty list, because we're good
         return ArrayListMultimap.create();
