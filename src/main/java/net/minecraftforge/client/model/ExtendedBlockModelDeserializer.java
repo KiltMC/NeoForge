@@ -14,11 +14,11 @@ import net.minecraft.util.GsonHelper;
 import net.minecraftforge.client.model.geometry.GeometryLoaderManager;
 import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.Kilt;
 import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockModelInjection;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -86,8 +86,10 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer
 
         var name = new ResourceLocation(GsonHelper.getAsString(object, "loader"));
         var loader = GeometryLoaderManager.get(name);
-        if (loader == null)
-            throw new JsonParseException(String.format(Locale.ENGLISH, "Model loader '%s' not found. Registered loaders: %s", name, GeometryLoaderManager.getLoaderList()));
+        if (loader == null) {
+            Kilt.Companion.getLogger().warn("Model loader '{}' not found. Registered loaders: {}", name, GeometryLoaderManager.getLoaderList());
+            return null;
+        }
 
         return loader.read(object, deserializationContext);
     }
