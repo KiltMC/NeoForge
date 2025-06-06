@@ -21,6 +21,7 @@ import net.minecraftforge.registries.ForgeRegistry.Snapshot;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.util.registry.DeferredForgeRegistry;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,6 +69,10 @@ public class RegistryManager
     public <V> ForgeRegistry<V> getRegistry(ResourceKey<? extends Registry<V>> key)
     {
         return getRegistry(key.location());
+    }
+
+    public <V> DeferredForgeRegistry<V> kilt$getDeferredRegistry(ResourceKey<? extends Registry<V>> key) {
+        return new DeferredForgeRegistry<>(key.location());
     }
 
     public <V> ResourceLocation getName(IForgeRegistry<V> reg)

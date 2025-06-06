@@ -22,6 +22,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -33,10 +34,13 @@ import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LogMessageAdapter;
 import net.minecraftforge.common.util.TablePrinter;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.registries.tags.ITagManager;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -148,6 +152,29 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             this.kilt$vanillaRegistry = registryBuilder.buildAndRegister();
         }
     }
+    
+    private Registry<V> kilt$getVanillaRegistry() {
+        if (this.kilt$vanillaRegistry == null) {
+            var server = ServerLifecycleHooks.getCurrentServer();
+            
+            if (server != null) {
+                this.kilt$vanillaRegistry = server.registryAccess().registryOrThrow(this.key);
+            } else {
+                // Kilt: pray that this works
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                    if (Minecraft.getInstance().level != null)
+                        this.kilt$vanillaRegistry = Minecraft.getInstance().level.registryAccess().registryOrThrow(this.key);
+                });
+            }
+
+            var registry = this.kilt$vanillaRegistry;
+            this.kilt$vanillaRegistry = null;
+
+            return registry;
+        }
+        
+        return this.kilt$vanillaRegistry;
+    }
 
     @Override
     public void register(String key, V value) {
@@ -185,7 +212,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             //TODO add remove support?
         };
          */
-        return kilt$vanillaRegistry.iterator();
+        return kilt$getVanillaRegistry().iterator();
     }
 
     @Override
@@ -214,27 +241,27 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         }
         return false;
          */
-        return kilt$vanillaRegistry.containsKey(key);
+        return kilt$getVanillaRegistry().containsKey(key);
     }
 
     @Override
     public boolean containsValue(V value) {
         // Kilt: use Vanilla registry
         //return this.names.containsValue(value);
-        return kilt$vanillaRegistry.getKey(value) != null;
+        return kilt$getVanillaRegistry().getKey(value) != null;
     }
 
     @Override
     public boolean isEmpty() {
         // Kilt: use Vanilla registry
         //return this.names.isEmpty();
-        return kilt$vanillaRegistry.keySet().isEmpty();
+        return kilt$getVanillaRegistry().keySet().isEmpty();
     }
 
     int size() {
         // Kilt: use Vanilla registry
         //return this.names.size();
-        return kilt$vanillaRegistry.size();
+        return kilt$getVanillaRegistry().size();
     }
 
     @Override
@@ -249,14 +276,14 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         }
         return ret == null ? this.defaultValue : ret;
         */
-        return kilt$vanillaRegistry.get(key);
+        return kilt$getVanillaRegistry().get(key);
     }
 
     @Override
     public ResourceLocation getKey(V value) {
         // Kilt: use Vanilla registry
         //return getResourceKey(value).map(ResourceKey::location).orElse(this.defaultKey);
-        return kilt$vanillaRegistry.getKey(value);
+        return kilt$getVanillaRegistry().getKey(value);
     }
 
     @NotNull
@@ -265,7 +292,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         // Kilt: use Vanilla registry
         // We use 'owners' here because we want to return the key for the inactive overridden items, not just the active set.
         // return Optional.ofNullable(this.owners.inverse().get(value)).map(OverrideOwner::key);
-        return kilt$vanillaRegistry.getResourceKey(value);
+        return kilt$getVanillaRegistry().getResourceKey(value);
     }
 
     @SuppressWarnings("unchecked")
@@ -299,7 +326,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Optional<Holder<V>> getHolder(ResourceKey<V> key) {
         // Kilt: use Vanilla registry
         //return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(key));
-        return kilt$vanillaRegistry.getHolder(key).map(Function.identity());
+        return kilt$getVanillaRegistry().getHolder(key).map(Function.identity());
     }
 
     @NotNull
@@ -307,7 +334,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Optional<Holder<V>> getHolder(ResourceLocation location) {
         // Kilt: use Vanilla registry
         //return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(location));
-        return kilt$vanillaRegistry.getHolder(ResourceKey.create(this.key, location)).map(Function.identity());
+        return kilt$getVanillaRegistry().getHolder(ResourceKey.create(this.key, location)).map(Function.identity());
     }
 
     @NotNull
@@ -315,7 +342,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Optional<Holder<V>> getHolder(V value) {
         // Kilt: use Vanilla registry
         //return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(value));
-        return kilt$vanillaRegistry.getResourceKey(value).flatMap(kilt$vanillaRegistry::getHolder);
+        return kilt$getVanillaRegistry().getResourceKey(value).flatMap(kilt$vanillaRegistry::getHolder);
     }
 
     @Nullable
@@ -329,14 +356,14 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Set<ResourceLocation> getKeys() {
         // Kilt: use Vanilla registry
         //return Collections.unmodifiableSet(this.names.keySet());
-        return kilt$vanillaRegistry.keySet();
+        return kilt$getVanillaRegistry().keySet();
     }
 
     @NotNull
     Set<ResourceKey<V>> getResourceKeys() {
         // Kilt: use Vanilla registry
         //return Collections.unmodifiableSet(this.keys.keySet());
-        return kilt$vanillaRegistry.registryKeySet();
+        return kilt$getVanillaRegistry().registryKeySet();
     }
 
     @NotNull
@@ -344,7 +371,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Collection<V> getValues() {
         // Kilt: use Vanilla registry
         //return Collections.unmodifiableSet(this.names.values());
-        return kilt$vanillaRegistry.stream().toList();
+        return kilt$getVanillaRegistry().stream().toList();
     }
 
     @NotNull
@@ -352,7 +379,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Set<Entry<ResourceKey<V>, V>> getEntries() {
         // Kilt: use Vanilla registry
         //return Collections.unmodifiableSet(this.keys.entrySet());
-        return kilt$vanillaRegistry.entrySet();
+        return kilt$getVanillaRegistry().entrySet();
     }
 
     @SuppressWarnings("unchecked")
@@ -375,13 +402,13 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             ret = this.ids.inverse().get(this.defaultValue);
         return ret == null ? -1 : ret.intValue();
          */
-        return kilt$vanillaRegistry.getId(value);
+        return kilt$getVanillaRegistry().getId(value);
     }
 
     public int getID(ResourceLocation name) {
         // Kilt: use Vanilla registry
         //return getID(this.names.get(name));
-        return kilt$vanillaRegistry.getId(kilt$vanillaRegistry.get(name));
+        return kilt$getVanillaRegistry().getId(kilt$getVanillaRegistry().get(name));
     }
 
     private int getIDRaw(V value) {
@@ -390,7 +417,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         Integer ret = this.ids.inverse().get(value);
         return ret == null ? -1 : ret.intValue();
          */
-        return kilt$vanillaRegistry.getId(value);
+        return kilt$getVanillaRegistry().getId(value);
     }
 
     private int getIDRaw(ResourceLocation name) {
@@ -398,7 +425,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         /*
         return getIDRaw(this.names.get(name));
          */
-        return kilt$vanillaRegistry.getId(kilt$vanillaRegistry.get(name));
+        return kilt$getVanillaRegistry().getId(kilt$getVanillaRegistry().get(name));
     }
 
     @Override
@@ -408,7 +435,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         V ret = this.ids.get(id);
         return ret == null ? this.defaultValue : ret;
          */
-        return kilt$vanillaRegistry.byId(id);
+        return kilt$getVanillaRegistry().byId(id);
     }
 
     @Nullable
@@ -419,12 +446,12 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return this.keys.inverse().get(value);
          */
 
-        var value = kilt$vanillaRegistry.byId(id);
+        var value = kilt$getVanillaRegistry().byId(id);
 
         if (value == null)
             return null;
 
-        return kilt$vanillaRegistry.getResourceKey(value).orElse(null);
+        return kilt$getVanillaRegistry().getResourceKey(value).orElse(null);
     }
 
     void validateKey() {
@@ -516,10 +543,10 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
         return idToUse;*/
 
-        var currentId = this.kilt$vanillaRegistry.getId(Registry.register(this.kilt$vanillaRegistry, key, value));
+        var currentId = this.kilt$getVanillaRegistry().getId(Registry.register(this.kilt$vanillaRegistry, key, value));
 
         if (this.add != null)
-            this.add.onAdd(this, this.stage, currentId, kilt$vanillaRegistry.getResourceKey(value).orElseThrow(), value, null);
+            this.add.onAdd(this, this.stage, currentId, kilt$getVanillaRegistry().getResourceKey(value).orElseThrow(), value, null);
 
         return currentId;
     }
@@ -534,7 +561,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         }
         return ret;*/
 
-        return this.kilt$vanillaRegistry.get(key);
+        return this.kilt$getVanillaRegistry().get(key);
     }
 
     /**
@@ -563,7 +590,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Optional<Holder.Reference<V>> getDelegate(ResourceKey<V> rkey) {
         // Kilt: use Vanilla registry
         //return Optional.ofNullable(delegatesByName.get(rkey.location()));
-        return kilt$vanillaRegistry.getHolder(rkey);
+        return kilt$getVanillaRegistry().getHolder(rkey);
     }
 
     @NotNull
@@ -571,7 +598,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Holder.Reference<V> getDelegateOrThrow(ResourceKey<V> rkey) {
         // Kilt: use Vanilla registry
         //return getDelegate(rkey).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for key %s", rkey)));
-        return kilt$vanillaRegistry.getHolderOrThrow(rkey);
+        return kilt$getVanillaRegistry().getHolderOrThrow(rkey);
     }
 
     @NotNull
@@ -579,7 +606,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Optional<Holder.Reference<V>> getDelegate(ResourceLocation key) {
         // Kilt: use Vanilla registry
         //return Optional.ofNullable(delegatesByName.get(key));
-        return kilt$vanillaRegistry.getHolder(ResourceKey.create(kilt$vanillaRegistry.key(), key));
+        return kilt$getVanillaRegistry().getHolder(ResourceKey.create(kilt$getVanillaRegistry().key(), key));
     }
 
     @NotNull
@@ -587,7 +614,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Holder.Reference<V> getDelegateOrThrow(ResourceLocation key) {
         // Kilt: use Vanilla registry
         //return getDelegate(key).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for key %s", key)));
-        return kilt$vanillaRegistry.getHolderOrThrow(ResourceKey.create(kilt$vanillaRegistry.key(), key));
+        return kilt$getVanillaRegistry().getHolderOrThrow(ResourceKey.create(kilt$getVanillaRegistry().key(), key));
     }
 
     @NotNull
@@ -595,7 +622,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Optional<Holder.Reference<V>> getDelegate(V value) {
         // Kilt: use Vanilla registry
         //return Optional.ofNullable(delegatesByValue.get(value));
-        return kilt$vanillaRegistry.getResourceKey(value).flatMap(kilt$vanillaRegistry::getHolder);
+        return kilt$getVanillaRegistry().getResourceKey(value).flatMap(kilt$vanillaRegistry::getHolder);
     }
 
     @NotNull
@@ -603,7 +630,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public Holder.Reference<V> getDelegateOrThrow(V value) {
         // Kilt: use Vanilla registry
         //return getDelegate(value).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for value %s", value)));
-        return kilt$vanillaRegistry.getHolderOrThrow(kilt$vanillaRegistry.getResourceKey(value).orElseThrow());
+        return kilt$getVanillaRegistry().getHolderOrThrow(kilt$getVanillaRegistry().getResourceKey(value).orElseThrow());
     }
 
     private Holder.Reference<V> bindDelegate(ResourceKey<V> rkey, V value) {

@@ -96,7 +96,7 @@ public class ForgeRegistries
     public static final IForgeRegistry<TreeDecoratorType<?>> TREE_DECORATOR_TYPES = RegistryManager.ACTIVE.getRegistry(Keys.TREE_DECORATOR_TYPES);
 
     // Dynamic/Data driven.
-    public static final IForgeRegistry<Biome> BIOMES = RegistryManager.ACTIVE.getRegistry(Keys.BIOMES);
+    public static final IForgeRegistry<Biome> BIOMES = RegistryManager.ACTIVE.kilt$getDeferredRegistry(Keys.BIOMES);
 
     // Custom forge registries
     static final DeferredRegister<EntityDataSerializer<?>> DEFERRED_ENTITY_DATA_SERIALIZERS = DeferredRegister.create(Keys.ENTITY_DATA_SERIALIZERS, Keys.ENTITY_DATA_SERIALIZERS.location().getNamespace());
