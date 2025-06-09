@@ -5,16 +5,9 @@
 
 package net.minecraftforge.registries;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
-
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -23,6 +16,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry.*;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class RegistryBuilder<T>
 {
@@ -47,6 +46,7 @@ public class RegistryBuilder<T>
     private DummyFactory<T> dummyFactory;
     private MissingFactory<T> missingFactory;
     private Set<ResourceLocation> legacyNames = new HashSet<>();
+    private boolean kilt$dynamic = false;
 
     public RegistryBuilder<T> setName(ResourceLocation name)
     {
@@ -221,6 +221,11 @@ public class RegistryBuilder<T>
         return this;
     }
 
+    public RegistryBuilder<T> kilt$dynamic() {
+        this.kilt$dynamic = true;
+        return this;
+    }
+
     /**
      * Enables tags for this registry if not already.
      * All forge registries with wrappers inherently support tags.
@@ -268,6 +273,7 @@ public class RegistryBuilder<T>
      */
     public RegistryBuilder<T> dataPackRegistry(Codec<T> codec, @Nullable Codec<T> networkCodec)
     {
+        this.kilt$dynamic();
         this.hasWrapper(); // A wrapper is required for data pack registries.
         this.disableSync(); // Datapack registries are synced using a different system than static registries.
         // Supplier averts having to set the registry name before calling this.
@@ -446,5 +452,9 @@ public class RegistryBuilder<T>
     boolean getHasWrapper()
     {
         return this.hasWrapper;
+    }
+
+    public boolean kilt$getDynamic() {
+        return kilt$dynamic;
     }
 }

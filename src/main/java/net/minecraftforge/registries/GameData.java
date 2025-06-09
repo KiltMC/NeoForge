@@ -129,7 +129,7 @@ public class GameData
         makeRegistry(TREE_DECORATOR_TYPES).disableSaving().disableSync().create();
 
         // Dynamic Worldgen
-        makeRegistry(BIOMES).disableSync().create();
+        makeRegistry(BIOMES).disableSync().kilt$dynamic().create();
     }
 
     static RegistryBuilder<EntityDataSerializer<?>> getDataSerializersRegistryBuilder()

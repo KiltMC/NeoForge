@@ -124,7 +124,6 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
-import net.minecraftforge.registries.GameData;
 import net.minecraftforge.registries.RegistryManager;
 import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.server.permission.PermissionAPI;
@@ -1471,6 +1470,8 @@ public class ForgeHooks
 
         Multimap<ResourceLocation, ResourceLocation> failedElements = null;
 
+        // Kilt: Ignore the saved registries
+        /*
         if (tag.contains("Registries"))
         {
             Map<ResourceLocation, ForgeRegistry.Snapshot> snapshot = new HashMap<>();
@@ -1496,6 +1497,7 @@ public class ForgeHooks
             });
             LOGGER.error(WORLDPERSISTENCE, buf.toString());
         }
+         */
     }
 
     public static String encodeLifecycle(Lifecycle lifecycle)

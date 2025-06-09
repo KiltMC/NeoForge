@@ -5,26 +5,18 @@
 
 package net.minecraftforge.registries;
 
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
 
-import java.util.*;
+import java.util.OptionalInt;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistry, IHolderHelperHolder<T>, MappedRegistryInjection
 {
@@ -75,7 +67,7 @@ class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistr
         return registerMapping(wanted, key, value, lifecycle);
     }
 
-    // Reading Functions
+    /*// Reading Functions
     @Override
     @Nullable
     public T get(@Nullable ResourceLocation name)
@@ -180,7 +172,7 @@ class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistr
     public int size()
     {
         return this.delegate.size();
-    }
+    }*/
 
     @Override
     public NamespacedHolderHelper<T> getHolderHelper()
@@ -188,7 +180,7 @@ class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistr
         return this.holders;
     }
 
-    @Override public Optional<Holder<T>> getHolder(int id) { return this.holders.getHolder(id); }
+    /*@Override public Optional<Holder<T>> getHolder(int id) { return this.holders.getHolder(id); }
     @Override public Optional<Holder<T>> getHolder(ResourceKey<T> key) { return this.holders.getHolder(key); }
     @Override public DataResult<Holder<T>> getOrCreateHolder(ResourceKey<T> key) { return this.holders.getOrCreateHolder(key); }
     @Override public Holder<T> getOrCreateHolderOrThrow(ResourceKey<T> key) { return this.holders.getOrCreateHolderOrThrow(key); }

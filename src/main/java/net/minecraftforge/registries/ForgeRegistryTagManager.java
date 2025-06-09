@@ -14,12 +14,7 @@ import net.minecraftforge.registries.tags.ITag;
 import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -58,6 +53,10 @@ class ForgeRegistryTagManager<V> implements ITagManager<V>
         {
             // Create empty tag
             tag = new ForgeRegistryTag<>(name);
+
+            // Kilt: Bind automatically based on the Vanilla registry
+            if (this.owner.kilt$vanillaRegistry != null)
+                ((ForgeRegistryTag<V>) tag).bind(this.owner.kilt$vanillaRegistry.getOrCreateTag(name));
 
             // Mojang uses volatile and sets the tag map this way to not have the performance penalties of synced read access.
             // However, this can generate a lot of new maps. We should look into performance alternatives.

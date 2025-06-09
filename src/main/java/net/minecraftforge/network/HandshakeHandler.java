@@ -115,6 +115,8 @@ public class HandshakeHandler
     private boolean negotiationStarted = false;
     private final List<Future<Void>> pendingFutures = new ArrayList<>();
 
+    private boolean kilt$isKilt = false;
+
     private HandshakeHandler(Connection networkManager, NetworkDirection side)
     {
         this.direction = side;
@@ -217,6 +219,10 @@ public class HandshakeHandler
         this.registriesToReceive = new HashSet<>(serverModList.getRegistries());
         this.registrySnapshots = Maps.newHashMap();
         LOGGER.debug(REGISTRIES, "Expecting {} registries: {}", ()->this.registriesToReceive.size(), ()->this.registriesToReceive);
+
+        // Kilt: Detect if the server is a Kilt server, so we can use the Fabric registry sync process if so.
+        //       Otherwise, we'll use the regular Forge process, but it may be broken.
+        this.kilt$isKilt = serverModList.getModList().contains("kilt");
     }
 
     void handleModData(HandshakeMessages.S2CModData serverModData, Supplier<NetworkEvent.Context> c)
@@ -248,6 +254,10 @@ public class HandshakeHandler
             return;
         }
         LOGGER.debug(FMLHSMARKER, "Accepted client connection mod list");
+
+        // Kilt: Detect if the client is a Kilt client, so we can go through the Fabric registry sync process.
+        //       Otherwise, we'll use the regular Forge process, but it may be broken.
+        this.kilt$isKilt = clientModList.getModList().contains("kilt");
     }
 
     void handleModMismatchData(HandshakeMessages.S2CChannelMismatchData modMismatchData, Supplier<NetworkEvent.Context> c)
@@ -265,8 +275,16 @@ public class HandshakeHandler
     }
 
     void handleRegistryMessage(final HandshakeMessages.S2CRegistry registryPacket, final Supplier<NetworkEvent.Context> contextSupplier){
-        // Kilt: focus on Fabric registry sync
-        /*LOGGER.debug(FMLHSMARKER,"Received registry packet for {}", registryPacket.getRegistryName());
+        // Kilt: Focus on Fabric registry sync instead of using Forge's when possible
+        if (this.kilt$isKilt) {
+            LOGGER.debug(FMLHSMARKER, "Detected that we are both using Kilt, deferring to Fabric's registry sync.");
+            contextSupplier.get().setPacketHandled(true);
+            NetworkConstants.handshakeChannel.reply(new HandshakeMessages.C2SAcknowledge(), contextSupplier.get());
+
+            return;
+        }
+
+        LOGGER.debug(FMLHSMARKER,"Received registry packet for {}", registryPacket.getRegistryName());
         this.registriesToReceive.remove(registryPacket.getRegistryName());
         this.registrySnapshots.put(registryPacket.getRegistryName(), registryPacket.getSnapshot());
 
@@ -280,7 +298,7 @@ public class HandshakeHandler
             LOGGER.error(FMLHSMARKER, "Connection closed, not continuing handshake");
         } else {
             NetworkConstants.handshakeChannel.reply(new HandshakeMessages.C2SAcknowledge(), contextSupplier.get());
-        }*/
+        }
 
         contextSupplier.get().setPacketHandled(true);
         NetworkConstants.handshakeChannel.reply(new HandshakeMessages.C2SAcknowledge(), contextSupplier.get());
