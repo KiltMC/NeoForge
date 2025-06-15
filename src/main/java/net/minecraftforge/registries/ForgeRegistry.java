@@ -62,16 +62,16 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     public static final Marker REGISTRIES = MarkerManager.getMarker("REGISTRIES");
     private static final Marker REGISTRYDUMP = MarkerManager.getMarker("REGISTRYDUMP");
     private static final Logger LOGGER = LogManager.getLogger();
-    private final RegistryManager stage;
+    protected final RegistryManager stage;
     private final BiMap<Integer, V> ids = HashBiMap.create();
     private final BiMap<ResourceLocation, V> names = HashBiMap.create();
     private final BiMap<ResourceKey<V>, V> keys = HashBiMap.create();
     private final Map<ResourceLocation, ResourceLocation> aliases = new HashMap<>();
     final Map<ResourceLocation, ?> slaves = new HashMap<>();
     private final ResourceLocation defaultKey;
-    //private final ResourceKey<V> defaultResourceKey;
+    private final ResourceKey<V> defaultResourceKey;
     private final CreateCallback<V> create;
-    private final AddCallback<V> add;
+    protected final AddCallback<V> add;
     private final ClearCallback<V> clear;
     private final ValidateCallback<V> validate;
     private final BakeCallback<V> bake;
@@ -93,20 +93,18 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     boolean isFrozen = false;
 
     private final ResourceLocation name;
-    private final ResourceKey<Registry<V>> key;
+    protected final ResourceKey<Registry<V>> key;
     private final RegistryBuilder<V> builder;
 
     private final Codec<V> codec = new RegistryCodec();
 
-    Registry<V> kilt$vanillaRegistry;
-
-    ForgeRegistry(RegistryManager stage, ResourceLocation name, RegistryBuilder<V> builder, Registry<V> vanillaRegistry) {
+    protected ForgeRegistry(RegistryManager stage, ResourceLocation name, RegistryBuilder<V> builder) {
         this.name = name;
         this.key = ResourceKey.createRegistryKey(name);
         this.builder = builder;
         this.stage = stage;
         this.defaultKey = builder.getDefault();
-        //this.defaultResourceKey = ResourceKey.create(key, defaultKey);
+        this.defaultResourceKey = ResourceKey.create(key, defaultKey);
         this.min = builder.getMinId();
         this.max = builder.getMaxId();
         this.availabilityMap = new BitSet(Math.min(max + 1, 0x0FFF));
@@ -122,58 +120,6 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         this.tagManager = this.hasWrapper ? new ForgeRegistryTagManager<>(this) : null;
         if (this.create != null)
             this.create.onCreate(this, stage);
-
-        this.kilt$vanillaRegistry = vanillaRegistry;
-    }
-
-    ForgeRegistry(RegistryManager stage, ResourceLocation name, RegistryBuilder<V> builder) {
-        this(stage, name, builder, null);
-
-        // Kilt: Try to get/create the Vanilla registry
-        var vanillaRegistry = BuiltInRegistries.REGISTRY.getOptional(name);
-
-        if (vanillaRegistry.isPresent()) {
-            this.kilt$vanillaRegistry = (Registry<V>) vanillaRegistry.orElseThrow();
-        } else if (
-            // Kilt: Make sure we're not loading datapack registries, we have to add these directly via external means
-            !DataPackRegistriesHooks.getSyncedCustomRegistries().contains(this.key) &&
-            RegistryDataLoader.WORLDGEN_REGISTRIES.stream().noneMatch(e -> e.key().equals(this.key))
-        ) {
-            var registryBuilder = this.defaultKey == null ? FabricRegistryBuilder.createSimple(this.key) : FabricRegistryBuilder.createDefaulted(this.key, this.defaultKey);
-
-            registryBuilder.attribute(RegistryAttribute.SYNCED);
-
-            if (builder.getSaveToDisc())
-                registryBuilder.attribute(RegistryAttribute.PERSISTED);
-
-            if (builder.getAllowModifications() || builder.getAllowOverrides())
-                registryBuilder.attribute(RegistryAttribute.MODDED);
-
-            this.kilt$vanillaRegistry = registryBuilder.buildAndRegister();
-        }
-    }
-    
-    private Registry<V> kilt$getVanillaRegistry() {
-        if (this.kilt$vanillaRegistry == null) {
-            var server = ServerLifecycleHooks.getCurrentServer();
-            
-            if (server != null) {
-                this.kilt$vanillaRegistry = server.registryAccess().registryOrThrow(this.key);
-            } else {
-                // Kilt: pray that this works
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                    if (Minecraft.getInstance().level != null)
-                        this.kilt$vanillaRegistry = Minecraft.getInstance().level.registryAccess().registryOrThrow(this.key);
-                });
-            }
-
-            var registry = this.kilt$vanillaRegistry;
-            this.kilt$vanillaRegistry = null;
-
-            return registry;
-        }
-        
-        return this.kilt$vanillaRegistry;
     }
 
     @Override
@@ -188,8 +134,6 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     @Override
     public Iterator<V> iterator() {
-        // Kilt: use Vanilla registry
-        /*
         return new Iterator<V>() {
             int cur = -1;
             V next = null;
@@ -211,8 +155,6 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             }
             //TODO add remove support?
         };
-         */
-        return kilt$getVanillaRegistry().iterator();
     }
 
     @Override
@@ -232,42 +174,30 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     @Override
     public boolean containsKey(ResourceLocation key) {
-        // Kilt: use Vanilla registry
-        /*
         while (key != null) {
             if (this.names.containsKey(key))
                 return true;
             key = this.aliases.get(key);
         }
         return false;
-         */
-        return kilt$getVanillaRegistry().containsKey(key);
     }
 
     @Override
     public boolean containsValue(V value) {
-        // Kilt: use Vanilla registry
-        //return this.names.containsValue(value);
-        return kilt$getVanillaRegistry().getKey(value) != null;
+        return this.names.containsValue(value);
     }
 
     @Override
     public boolean isEmpty() {
-        // Kilt: use Vanilla registry
-        //return this.names.isEmpty();
-        return kilt$getVanillaRegistry().keySet().isEmpty();
+        return this.names.isEmpty();
     }
 
-    int size() {
-        // Kilt: use Vanilla registry
-        //return this.names.size();
-        return kilt$getVanillaRegistry().size();
+    protected int size() {
+        return this.names.size();
     }
 
     @Override
     public V getValue(ResourceLocation key) {
-        // Kilt: use Vanilla registry
-        /*
         V ret = this.names.get(key);
         key = this.aliases.get(key);
         while (ret == null && key != null) {
@@ -275,24 +205,18 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             key = this.aliases.get(key);
         }
         return ret == null ? this.defaultValue : ret;
-        */
-        return kilt$getVanillaRegistry().get(key);
     }
 
     @Override
     public ResourceLocation getKey(V value) {
-        // Kilt: use Vanilla registry
-        //return getResourceKey(value).map(ResourceKey::location).orElse(this.defaultKey);
-        return kilt$getVanillaRegistry().getKey(value);
+        return getResourceKey(value).map(ResourceKey::location).orElse(this.defaultKey);
     }
 
     @NotNull
     @Override
     public Optional<ResourceKey<V>> getResourceKey(V value) {
-        // Kilt: use Vanilla registry
         // We use 'owners' here because we want to return the key for the inactive overridden items, not just the active set.
-        // return Optional.ofNullable(this.owners.inverse().get(value)).map(OverrideOwner::key);
-        return kilt$getVanillaRegistry().getResourceKey(value);
+         return Optional.ofNullable(this.owners.inverse().get(value)).map(OverrideOwner::key);
     }
 
     @SuppressWarnings("unchecked")
@@ -324,25 +248,19 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     @NotNull
     @Override
     public Optional<Holder<V>> getHolder(ResourceKey<V> key) {
-        // Kilt: use Vanilla registry
-        //return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(key));
-        return kilt$getVanillaRegistry().getHolder(key).map(Function.identity());
+        return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(key));
     }
 
     @NotNull
     @Override
     public Optional<Holder<V>> getHolder(ResourceLocation location) {
-        // Kilt: use Vanilla registry
-        //return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(location));
-        return kilt$getVanillaRegistry().getHolder(ResourceKey.create(this.key, location)).map(Function.identity());
+        return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(location));
     }
 
     @NotNull
     @Override
     public Optional<Holder<V>> getHolder(V value) {
-        // Kilt: use Vanilla registry
-        //return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(value));
-        return kilt$getVanillaRegistry().getResourceKey(value).flatMap(kilt$vanillaRegistry::getHolder);
+        return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.getHolder(value));
     }
 
     @Nullable
@@ -354,32 +272,24 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     @NotNull
     @Override
     public Set<ResourceLocation> getKeys() {
-        // Kilt: use Vanilla registry
-        //return Collections.unmodifiableSet(this.names.keySet());
-        return kilt$getVanillaRegistry().keySet();
+        return Collections.unmodifiableSet(this.names.keySet());
     }
 
     @NotNull
-    Set<ResourceKey<V>> getResourceKeys() {
-        // Kilt: use Vanilla registry
-        //return Collections.unmodifiableSet(this.keys.keySet());
-        return kilt$getVanillaRegistry().registryKeySet();
+    protected Set<ResourceKey<V>> getResourceKeys() {
+        return Collections.unmodifiableSet(this.keys.keySet());
     }
 
     @NotNull
     @Override
     public Collection<V> getValues() {
-        // Kilt: use Vanilla registry
-        //return Collections.unmodifiableSet(this.names.values());
-        return kilt$getVanillaRegistry().stream().toList();
+        return Collections.unmodifiableSet(this.names.values());
     }
 
     @NotNull
     @Override
     public Set<Entry<ResourceKey<V>, V>> getEntries() {
-        // Kilt: use Vanilla registry
-        //return Collections.unmodifiableSet(this.keys.entrySet());
-        return kilt$getVanillaRegistry().entrySet();
+        return Collections.unmodifiableSet(this.keys.entrySet());
     }
 
     @SuppressWarnings("unchecked")
@@ -395,63 +305,35 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     public int getID(V value) {
-        // Kilt: use Vanilla registry
-        /*
         Integer ret = this.ids.inverse().get(value);
         if (ret == null && this.defaultValue != null)
             ret = this.ids.inverse().get(this.defaultValue);
         return ret == null ? -1 : ret.intValue();
-         */
-        return kilt$getVanillaRegistry().getId(value);
     }
 
     public int getID(ResourceLocation name) {
-        // Kilt: use Vanilla registry
-        //return getID(this.names.get(name));
-        return kilt$getVanillaRegistry().getId(kilt$getVanillaRegistry().get(name));
+        return getID(this.names.get(name));
     }
 
-    private int getIDRaw(V value) {
-        // Kilt: use Vanilla registry
-        /*
+    protected int getIDRaw(V value) {
         Integer ret = this.ids.inverse().get(value);
         return ret == null ? -1 : ret.intValue();
-         */
-        return kilt$getVanillaRegistry().getId(value);
     }
 
-    private int getIDRaw(ResourceLocation name) {
-        // Kilt: use Vanilla registry
-        /*
+    protected int getIDRaw(ResourceLocation name) {
         return getIDRaw(this.names.get(name));
-         */
-        return kilt$getVanillaRegistry().getId(kilt$getVanillaRegistry().get(name));
     }
 
     @Override
     public V getValue(int id) {
-        // Kilt: use Vanilla registry
-        /*
         V ret = this.ids.get(id);
         return ret == null ? this.defaultValue : ret;
-         */
-        return kilt$getVanillaRegistry().byId(id);
     }
 
     @Nullable
     public ResourceKey<V> getKey(int id) {
-        // Kilt: use Vanilla registry
-        /*
         V value = getValue(id);
         return this.keys.inverse().get(value);
-         */
-
-        var value = kilt$getVanillaRegistry().byId(id);
-
-        if (value == null)
-            return null;
-
-        return kilt$getVanillaRegistry().getResourceKey(value).orElse(null);
     }
 
     void validateKey() {
@@ -478,12 +360,11 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return add(id, key, value, owner);
     }
 
-    int add(int id, ResourceLocation key, V value, String owner) {
+    protected int add(int id, ResourceLocation key, V value, String owner) {
         Preconditions.checkNotNull(key, "Can't use a null-name for the registry, object %s.", value);
         Preconditions.checkNotNull(value, "Can't add null-object to the registry, name %s.", key);
 
-        // Kilt: Try to use Vanilla's registry instead.
-        /*int idToUse = id;
+        int idToUse = id;
         if (idToUse < 0 || availabilityMap.get(idToUse))
             idToUse = availabilityMap.nextClearBit(min);
 
@@ -541,27 +422,17 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
         LOGGER.trace(REGISTRIES,"Registry {} add: {} {} {} (req. id {})", this.name, key, idToUse, value, id);
 
-        return idToUse;*/
-
-        var currentId = this.kilt$getVanillaRegistry().getId(Registry.register(this.kilt$vanillaRegistry, key, value));
-
-        if (this.add != null)
-            this.add.onAdd(this, this.stage, currentId, kilt$getVanillaRegistry().getResourceKey(value).orElseThrow(), value, null);
-
-        return currentId;
+        return idToUse;
     }
 
     public V getRaw(ResourceLocation key) {
-        // Kilt: Use Vanilla's registry instead.
-        /*V ret = this.names.get(key);
+        V ret = this.names.get(key);
         key = this.aliases.get(key);
         while (ret == null && key != null) {
             ret = this.names.get(key);
             key = this.aliases.get(key);
         }
-        return ret;*/
-
-        return this.kilt$getVanillaRegistry().get(key);
+        return ret;
     }
 
     /**
@@ -588,49 +459,37 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     @NotNull
     @Override
     public Optional<Holder.Reference<V>> getDelegate(ResourceKey<V> rkey) {
-        // Kilt: use Vanilla registry
-        //return Optional.ofNullable(delegatesByName.get(rkey.location()));
-        return kilt$getVanillaRegistry().getHolder(rkey);
+        return Optional.ofNullable(delegatesByName.get(rkey.location()));
     }
 
     @NotNull
     @Override
     public Holder.Reference<V> getDelegateOrThrow(ResourceKey<V> rkey) {
-        // Kilt: use Vanilla registry
-        //return getDelegate(rkey).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for key %s", rkey)));
-        return kilt$getVanillaRegistry().getHolderOrThrow(rkey);
+        return getDelegate(rkey).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for key %s", rkey)));
     }
 
     @NotNull
     @Override
     public Optional<Holder.Reference<V>> getDelegate(ResourceLocation key) {
-        // Kilt: use Vanilla registry
-        //return Optional.ofNullable(delegatesByName.get(key));
-        return kilt$getVanillaRegistry().getHolder(ResourceKey.create(kilt$getVanillaRegistry().key(), key));
+        return Optional.ofNullable(delegatesByName.get(key));
     }
 
     @NotNull
     @Override
     public Holder.Reference<V> getDelegateOrThrow(ResourceLocation key) {
-        // Kilt: use Vanilla registry
-        //return getDelegate(key).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for key %s", key)));
-        return kilt$getVanillaRegistry().getHolderOrThrow(ResourceKey.create(kilt$getVanillaRegistry().key(), key));
+        return getDelegate(key).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for key %s", key)));
     }
 
     @NotNull
     @Override
     public Optional<Holder.Reference<V>> getDelegate(V value) {
-        // Kilt: use Vanilla registry
-        //return Optional.ofNullable(delegatesByValue.get(value));
-        return kilt$getVanillaRegistry().getResourceKey(value).flatMap(kilt$vanillaRegistry::getHolder);
+        return Optional.ofNullable(delegatesByValue.get(value));
     }
 
     @NotNull
     @Override
     public Holder.Reference<V> getDelegateOrThrow(V value) {
-        // Kilt: use Vanilla registry
-        //return getDelegate(value).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for value %s", value)));
-        return kilt$getVanillaRegistry().getHolderOrThrow(kilt$getVanillaRegistry().getResourceKey(value).orElseThrow());
+        return getDelegate(value).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for value %s", value)));
     }
 
     private Holder.Reference<V> bindDelegate(ResourceKey<V> rkey, V value) {
@@ -656,11 +515,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return this.defaultValue;
     }
 
-    void validateContent(ResourceLocation registryName) {
-        // Kilt: if this is a datapack registry, don't even bother
-        if (kilt$vanillaRegistry == null)
-            return;
-
+    protected void validateContent(ResourceLocation registryName) {
         for (V obj : this) {
             int id = getID(obj);
             ResourceLocation name = getKey(obj);
@@ -837,12 +692,9 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             wrapper.locked = false;
     }
 
-    void dump(ResourceLocation name) {
+    protected void dump(ResourceLocation name) {
         // Building a good looking table is not cheap, so only do it if the debug logger is enabled.
         if (LOGGER.isDebugEnabled(REGISTRYDUMP)) {
-            if (kilt$vanillaRegistry == null)
-                return;
-
             TablePrinter<DumpRow> tab = new TablePrinter<DumpRow>()
                     .header("ID",    r -> r.id)
                     .header("Key",   r -> r.key)

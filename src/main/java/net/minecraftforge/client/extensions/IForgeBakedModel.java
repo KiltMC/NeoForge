@@ -63,6 +63,7 @@ public interface IForgeBakedModel
      */
     default BakedModel applyTransform(ItemDisplayContext transformType, PoseStack poseStack, boolean applyLeftHandTransform)
     {
+        self().getTransforms().getTransform(transformType).apply(applyLeftHandTransform, poseStack);
         return self();
     }
 

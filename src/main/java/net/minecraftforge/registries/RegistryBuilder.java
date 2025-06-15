@@ -50,6 +50,17 @@ public class RegistryBuilder<T> {
     @Nullable
     private Function<T, Holder.Reference<T>> intrusiveHolderCallback = null;
 
+    private boolean kilt$vanillaRegistry = false;
+
+    public RegistryBuilder<T> kilt$markVanillaRegistry() {
+        this.kilt$vanillaRegistry = true;
+        return this;
+    }
+
+    public boolean kilt$isVanillaRegistry() {
+        return kilt$vanillaRegistry;
+    }
+
     public RegistryBuilder<T> setName(ResourceLocation name)
     {
         this.registryName = name;

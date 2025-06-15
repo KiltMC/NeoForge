@@ -14,6 +14,7 @@ import net.minecraftforge.registries.tags.ITag;
 import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 import xyz.bluspring.kilt.util.registry.NoopRegistry;
+import xyz.bluspring.kilt.util.registry.VanillaForgeRegistry;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -61,8 +62,9 @@ class ForgeRegistryTagManager<V> implements ITagManager<V>
             tag = new ForgeRegistryTag<>(name);
 
             // Kilt: Bind automatically based on the Vanilla registry
-            if (!(this.owner.kilt$vanillaRegistry instanceof NoopRegistry<V>))
-                ((ForgeRegistryTag<V>) tag).bind(this.owner.kilt$vanillaRegistry.getOrCreateTag(name));
+            if (this.owner instanceof VanillaForgeRegistry<V> reg)
+                if (!(reg.getVanillaRegistry() instanceof NoopRegistry<V>))
+                    ((ForgeRegistryTag<V>) tag).bind(reg.getVanillaRegistry().getOrCreateTag(name));
 
             // Mojang uses volatile and sets the tag map this way to not have the performance penalties of synced read access.
             // However, this can generate a lot of new maps. We should look into performance alternatives.
