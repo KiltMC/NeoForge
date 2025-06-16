@@ -36,6 +36,7 @@ import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 import net.minecraftforge.client.model.geometry.IGeometryLoader;
 import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
+import net.minecraftforge.client.model.geometry.UnbakedGeometryHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,9 +60,9 @@ public class SeparateTransformsModel implements IUnbakedGeometry<SeparateTransfo
         return new Baked(
                 context.useAmbientOcclusion(), context.isGui3d(), context.useBlockLight(),
                 spriteGetter.apply(context.getMaterial("particle")), overrides,
-                baseModel.bake(baker, baseModel, spriteGetter, modelState, modelLocation, context.useBlockLight()),
+                UnbakedGeometryHelper.bake(baseModel, baker, baseModel, spriteGetter, modelState, modelLocation, context.useBlockLight()),
                 ImmutableMap.copyOf(Maps.transformValues(perspectives, value -> {
-                    return value.bake(baker, value, spriteGetter, modelState, modelLocation, context.useBlockLight());
+                    return UnbakedGeometryHelper.bake(value, baker, value, spriteGetter, modelState, modelLocation, context.useBlockLight());
                 }))
         );
     }

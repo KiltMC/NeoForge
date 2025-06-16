@@ -22,6 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.bluspring.kilt.util.registry.DeferredForgeRegistry;
+import xyz.bluspring.kilt.util.registry.VanillaForgeRegistry;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -117,7 +118,7 @@ public class RegistryManager
     {
         if (registries.containsKey(name))
             throw new IllegalArgumentException("Attempted to register a registry for " + name + " but it already exists");
-        ForgeRegistry<V> reg = new ForgeRegistry<V>(this, name, builder);
+        ForgeRegistry<V> reg = builder.kilt$isVanillaRegistry() ? new VanillaForgeRegistry<V>(this, name, builder) : new ForgeRegistry<V>(this, name, builder);
         registries.put(name, reg);
         if (builder.getSaveToDisc())
             this.persisted.add(name);
