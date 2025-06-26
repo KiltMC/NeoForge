@@ -668,6 +668,7 @@ public class ForgeHooks
     {
         if (stack.getItem().hasCraftingRemainingItem(stack))
         {
+            // TODO: kilt use fabric's version
             stack = stack.getItem().getCraftingRemainingItem(stack);
             if (!stack.isEmpty() && stack.isDamageableItem() && stack.getDamageValue() > stack.getMaxDamage())
             {
