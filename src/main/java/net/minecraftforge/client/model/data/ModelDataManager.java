@@ -6,8 +6,6 @@
 package net.minecraftforge.client.model.data;
 
 import com.google.common.base.Preconditions;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -22,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,8 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModelDataManager
 {
     private final Level level;
-    private final Long2ObjectMap<Set<BlockPos>> needModelDataRefresh = new Long2ObjectOpenHashMap<>();
-    private final Long2ObjectMap<Map<BlockPos, ModelData>> modelDataCache = new Long2ObjectOpenHashMap<>(); // Use map for compat reasons
+    private final Map<ChunkPos, Set<BlockPos>> needModelDataRefresh = new ConcurrentHashMap<>();
+    private final Map<ChunkPos, Map<BlockPos, ModelData>> modelDataCache = new ConcurrentHashMap<>();
 
     public ModelDataManager(Level level)
     {
@@ -47,55 +46,38 @@ public class ModelDataManager
     public void requestRefresh(@NotNull BlockEntity blockEntity)
     {
         Preconditions.checkNotNull(blockEntity, "Block entity must not be null");
-        needModelDataRefresh.computeIfAbsent(ChunkPos.asLong(blockEntity.getBlockPos()), $ -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
-                            .add(blockEntity.getBlockPos());
+        needModelDataRefresh.computeIfAbsent(new ChunkPos(blockEntity.getBlockPos()), $ -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
+                .add(blockEntity.getBlockPos());
     }
 
     private void refreshAt(ChunkPos chunk)
     {
-        refreshAt(chunk.toLong());
-    }
+        Set<BlockPos> needUpdate = needModelDataRefresh.remove(chunk);
 
-    private void refreshAt(long chunk)
-    {
-        try {
-            // Kilt: Catch exceptions with ModelData
-            // TODO: remove in 1.21+
-            if (!needModelDataRefresh.containsKey(chunk))
-                return;
-
-            Set<BlockPos> needUpdate = needModelDataRefresh.remove(chunk);
-
-            if (needUpdate != null)
+        if (needUpdate != null)
+        {
+            Map<BlockPos, ModelData> data = modelDataCache.computeIfAbsent(chunk, $ -> new ConcurrentHashMap<>());
+            for (BlockPos pos : needUpdate)
             {
-                Map<BlockPos, ModelData> data = modelDataCache.computeIfAbsent(chunk, $ -> new ConcurrentHashMap<>());
-                for (BlockPos pos : needUpdate)
+                BlockEntity toUpdate = level.getBlockEntity(pos);
+                if (toUpdate != null && !toUpdate.isRemoved())
                 {
-                    BlockEntity toUpdate = level.getBlockEntity(pos);
-                    if (toUpdate != null && !toUpdate.isRemoved())
-                    {
-                        data.put(pos, toUpdate.getModelData());
-                    }
-                    else
-                    {
-                        data.remove(pos);
-                    }
+                    data.put(pos, toUpdate.getModelData());
+                }
+                else
+                {
+                    data.remove(pos);
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException ignored) {}
+        }
     }
 
     public @Nullable ModelData getAt(BlockPos pos)
     {
-        return getAt(ChunkPos.asLong(pos)).get(pos);
+        return getAt(new ChunkPos(pos)).get(pos);
     }
 
     public Map<BlockPos, ModelData> getAt(ChunkPos pos)
-    {
-        return getAt(pos.toLong());
-    }
-
-    public Map<BlockPos, ModelData> getAt(long pos)
     {
         Preconditions.checkArgument(level.isClientSide, "Cannot request model data for server level");
         refreshAt(pos);
@@ -114,7 +96,7 @@ public class ModelDataManager
             return;
 
         ChunkPos chunk = event.getChunk().getPos();
-        modelDataManager.needModelDataRefresh.remove(chunk.toLong());
-        modelDataManager.modelDataCache.remove(chunk.toLong());
+        modelDataManager.needModelDataRefresh.remove(chunk);
+        modelDataManager.modelDataCache.remove(chunk);
     }
 }
