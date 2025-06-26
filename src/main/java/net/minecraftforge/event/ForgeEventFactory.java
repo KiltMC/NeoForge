@@ -5,6 +5,7 @@
 
 package net.minecraftforge.event;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.advancements.Advancement;
@@ -266,11 +267,15 @@ public class ForgeEventFactory
        return event.getDroppedExperience();
     }
 
-    public static int getMaxSpawnPackSize(Mob entity)
+    public static int getMaxSpawnPackSize(Mob entity) {
+        return kilt$getMaxSpawnPackSize(entity, args -> ((Mob) args[0]).getMaxSpawnClusterSize());
+    }
+
+    public static int kilt$getMaxSpawnPackSize(Mob entity, Operation<Integer> original)
     {
         LivingPackSizeEvent maxCanSpawnEvent = new LivingPackSizeEvent(entity);
         MinecraftForge.EVENT_BUS.post(maxCanSpawnEvent);
-        return maxCanSpawnEvent.getResult() == Result.ALLOW ? maxCanSpawnEvent.getMaxPackSize() : entity.getMaxSpawnClusterSize();
+        return maxCanSpawnEvent.getResult() == Result.ALLOW ? maxCanSpawnEvent.getMaxPackSize() : original.call(entity);
     }
 
     public static Component getPlayerDisplayName(Player player, Component username)

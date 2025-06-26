@@ -709,7 +709,7 @@ public class ForgeHooksClient
         MinecraftForge.EVENT_BUS.post(new InputEvent.Key(key, scanCode, action, modifiers));
     }
 
-    public static InputEvent.InteractionKeyMappingTriggered onClickInput(int button, KeyMapping keyBinding, InteractionHand hand)
+    public static InputEvent.InteractionKeyMappingTriggered onClickInput(int button, KeyMapping keyBinding, InteractionHand hand) // Kilt: TODO not fully implemented
     {
         InputEvent.InteractionKeyMappingTriggered event = new InputEvent.InteractionKeyMappingTriggered(button, keyBinding, hand);
         MinecraftForge.EVENT_BUS.post(event);
