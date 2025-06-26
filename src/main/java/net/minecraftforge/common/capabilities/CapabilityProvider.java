@@ -35,6 +35,22 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     private CompoundTag                   lazyData           = null;
     private boolean initialized = false;
 
+    // Kilt: cursed workaround
+    protected CapabilityProvider() {
+        Class<?> classBeforeThisOne = this.getClass();
+
+        do {
+            var currentClass = classBeforeThisOne.getSuperclass();
+
+            if (currentClass != CapabilityProvider.class) {
+                classBeforeThisOne = currentClass;
+            } else break;
+        } while (true);
+
+        this.baseClass = (Class<B>) classBeforeThisOne;
+        this.isLazy = false;
+    }
+
     protected CapabilityProvider(Class<B> baseClass)
     {
         this(baseClass, false);
