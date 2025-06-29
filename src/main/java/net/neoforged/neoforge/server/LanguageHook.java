@@ -21,6 +21,8 @@ import net.neoforged.fml.i18n.I18nManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.locale.LanguageInjection;
+import xyz.bluspring.kilt.mixin.MinecraftServerAccessor;
 
 /**
  * Loads the built-in language files, and handles loading the default language ({@value Language#DEFAULT}) on the
@@ -48,7 +50,7 @@ public class LanguageHook {
     private static void loadLanguage(String langName, MinecraftServer server) {
         String langFile = String.format(Locale.ROOT, "lang/%s.json", langName);
         // noinspection resource
-        ResourceManager resourceManager = server.getServerResources().resourceManager();
+        ResourceManager resourceManager = ((MinecraftServerAccessor) server).getServerResources().resourceManager();
         // We cannot use the resource manager itself, because it is specifically scoped to data packs
         // (the PackType given to MultiPackResourceManager is SERVER_DATA)
         // Instead, we create a MultiPackResourceManager configured for PackType.CLIENT_RESOURCES
@@ -62,7 +64,7 @@ public class LanguageHook {
                 ResourceLocation langResource = ResourceLocation.fromNamespaceAndPath(namespace, langFile);
                 for (Resource resource : clientResources.getResourceStack(langResource)) {
                     try (InputStream stream = resource.open()) {
-                        Language.loadFromJson(stream, (key, value) -> modTable.put(key, value), (key, value) -> modComponentTable.put(key, value));
+                        LanguageInjection.loadFromJson(stream, (key, value) -> modTable.put(key, value), (key, value) -> modComponentTable.put(key, value));
                     }
                 }
                 loaded++;
@@ -79,14 +81,14 @@ public class LanguageHook {
 
         try (InputStream input = classLoader.getResourceAsStream("assets/minecraft/lang/en_us.json")) {
             assert input != null;
-            Language.loadFromJson(input, (key, value) -> modTable.put(key, value), (key, value) -> modComponentTable.put(key, value));
+            LanguageInjection.loadFromJson(input, (key, value) -> modTable.put(key, value), (key, value) -> modComponentTable.put(key, value));
         } catch (Exception exception) {
             LOGGER.warn("Failed to load built-in language file for Minecraft", exception);
         }
 
         try (InputStream input = classLoader.getResourceAsStream("assets/neoforge/lang/en_us.json")) {
             assert input != null;
-            Language.loadFromJson(input, (key, value) -> modTable.put(key, value), (key, value) -> modComponentTable.put(key, value));
+            LanguageInjection.loadFromJson(input, (key, value) -> modTable.put(key, value), (key, value) -> modComponentTable.put(key, value));
         } catch (Exception exception) {
             LOGGER.warn("Failed to load built-in language file for NeoForge", exception);
         }

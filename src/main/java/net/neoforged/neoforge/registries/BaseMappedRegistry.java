@@ -20,12 +20,14 @@ import net.neoforged.neoforge.registries.callback.RegistryCallback;
 import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.core.MappedRegistryInjection;
 
 @ApiStatus.Internal
-public abstract class BaseMappedRegistry<T> implements Registry<T> {
-    protected final List<AddCallback<T>> addCallbacks = new ArrayList<>();
-    protected final List<BakeCallback<T>> bakeCallbacks = new ArrayList<>();
-    protected final List<ClearCallback<T>> clearCallbacks = new ArrayList<>();
+public abstract class BaseMappedRegistry<T> implements Registry<T>, IRegistryExtension<T>, MappedRegistryInjection<T> {
+    // Kilt: bump visibility to public
+    public final List<AddCallback<T>> addCallbacks = new ArrayList<>();
+    public final List<BakeCallback<T>> bakeCallbacks = new ArrayList<>();
+    public final List<ClearCallback<T>> clearCallbacks = new ArrayList<>();
     final Map<ResourceLocation, ResourceLocation> aliases = new HashMap<>();
     final Map<DataMapType<T, ?>, Map<ResourceKey<T>, ?>> dataMaps = new IdentityHashMap<>();
 
@@ -106,6 +108,10 @@ public abstract class BaseMappedRegistry<T> implements Registry<T> {
     }
 
     protected void clear(boolean full) {
+        this.kilt$clear(full);
+    }
+
+    public void kilt$clear(boolean full) {
         this.aliases.clear();
         if (full) {
             this.dataMaps.clear();
@@ -118,7 +124,7 @@ public abstract class BaseMappedRegistry<T> implements Registry<T> {
      */
     protected abstract void registerIdMapping(ResourceKey<T> key, int id);
 
-    protected abstract void unfreeze();
+    public abstract void unfreeze();
 
     @Override
     public <A> @Nullable A getData(DataMapType<T, A> type, ResourceKey<T> key) {
