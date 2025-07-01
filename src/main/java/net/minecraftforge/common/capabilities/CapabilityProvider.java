@@ -62,17 +62,17 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         this.isLazy = SUPPORTS_LAZY_CAPABILITIES && isLazy;
     }
 
-    protected void gatherCapabilities()
+    protected final void gatherCapabilities()
     {
         gatherCapabilities(() -> null);
     }
 
-    protected void gatherCapabilities(@Nullable ICapabilityProvider parent)
+    protected final void gatherCapabilities(@Nullable ICapabilityProvider parent)
     {
         gatherCapabilities(() -> parent);
     }
 
-    protected void gatherCapabilities(@Nullable Supplier<ICapabilityProvider> parent)
+    protected final void gatherCapabilities(@Nullable Supplier<ICapabilityProvider> parent)
     {
         if (isLazy && !initialized)
         {
