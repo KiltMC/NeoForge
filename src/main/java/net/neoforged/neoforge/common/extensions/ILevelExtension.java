@@ -53,7 +53,7 @@ public interface ILevelExtension {
      * All part entities in this world. Used when collecting entities in an AABB to fix parts being
      * ignored whose parent entity is in a chunk that does not intersect with the AABB.
      */
-    public default Collection<PartEntity<?>> getPartEntities() {
+    public default Collection<PartEntity<?>> kilt$getPartEntities() {
         return Collections.emptyList();
     }
 

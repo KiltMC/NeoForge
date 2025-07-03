@@ -5,6 +5,7 @@
 
 package net.neoforged.neoforge.event.entity.living;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.NaturalSpawner;
 
@@ -18,6 +19,11 @@ public class SpawnClusterSizeEvent extends LivingEvent {
     public SpawnClusterSizeEvent(Mob entity) {
         super(entity);
         this.size = entity.getMaxSpawnClusterSize();
+    }
+
+    public SpawnClusterSizeEvent(Mob entity, Operation<Integer> original) {
+        super(entity);
+        this.size = original.call(entity);
     }
 
     /**

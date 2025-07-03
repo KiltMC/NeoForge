@@ -6,12 +6,14 @@
 package net.neoforged.neoforge.common.extensions;
 
 import java.util.Optional;
+
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.LevelReaderExtensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.LevelReader;
 
-public interface ILevelReaderExtension {
+public interface ILevelReaderExtension extends LevelReaderExtensions {
     private LevelReader self() {
         return (LevelReader) this;
     }

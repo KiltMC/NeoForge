@@ -5,6 +5,7 @@
 
 package net.neoforged.neoforge.event;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.datafixers.util.Either;
@@ -248,6 +249,12 @@ public class EventHooks {
         return event.getResult() == PositionCheck.Result.SUCCEED;
     }
 
+    public static PositionCheck.Result kilt$checkSpawnPosition(Mob mob, ServerLevelAccessor level, MobSpawnType spawnType) {
+        var event = new PositionCheck(mob, level, spawnType, null);
+        NeoForge.EVENT_BUS.post(event);
+        return event.getResult();
+    }
+
     /**
      * Specialized variant of {@link #checkSpawnPosition} for spawners, as they have slightly different checks, and pass through the {@link BaseSpawner} to the event.
      * 
@@ -414,6 +421,12 @@ public class EventHooks {
      */
     public static int getMaxSpawnClusterSize(Mob entity) {
         var event = new SpawnClusterSizeEvent(entity);
+        NeoForge.EVENT_BUS.post(event);
+        return event.getSize();
+    }
+
+    public static int kilt$getMaxSpawnClusterSize(Mob entity, Operation<Integer> original) {
+        var event = new SpawnClusterSizeEvent(entity, original);
         NeoForge.EVENT_BUS.post(event);
         return event.getSize();
     }
