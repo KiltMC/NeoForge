@@ -855,10 +855,16 @@ public class ForgeHooks
 
     public static String readPoolName(JsonObject json)
     {
-        LootTableContext ctx = getLootTableContext();
-
         if (json.has("name"))
             return GsonHelper.getAsString(json, "name");
+
+        // Kilt: try to fix context crash
+        LootTableContext ctx;
+        try {
+            ctx = getLootTableContext();
+        } catch (NullPointerException ignored) {
+            return "main";
+        }
 
         if (ctx.custom)
             return "custom#" + json.hashCode(); //We don't care about custom ones modders shouldn't be editing them!
