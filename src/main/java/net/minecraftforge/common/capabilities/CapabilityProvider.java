@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import xyz.bluspring.kilt.workarounds.CapabilityInvalidationWorkaround;
+import xyz.bluspring.kilt.workarounds.CapabilityProviderWorkaround;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
@@ -35,6 +36,8 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     private CompoundTag                   lazyData           = null;
     private boolean initialized = false;
 
+    private CapabilityProviderWorkaround<B> kilt$deferred;
+
     // Kilt: cursed workaround
     protected CapabilityProvider() {
         Class<?> classBeforeThisOne = this.getClass();
@@ -49,6 +52,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
 
         this.baseClass = (Class<B>) classBeforeThisOne;
         this.isLazy = false;
+        this.kilt$deferred = new CapabilityProviderWorkaround<>(this.baseClass, this.isLazy, (B) this);
     }
 
     protected CapabilityProvider(Class<B> baseClass)
@@ -64,16 +68,31 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
 
     protected final void gatherCapabilities()
     {
+        if (this.kilt$deferred != null) {
+            this.kilt$deferred.gatherCapabilities();
+            return;
+        }
+
         gatherCapabilities(() -> null);
     }
 
     protected final void gatherCapabilities(@Nullable ICapabilityProvider parent)
     {
+        if (this.kilt$deferred != null) {
+            this.kilt$deferred.gatherCapabilities(parent);
+            return;
+        }
+
         gatherCapabilities(() -> parent);
     }
 
     protected final void gatherCapabilities(@Nullable Supplier<ICapabilityProvider> parent)
     {
+        if (this.kilt$deferred != null) {
+            this.kilt$deferred.gatherCapabilities(parent);
+            return;
+        }
+
         if (isLazy && !initialized)
         {
             lazyParentSupplier = parent == null ? () -> null : parent;
@@ -93,12 +112,20 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     @NotNull
     public B getProvider()
     {
+        if (this.kilt$deferred != null) {
+            return this.kilt$deferred.getProvider();
+        }
+
         return (B)this;
     }
 
     // Kilt: change protected to public
     public final @Nullable CapabilityDispatcher getCapabilities()
     {
+        if (this.kilt$deferred != null) {
+            return this.kilt$deferred.getCapabilities();
+        }
+
         if (isLazy && !initialized)
         {
             doGatherCapabilities(lazyParentSupplier == null ? null : lazyParentSupplier.get());
@@ -113,11 +140,19 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
 
     public final boolean areCapsCompatible(CapabilityProvider<B> other)
     {
+        if (this.kilt$deferred != null) {
+            return this.kilt$deferred.areCapsCompatible(other);
+        }
+
         return areCapsCompatible(other.getCapabilities());
     }
 
     public final boolean areCapsCompatible(@Nullable CapabilityDispatcher other)
     {
+        if (this.kilt$deferred != null) {
+            return this.kilt$deferred.areCapsCompatible(other);
+        }
+
         final CapabilityDispatcher disp = getCapabilities();
         if (disp == null)
         {
@@ -138,6 +173,10 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
 
     protected final @Nullable CompoundTag serializeCaps()
     {
+        if (this.kilt$deferred != null) {
+            return this.kilt$deferred.serializeCaps();
+        }
+
         if (isLazy && !initialized)
         {
             return lazyData;
@@ -153,6 +192,11 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
 
     protected final void deserializeCaps(CompoundTag tag)
     {
+        if (this.kilt$deferred != null) {
+            this.kilt$deferred.deserializeCaps(tag);
+            return;
+        }
+
         if (isLazy && !initialized)
         {
             lazyData = tag;
@@ -176,6 +220,11 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
      */
     public void kilt$invalidateCaps()
     {
+        if (this.kilt$deferred != null) {
+            this.kilt$deferred.kilt$invalidateCaps();
+            return;
+        }
+
         this.valid = false;
         final CapabilityDispatcher disp = getCapabilities();
         if (disp != null)
@@ -193,6 +242,11 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
      */
     public void reviveCaps()
     {
+        if (this.kilt$deferred != null) {
+            this.kilt$deferred.reviveCaps();
+            return;
+        }
+
         this.valid = true; //Stupid players don't copy the entity when transporting across worlds.
     }
 
@@ -200,8 +254,17 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     @NotNull
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
     {
+        if (this.kilt$deferred != null) {
+            return this.kilt$deferred.getCapability(cap, side);
+        }
+
         final CapabilityDispatcher disp = getCapabilities();
         return !valid || disp == null ? LazyOptional.empty() : disp.getCapability(cap, side);
+    }
+
+    @Override
+    public CapabilityProviderWorkaround<B> kilt$getCapabilityWorkaround() {
+        return this.kilt$deferred;
     }
 
     /**
