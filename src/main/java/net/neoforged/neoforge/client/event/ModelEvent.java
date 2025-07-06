@@ -22,6 +22,7 @@ import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.client.resources.model.ModelResourceLocationInjection;
 
 /**
  * Houses events related to models.
@@ -130,7 +131,7 @@ public abstract class ModelEvent extends Event {
     /**
      * Fired when the {@link net.minecraft.client.resources.model.ModelBakery} is notified of the resource manager reloading.
      * Allows developers to register models to be loaded, along with their dependencies. Models registered through this
-     * event must use the {@link ModelResourceLocation#STANDALONE_VARIANT} variant.
+     * event must use the {@link ModelResourceLocationInjection#STANDALONE_VARIANT} variant.
      *
      * <p>This event is not {@linkplain ICancellableEvent cancellable}, and does not {@linkplain HasResult have a result}.</p>
      *
@@ -151,8 +152,8 @@ public abstract class ModelEvent extends Event {
          */
         public void register(ModelResourceLocation model) {
             Preconditions.checkArgument(
-                    model.getVariant().equals(ModelResourceLocation.STANDALONE_VARIANT),
-                    "Side-loaded models must use the '" + ModelResourceLocation.STANDALONE_VARIANT + "' variant");
+                    model.getVariant().equals(ModelResourceLocationInjection.STANDALONE_VARIANT),
+                    "Side-loaded models must use the '" + ModelResourceLocationInjection.STANDALONE_VARIANT + "' variant");
             models.add(model);
         }
     }
@@ -165,10 +166,10 @@ public abstract class ModelEvent extends Event {
      * <p>This event is fired on the mod-specific event bus, only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class RegisterGeometryLoaders extends ModelEvent implements IModBusEvent {
-        private final Map<ResourceLocation, IGeometryLoader<?>> loaders;
+        private final Map<ResourceLocation, io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<?>> loaders;
 
         @ApiStatus.Internal
-        public RegisterGeometryLoaders(Map<ResourceLocation, IGeometryLoader<?>> loaders) {
+        public RegisterGeometryLoaders(Map<ResourceLocation, io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<?>> loaders) {
             this.loaders = loaders;
         }
 
@@ -178,7 +179,7 @@ public abstract class ModelEvent extends Event {
          * @param key    the ID of the loader
          * @param loader the geometry loader to register
          */
-        public void register(ResourceLocation key, IGeometryLoader<?> loader) {
+        public void register(ResourceLocation key, io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<?> loader) {
             Preconditions.checkArgument(!loaders.containsKey(key), "Geometry loader already registered: " + key);
             loaders.put(key, loader);
         }
