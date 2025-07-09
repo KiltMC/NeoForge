@@ -66,6 +66,11 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         this.isLazy = SUPPORTS_LAZY_CAPABILITIES && isLazy;
     }
 
+    @Override
+    public void kilt$setLazy(boolean isLazy) {
+        this.isLazy = isLazy;
+    }
+
     protected final void gatherCapabilities()
     {
         if (this.kilt$deferred != null) {

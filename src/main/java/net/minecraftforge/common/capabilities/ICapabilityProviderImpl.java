@@ -28,4 +28,6 @@ public interface ICapabilityProviderImpl<B extends ICapabilityProviderImpl<B>> e
     default CapabilityProviderWorkaround<B> kilt$getCapabilityWorkaround() {
         return null;
     }
+
+    default void kilt$setLazy(boolean isLazy) {}
 }
