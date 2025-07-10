@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import xyz.bluspring.kilt.injections.client.gui.GuiInjection;
 
+import java.util.function.Function;
+
 /**
  * All the vanilla {@linkplain IGuiOverlay HUD overlays} in the order that they render.
  */
@@ -31,26 +33,26 @@ public enum VanillaGuiOverlay
             gui.setupOverlayRenderState(true, false);
             gui.renderVignette(guiGraphics, gui.getMinecraft().getCameraEntity());
         }
-    }),
+    }, $ -> Minecraft.useFancyGraphics()),
     SPYGLASS("spyglass", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         gui.setupOverlayRenderState(true, false);
         gui.renderSpyglassOverlay(guiGraphics);
-    }),
+    }, $ -> true),
     HELMET("helmet", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         gui.setupOverlayRenderState(true, false);
         gui.renderHelmet(partialTick, guiGraphics);
-    }),
+    }, $ -> true),
     FROSTBITE("frostbite", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         gui.setupOverlayRenderState(true, false);
         gui.renderFrostbite(guiGraphics);
-    }),
+    }, $ -> true),
     PORTAL("portal", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         float f1 = Mth.lerp(partialTick, gui.getMinecraft().player.oSpinningEffectIntensity, gui.getMinecraft().player.spinningEffectIntensity);
         if (f1 > 0.0F && !gui.getMinecraft().player.hasEffect(MobEffects.CONFUSION)) {
             gui.setupOverlayRenderState(true, false);
             gui.renderPortalOverlay(guiGraphics, f1);
         }
-    }),
+    }, gui -> Mth.lerp(gui.getMinecraft().getDeltaFrameTime(), gui.getMinecraft().player.oSpinningEffectIntensity, gui.getMinecraft().player.spinningEffectIntensity) > 0f && !gui.getMinecraft().player.hasEffect(MobEffects.CONFUSION)),
     HOTBAR("hotbar", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         if (!gui.getMinecraft().options.hideGui)
         {
@@ -93,14 +95,14 @@ public enum VanillaGuiOverlay
             gui.setupOverlayRenderState(true, false);
             gui.renderHealth(screenWidth, screenHeight, guiGraphics);
         }
-    }),
+    }, gui -> !gui.getMinecraft().options.hideGui && gui.shouldDrawSurvivalElements()),
     ARMOR_LEVEL("armor_level", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         if (!gui.getMinecraft().options.hideGui && gui.shouldDrawSurvivalElements())
         {
             gui.setupOverlayRenderState(true, false);
             gui.renderArmor(guiGraphics, screenWidth, screenHeight);
         }
-    }),
+    }, gui -> !gui.getMinecraft().options.hideGui && gui.shouldDrawSurvivalElements()),
     FOOD_LEVEL("food_level", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         Entity vehicle = gui.getMinecraft().player.getVehicle();
         boolean isMounted = vehicle != null && vehicle.showVehicleHealth();
@@ -109,21 +111,21 @@ public enum VanillaGuiOverlay
             gui.setupOverlayRenderState(true, false);
             gui.renderFood(screenWidth, screenHeight, guiGraphics);
         }
-    }),
+    }, gui -> !(gui.getMinecraft().player.getVehicle() != null && gui.getMinecraft().player.getVehicle().showVehicleHealth()) && !gui.getMinecraft().options.hideGui && gui.shouldDrawSurvivalElements()),
     AIR_LEVEL("air_level", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         if (!gui.getMinecraft().options.hideGui && gui.shouldDrawSurvivalElements())
         {
             gui.setupOverlayRenderState(true, false);
             gui.renderAir(screenWidth, screenHeight, guiGraphics);
         }
-    }),
+    }, gui -> !gui.getMinecraft().options.hideGui && gui.shouldDrawSurvivalElements()),
     MOUNT_HEALTH("mount_health", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         if (!gui.getMinecraft().options.hideGui && gui.shouldDrawSurvivalElements())
         {
             gui.setupOverlayRenderState(true, false);
             gui.renderHealthMount(screenWidth, screenHeight, guiGraphics);
         }
-    }),
+    }, gui -> !gui.getMinecraft().options.hideGui && gui.shouldDrawSurvivalElements()),
     JUMP_BAR("jump_bar", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         PlayerRideableJumping playerRideableJumping = gui.getMinecraft().player.jumpableVehicle();
         if (playerRideableJumping != null && !gui.getMinecraft().options.hideGui)
@@ -131,14 +133,14 @@ public enum VanillaGuiOverlay
             gui.setupOverlayRenderState(true, false);
             gui.renderJumpMeter(playerRideableJumping, guiGraphics, screenWidth / 2 - 91);
         }
-    }),
+    }, gui -> gui.getMinecraft().player.jumpableVehicle() != null && !gui.getMinecraft().options.hideGui),
     EXPERIENCE_BAR("experience_bar", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         if (gui.getMinecraft().player.jumpableVehicle() == null && !gui.getMinecraft().options.hideGui)
         {
             gui.setupOverlayRenderState(true, false);
             gui.renderExperience(screenWidth / 2 - 91, guiGraphics);
         }
-    }),
+    }, gui -> gui.getMinecraft().player.jumpableVehicle() == null && !gui.getMinecraft().options.hideGui),
     ITEM_NAME("item_name", (gui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
         if (!gui.getMinecraft().options.hideGui)
         {
@@ -217,11 +219,18 @@ public enum VanillaGuiOverlay
     private final ResourceLocation id;
     final IGuiOverlay overlay;
     NamedGuiOverlay type;
+    Function<ForgeGui, Boolean> kilt$shouldSetupOverlayRenderState = gui -> !gui.getMinecraft().options.hideGui;
 
     VanillaGuiOverlay(String id, IGuiOverlay overlay)
     {
         this.id = new ResourceLocation("minecraft", id);
         this.overlay = overlay;
+    }
+
+    VanillaGuiOverlay(String id, IGuiOverlay overlay, Function<ForgeGui, Boolean> shouldSetupOverlayRenderState)
+    {
+        this(id, overlay);
+        this.kilt$shouldSetupOverlayRenderState = shouldSetupOverlayRenderState;
     }
 
     @NotNull
@@ -233,5 +242,9 @@ public enum VanillaGuiOverlay
     public NamedGuiOverlay type()
     {
         return type;
+    }
+
+    public boolean kilt$shouldSetupOverlayRenderState(ForgeGui gui) {
+        return this.kilt$shouldSetupOverlayRenderState.apply(gui);
     }
 }
