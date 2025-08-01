@@ -136,6 +136,9 @@ public class NetworkHooks
     }
 
     public static void handleClientLoginSuccess(Connection manager) {
+        // Kilt: fixes Replay Mod
+        manager.channel().attr(NetworkConstants.FML_NETVERSION).setIfAbsent(NetworkConstants.NOVERSION);
+
         if (isVanillaConnection(manager)) {
             LOGGER.info("Connected to a vanilla server. Catching up missing behaviour.");
             ConfigTracker.INSTANCE.loadDefaultServerConfigs();
