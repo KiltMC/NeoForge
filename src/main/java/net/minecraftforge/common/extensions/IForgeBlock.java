@@ -5,6 +5,8 @@
 
 package net.minecraftforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.block.*;
+import io.github.fabricators_of_create.porting_lib.enchant.EnchantmentBonusBlock;
 import io.github.fabricators_of_create.porting_lib.tool.extensions.BlockExtensions;
 import net.fabricmc.fabric.api.block.v1.FabricBlock;
 import net.minecraft.client.Camera;
@@ -46,6 +48,7 @@ import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.helpers.FabricImplemented;
 import xyz.bluspring.kilt.injections.item.AxeItemInjection;
 import xyz.bluspring.kilt.injections.item.ShovelItemInjection;
 
@@ -75,6 +78,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param entity the entity in question
      * @return the factor by which the entity's motion should be multiplied
      */
+    @FabricImplemented(CustomFrictionBlock.class)
     default float getFriction(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity)
     {
         return self().getFriction();
@@ -105,6 +109,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      *     </li>
      * </ul>
      */
+    @FabricImplemented(LightEmissiveBlock.class)
     default int getLightEmission(BlockState state, BlockGetter level, BlockPos pos)
     {
         return state.getLightEmission();
@@ -159,6 +164,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param player The player damaging the block
      * @return True to spawn the drops
      */
+    @FabricImplemented(HarvestableBlock.class)
     default public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player)
     {
         return ForgeHooks.isCorrectToolForDrops(state, player);
@@ -184,6 +190,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param fluid The current fluid state at current position
      * @return True if the block is actually destroyed.
      */
+    @FabricImplemented(PlayerDestroyBlock.class)
     default boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid)
     {
         self().playerWillDestroy(level, pos, state, player);
@@ -237,6 +244,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param type The Mob Category Type
      * @return True to allow a mob of the specified category to spawn, false to prevent it.
      */
+    @FabricImplemented(ValidSpawnBlock.class)
     default boolean isValidSpawn(BlockState state, BlockGetter level, BlockPos pos, SpawnPlacements.Type type, EntityType<?> entityType)
     {
         return state.isValidSpawn(level, pos, entityType);
@@ -277,6 +285,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param explosion The explosion
      * @return The amount of the explosion absorbed.
      */
+    @FabricImplemented(ExplosionResistanceBlock.class)
     default float getExplosionResistance(BlockState state, BlockGetter level, BlockPos pos, Explosion explosion)
     {
         return self().getExplosionResistance();
@@ -306,6 +315,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param numberOfParticles That vanilla level have spawned
      * @return True to prevent vanilla landing particles from spawning
      */
+    @FabricImplemented(CustomLandingEffectsBlock.class)
     default boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles)
     {
         return false;
@@ -323,6 +333,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
     * @param entity The entity running on the block.
     * @return True to prevent vanilla running particles from spawning.
     */
+   @FabricImplemented(CustomRunningEffectsBlock.class)
     default boolean addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity)
     {
         return false;
@@ -431,6 +442,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
     * @param silkTouchLevel silk touch enchantment level of tool being used
     * @return Amount of XP from breaking this block.
     */
+   @FabricImplemented(CustomExpBlock.class)
     default int getExpDrop(BlockState state, LevelReader level, RandomSource randomSource, BlockPos pos, int fortuneLevel, int silkTouchLevel)
     {
        return 0;
@@ -447,6 +459,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
     * @param pos Block position in level
     * @return The amount of enchanting power this block produces.
     */
+   @FabricImplemented(EnchantmentBonusBlock.class)
     default float getEnchantPowerBonus(BlockState state, LevelReader level, BlockPos pos)
     {
         return state.is(BlockTags.ENCHANTMENT_POWER_PROVIDER) ? 1: 0;
@@ -458,6 +471,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
     * @param pos Block position in level
     * @param neighbor Block position of neighbor
     */
+   @FabricImplemented(NeighborChangeListeningBlock.class)
     default void onNeighborChange(BlockState state, LevelReader level, BlockPos pos, BlockPos neighbor){}
 
    /**
@@ -467,6 +481,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
     * @param side The INPUT side of the block to be powered - ie the opposite of this block's output side
     * @return Whether Block#isProvidingWeakPower should be called when determining indirect power
     */
+   @FabricImplemented(WeakPowerCheckingBlock.class)
     default boolean shouldCheckWeakPower(BlockState state, SignalGetter level, BlockPos pos, Direction side)
     {
         return state.isRedstoneConductor(level, pos);
@@ -494,6 +509,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param entity The entity that is breaking/stepping on/placing/hitting/falling on this block, or null if no entity is in this context
      * @return A SoundType to use
      */
+    @FabricImplemented(CustomSoundTypeBlock.class)
     default SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity)
     {
         return self().getSoundType(state);
@@ -506,6 +522,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param beaconPos The position of the beacon
      * @return A float RGB [0.0, 1.0] array to be averaged with a beacon's existing beam color, or null to do nothing to the beam
      */
+    @FabricImplemented(BeaconColorMultiplierBlock.class)
     @Nullable
     default float[] getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos)
     {
@@ -571,6 +588,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param state The state
      * @return true if the block is sticky block which used for pull or push adjacent blocks (use by piston)
      */
+    @FabricImplemented(CustomSlimeBlock.class)
     default boolean isSlimeBlock(BlockState state)
     {
         return state.getBlock() == Blocks.SLIME_BLOCK;
@@ -580,6 +598,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param state The state
      * @return true if the block is sticky block which used for pull or push adjacent blocks (use by piston)
      */
+    @FabricImplemented(StickyBlock.class)
     default boolean isStickyBlock(BlockState state)
     {
         return state.getBlock() == Blocks.SLIME_BLOCK || state.getBlock() == Blocks.HONEY_BLOCK;
@@ -591,6 +610,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param other Other block
      * @return True to link blocks
      */
+    @FabricImplemented(StickToBlock.class)
     default boolean canStickTo(BlockState state, BlockState other)
     {
         if (state.getBlock() == Blocks.HONEY_BLOCK && other.getBlock() == Blocks.SLIME_BLOCK) return false;
@@ -637,6 +657,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param direction The direction that the fire is coming from
      * @param igniter The entity that lit the fire
      */
+    @FabricImplemented(CaughtFireBlock.class)
     default void onCaughtFire(BlockState state, Level level, BlockPos pos, @Nullable Direction direction, @Nullable LivingEntity igniter) {}
 
     /**
@@ -665,6 +686,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param direction The direction that the fire is coming from
      * @return True if this block sustains fire, meaning it will never go out.
      */
+    @FabricImplemented(FireSourceBlock.class)
     default boolean isFireSource(BlockState state, LevelReader level, BlockPos pos, Direction direction)
     {
         return state.is(level.dimensionType().infiniburn());
@@ -678,6 +700,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param pos Block position in level
      * @return True to allow the ender dragon to destroy this block
      */
+    @FabricImplemented(EntityDestroyBlock.class)
     default boolean canEntityDestroy(BlockState state, BlockGetter level, BlockPos pos, Entity entity)
     {
         if (entity instanceof EnderDragon)
@@ -800,6 +823,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @param entity The entity on the scaffolding
      * @return True if the block should act like scaffolding
      */
+    @FabricImplemented(CustomScaffoldingBlock.class)
     default boolean isScaffolding(BlockState state, LevelReader level, BlockPos pos, LivingEntity entity)
     {
         return state.is(Blocks.SCAFFOLDING);
@@ -834,6 +858,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * 2. {@code neighborState.updateShape(fromDirection, stateOfYourBlock, level, neighborBlockPos, yourBlockPos)},
      * where {@code fromDirection} is defined from the neighbor block's point of view.
      */
+    @FabricImplemented(ConnectableRedstoneBlock.class)
     default boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction)
     {
         if (state.is(Blocks.REDSTONE_WIRE))
@@ -965,7 +990,8 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      * @return The appearance of this block on the given side. By default, the current state
      * @see IForgeBlockState#getAppearance(BlockAndTintGetter, BlockPos, Direction, BlockState, BlockPos)
      */
-    default BlockState getAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side, @Nullable BlockState queryState, @Nullable BlockPos queryPos)
+    // Kilt: this may not get called, but that's okay, because method calls should be pointing at Fabric's instead.
+    default BlockState forge$getAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side, @Nullable BlockState queryState, @Nullable BlockPos queryPos)
     {
         return state;
     }
