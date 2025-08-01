@@ -49,6 +49,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -457,12 +458,22 @@ public class ForgeHooksClient
                 return handler.getFluidSprites(level, pos, fluidStateIn);
         }
 
+        ResourceLocation stillTexture = props.getStillTexture(fluidStateIn, level, pos);
+        ResourceLocation flowingTexture = props.getFlowingTexture(fluidStateIn, level, pos);
         ResourceLocation overlayTexture = props.getOverlayTexture(fluidStateIn, level, pos);
         return new TextureAtlasSprite[] {
-                Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(props.getStillTexture(fluidStateIn, level, pos)),
-                Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(props.getFlowingTexture(fluidStateIn, level, pos)),
-                overlayTexture == null ? null : Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(overlayTexture),
+                kilt$getFluidSprite(stillTexture),
+                kilt$getFluidSprite(flowingTexture),
+                kilt$getFluidSprite(overlayTexture == null ? stillTexture == null ? flowingTexture : stillTexture : overlayTexture)
         };
+    }
+
+    private static TextureAtlasSprite kilt$getFluidSprite(ResourceLocation texture) {
+        var atlas = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS);
+        if (texture == null)
+            return atlas.apply(MissingTextureAtlasSprite.getLocation());
+
+        return atlas.apply(texture);
     }
 
     @SuppressWarnings("deprecation")
