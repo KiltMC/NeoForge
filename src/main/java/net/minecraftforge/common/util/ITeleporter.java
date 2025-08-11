@@ -74,7 +74,7 @@ public interface ITeleporter extends io.github.fabricators_of_create.porting_lib
      */
     default boolean isVanilla()
     {
-        return this.getClass() == PortalForcer.class;
+        return (Class) this.getClass() == (Class) PortalForcer.class;
     }
 
     /**
