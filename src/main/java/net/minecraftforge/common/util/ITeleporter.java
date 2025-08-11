@@ -74,7 +74,7 @@ public interface ITeleporter extends io.github.fabricators_of_create.porting_lib
      */
     default boolean isVanilla()
     {
-        return true; // wELP.
+        return this.getClass() == PortalForcer.class;
     }
 
     /**
