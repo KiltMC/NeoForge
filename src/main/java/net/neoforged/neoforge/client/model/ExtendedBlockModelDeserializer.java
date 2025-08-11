@@ -35,7 +35,8 @@ import org.jetbrains.annotations.Nullable;
  * changes introduced to the spec by Forge.
  */
 public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer {
-    public static final Gson INSTANCE = (new GsonBuilder())
+    // Kilt: make INSTANCE non-final
+    public static Gson INSTANCE = (new GsonBuilder())
             .registerTypeAdapter(BlockModel.class, new ExtendedBlockModelDeserializer())
             .registerTypeAdapter(BlockElement.class, new BlockElement.Deserializer())
             .registerTypeAdapter(BlockElementFace.class, new BlockElementFace.Deserializer())
@@ -49,29 +50,34 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer {
     @Override
     public BlockModel deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext) throws JsonParseException {
         BlockModel model = super.deserialize(element, targetType, deserializationContext);
+        return this.kilt$deserialize(element, targetType, deserializationContext, model);
+    }
+
+    // Kilt: split off into custom deserialize, for improved mod compatibility
+    public BlockModel kilt$deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext, BlockModel model) throws JsonParseException {
         JsonObject jsonobject = element.getAsJsonObject();
         IUnbakedGeometry<?> geometry = deserializeGeometry(deserializationContext, jsonobject);
 
         List<BlockElement> elements = model.getElements();
         if (geometry != null) {
             elements.clear();
-            model.customData.setCustomGeometry(geometry);
+            model.kilt$getCustomData().setCustomGeometry(geometry);
         }
 
         if (jsonobject.has("transform")) {
             JsonElement transform = jsonobject.get("transform");
-            model.customData.setRootTransform(deserializationContext.deserialize(transform, Transformation.class));
+            model.kilt$getCustomData().setRootTransform(deserializationContext.deserialize(transform, Transformation.class));
         }
 
         if (jsonobject.has("render_type")) {
             var renderTypeHintName = GsonHelper.getAsString(jsonobject, "render_type");
-            model.customData.setRenderTypeHint(ResourceLocation.parse(renderTypeHintName));
+            model.kilt$getCustomData().setRenderTypeHint(ResourceLocation.parse(renderTypeHintName));
         }
 
         if (jsonobject.has("visibility")) {
             JsonObject visibility = GsonHelper.getAsJsonObject(jsonobject, "visibility");
             for (Map.Entry<String, JsonElement> part : visibility.entrySet()) {
-                model.customData.visibilityData.setVisibilityState(part.getKey(), part.getValue().getAsBoolean());
+                model.kilt$getCustomData().visibilityData.setVisibilityState(part.getKey(), part.getValue().getAsBoolean());
             }
         }
 
