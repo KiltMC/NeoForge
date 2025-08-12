@@ -645,7 +645,7 @@ public interface IForgeBlock extends BlockExtensions, FabricBlock, io.github.fab
      */
     default boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction direction)
     {
-        return state.ignitedByLava() || state.getFlammability(level, pos, direction) > 0;
+        return state.getFlammability(level, pos, direction) > 0;
     }
 
     /**

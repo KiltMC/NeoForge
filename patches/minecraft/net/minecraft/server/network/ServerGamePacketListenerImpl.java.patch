@@ -31,7 +31,7 @@
           BlockPos blockpos = blockhitresult.m_82425_();
           Vec3 vec31 = Vec3.m_82512_(blockpos);
 -         if (!(this.f_9743_.m_146892_().m_82557_(vec31) > f_215198_)) {
-+         if (this.f_9743_.canReach(blockpos, 1.5)) { // Vanilla uses eye-to-center distance < 6, which implies a padding of 1.5
++         if (this.f_9743_.canReachRaw(blockpos, 1.5)) { // Vanilla uses eye-to-center distance < ServerGamePacketListenerImpl which is 6*6, default block reach is 4.5, so add 1.5 padding
              Vec3 vec32 = vec3.m_82546_(vec31);
              double d0 = 1.0000001D;
              if (Math.abs(vec32.m_7096_()) < 1.0000001D && Math.abs(vec32.m_7098_()) < 1.0000001D && Math.abs(vec32.m_7094_()) < 1.0000001D) {
@@ -65,7 +65,7 @@
  
           AABB aabb = entity.m_20191_();
 -         if (aabb.m_272282_(this.f_9743_.m_146892_()) < f_215198_) {
-+         if (this.f_9743_.canReach(entity, 3)) { // Vanilla padding is 3.0 (distSq < 6.0 * 6.0)
++         if (this.f_9743_.canReachRaw(entity, 3.0)) { // Vanilla uses MAX_INTERACTION_DISTANCE which is 6*6 default entity reach is 3.0 so add 3.0 padding
              p_9866_.m_179617_(new ServerboundInteractPacket.Handler() {
                 private void m_143678_(InteractionHand p_143679_, ServerGamePacketListenerImpl.EntityInteraction p_143680_) {
                    ItemStack itemstack = ServerGamePacketListenerImpl.this.f_9743_.m_21120_(p_143679_);
