@@ -12,6 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.tags.ITagManager;
@@ -325,7 +326,7 @@ public class DeferredRegister<T>
             this.register = register;
         }
 
-        @SubscribeEvent
+        @SubscribeEvent(priority = EventPriority.HIGHEST) // Kilt: must be run first to not crash with ProjectE
         public void handleEvent(RegisterEvent event) {
             register.addEntries(event);
         }
