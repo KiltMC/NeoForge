@@ -223,6 +223,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 
 /**
  * Class for various common (i.e. client and server-side) hooks.
@@ -1590,7 +1591,7 @@ public class CommonHooks {
     }
 
     public static Map<RecipeBookType, Pair<String, String>> buildRecipeBookTypeTagFields(Map<RecipeBookType, Pair<String, String>> vanillaMap) {
-        ExtensionInfo extInfo = RecipeBookType.getExtensionInfo();
+        ExtensionInfo extInfo = RecipeBookTypeInjection.getExtensionInfo();
         if (extInfo.extended()) {
             vanillaMap = new HashMap<>(vanillaMap);
             for (RecipeBookType type : RecipeBookType.values()) {

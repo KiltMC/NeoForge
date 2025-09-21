@@ -26,7 +26,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -55,6 +54,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.entity.SpawnPlacementsInjection;
 
 public class ServerLifecycleHooks {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -183,7 +183,7 @@ public class ServerLifecycleHooks {
             final MobSpawnSettings mobSettings = biome.getMobSettings();
             mobSettings.getSpawnerTypes().forEach(category -> {
                 mobSettings.getMobs(category).unwrap().forEach(data -> {
-                    if (SpawnPlacements.hasPlacement(data.type)) return;
+                    if (SpawnPlacementsInjection.hasPlacement(data.type)) return;
                     entitiesWithoutPlacements.add(data.type);
                 });
             });
