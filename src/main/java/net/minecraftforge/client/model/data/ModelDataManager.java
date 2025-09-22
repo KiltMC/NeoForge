@@ -59,7 +59,7 @@ public class ModelDataManager
             Map<BlockPos, ModelData> data = modelDataCache.computeIfAbsent(chunk, $ -> new ConcurrentHashMap<>());
             for (BlockPos pos : needUpdate)
             {
-                BlockEntity toUpdate = level.getBlockEntity(pos);
+                BlockEntity toUpdate = level.getExistingBlockEntity(pos); // Kilt: try to avoid a palette entry crash when running in parallel
                 if (toUpdate != null && !toUpdate.isRemoved())
                 {
                     data.put(pos, toUpdate.getModelData());
