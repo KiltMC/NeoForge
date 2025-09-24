@@ -409,8 +409,13 @@ public class ForgeMod
         final IEventBus modEventBus = context.getModEventBus();
         // Forge-provided datapack registries
         modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
-            event.dataPackRegistry(ForgeRegistries.Keys.BIOME_MODIFIERS, BiomeModifier.DIRECT_CODEC);
-            event.dataPackRegistry(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, StructureModifier.DIRECT_CODEC);
+            // Kilt: use fallbacks to avoid crashing when multiloader Fabric mods decide to keep their biome modifier data.
+            event.dataPackRegistry(ForgeRegistries.Keys.BIOME_MODIFIERS, BiomeModifier.DIRECT_CODEC.orElse(error -> {
+                LOGGER.error("[Kilt] Failed to load biome modifier, falling back to empty biome modifier. Error: {}", error);
+            }, NoneBiomeModifier.INSTANCE));
+            event.dataPackRegistry(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, StructureModifier.DIRECT_CODEC.orElse(error -> {
+                LOGGER.error("[Kilt] Failed to load structure modifier, falling back to empty structure modifier. Error: {}", error);
+            }, NoneStructureModifier.INSTANCE));
         });
         modEventBus.addListener(this::preInit);
         modEventBus.addListener(this::gatherData);
