@@ -15,7 +15,7 @@ import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
  *
  * <p>Register using {@link RegisterBrewingRecipesEvent} and {@link Builder#addRecipe(IBrewingRecipe)}.
  */
-public interface IBrewingRecipe {
+public interface IBrewingRecipe extends io.github.fabricators_of_create.porting_lib.brewing.IBrewingRecipe {
     /**
      * Returns true is the passed ItemStack is an input for this recipe. "Input"
      * being the item that goes in one of the three bottom slots of the brewing

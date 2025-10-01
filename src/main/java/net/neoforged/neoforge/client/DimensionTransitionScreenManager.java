@@ -52,6 +52,13 @@ public class DimensionTransitionScreenManager {
         return ReceivingLevelScreen::new;
     }
 
+    // Kilt: mod compatibility helper
+    public static boolean kilt$hasScreen(@Nullable ResourceKey<Level> toDimension, @Nullable ResourceKey<Level> fromDimension) {
+        return conditionalDimensionEffects.containsKey(Pair.of(toDimension, fromDimension)) ||
+                toDimensionTransitions.containsKey(toDimension) ||
+                fromDimensionTransitions.containsKey(fromDimension);
+    }
+
     public interface ReceivingLevelScreenFactory {
         ReceivingLevelScreen create(BooleanSupplier supplier, ReceivingLevelScreen.Reason reason);
     }
