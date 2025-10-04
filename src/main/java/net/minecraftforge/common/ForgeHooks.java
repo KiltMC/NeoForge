@@ -145,6 +145,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -457,12 +458,21 @@ public class ForgeHooks
             state.getBlock().popExperience(level, pos, exp);
     }
 
-    public static int onBlockBreakEvent(Level level, GameType gameType, ServerPlayer entityPlayer, BlockPos pos)
+	public static int onBlockBreakEvent(Level level, GameType gameType, ServerPlayer entityPlayer, BlockPos pos)
+	{
+		return kilt$onBlockBreakEvent(
+				level, gameType, entityPlayer, pos,
+				() -> entityPlayer.getMainHandItem().getItem().canAttackBlock(level.getBlockState(pos), level, pos, entityPlayer)
+		);
+	}
+
+	// Kilt: Call original for better mod compatibility
+    public static int kilt$onBlockBreakEvent(Level level, GameType gameType, ServerPlayer entityPlayer, BlockPos pos, BooleanSupplier original)
     {
         // Logic from tryHarvestBlock for pre-canceling the event
         boolean preCancelEvent = false;
         ItemStack itemstack = entityPlayer.getMainHandItem();
-        if (!itemstack.isEmpty() && !itemstack.getItem().canAttackBlock(level.getBlockState(pos), level, pos, entityPlayer))
+        if (!itemstack.isEmpty() && !original.getAsBoolean())
         {
             preCancelEvent = true;
         }
