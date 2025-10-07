@@ -326,7 +326,7 @@ public class DeferredRegister<T>
             this.register = register;
         }
 
-        @SubscribeEvent(priority = EventPriority.HIGHEST) // Kilt: must be run first to not crash with ProjectE
+        @SubscribeEvent
         public void handleEvent(RegisterEvent event) {
             register.addEntries(event);
         }
