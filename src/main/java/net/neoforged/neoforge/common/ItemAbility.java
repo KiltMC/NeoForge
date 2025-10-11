@@ -6,6 +6,8 @@
 package net.neoforged.neoforge.common;
 
 import com.mojang.serialization.Codec;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -30,6 +32,10 @@ public final class ItemAbility {
      */
     public static ItemAbility get(String name) {
         return actions.computeIfAbsent(name, ItemAbility::new);
+    }
+
+    public static @Nullable ItemAbility kilt$getNullable(String name) {
+        return actions.get(name);
     }
 
     /**
