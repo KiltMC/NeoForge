@@ -37,14 +37,14 @@ public abstract class ContextAwareReloadListener implements PreparableReloadList
     /**
      * Returns the condition context held by this listener, or {@link IContext#EMPTY} if it is unavailable.
      */
-    protected final ICondition.IContext getContext() {
+    public final ICondition.IContext getContext() {
         return this.conditionContext;
     }
 
     /**
      * Returns the registry access held by this listener, or {@link RegistryAccess#EMPTY} if it is unavailable.
      */
-    protected final HolderLookup.Provider getRegistryLookup() {
+    public final HolderLookup.Provider getRegistryLookup() {
         return this.registryLookup;
     }
 
