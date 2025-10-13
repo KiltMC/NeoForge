@@ -99,4 +99,12 @@ public interface IItemHandler {
      *         false if the slot can never insert the ItemStack in any situation.
      */
     boolean isItemValid(int slot, ItemStack stack);
+
+    /**
+     * For kilt so we don't override vanilla logic
+     * @return true if the handler is for a vanilla inventory
+     */
+    default boolean kilt$isVanilla() {
+        return false;
+    }
 }

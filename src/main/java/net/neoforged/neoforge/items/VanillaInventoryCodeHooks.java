@@ -41,6 +41,8 @@ public class VanillaInventoryCodeHooks {
         return getSourceItemHandler(level, dest)
                 .map(itemHandlerResult -> {
                     IItemHandler handler = itemHandlerResult.getKey();
+                    if (handler.kilt$isVanilla()) // Kilt avoid replacing vanilla logic
+                        return null;
 
                     for (int i = 0; i < handler.getSlots(); i++) {
                         ItemStack extractItem = handler.extractItem(i, 1, true);

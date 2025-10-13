@@ -41,4 +41,9 @@ public class VanillaHopperItemHandler extends InvWrapper {
             return stack;
         }
     }
+
+    @Override
+    public boolean kilt$isVanilla() {
+        return this.getClass().equals(VanillaHopperItemHandler.class);
+    }
 }

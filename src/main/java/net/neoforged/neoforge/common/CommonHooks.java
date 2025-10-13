@@ -223,7 +223,9 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.entity.AttributeSupplierBuilderInjection;
 import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
+import xyz.bluspring.kilt.injections.world.level.LevelInjection;
 
 /**
  * Class for various common (i.e. client and server-side) hooks.
@@ -609,22 +611,22 @@ public class CommonHooks {
         DataComponentMap components = itemstack.getComponents();
 
         if (!(itemstack.getItem() instanceof BucketItem)) // if not bucket
-            level.captureBlockSnapshots = true;
+            level.kilt$setCapturingBlockSnapshots(true);
 
         ItemStack copy = itemstack.copy();
         InteractionResult ret = itemstack.getItem().useOn(context);
         if (itemstack.isEmpty())
             EventHooks.onPlayerDestroyItem(player, copy, context.getHand());
 
-        level.captureBlockSnapshots = false;
+        level.kilt$setCapturingBlockSnapshots(false);
 
         if (ret.consumesAction()) {
             // save new item data
             int newSize = itemstack.getCount();
             DataComponentMap newComponents = itemstack.getComponents();
             @SuppressWarnings("unchecked")
-            List<BlockSnapshot> blockSnapshots = (List<BlockSnapshot>) level.capturedBlockSnapshots.clone();
-            level.capturedBlockSnapshots.clear();
+            List<BlockSnapshot> blockSnapshots = (List<BlockSnapshot>) level.kilt$getCapturedBlockSnapshots().clone();
+            level.kilt$getCapturedBlockSnapshots().clear();
 
             // make sure to set pre-placement item data for event
             itemstack.setCount(size);
@@ -644,9 +646,9 @@ public class CommonHooks {
                 ret = InteractionResult.FAIL; // cancel placement
                 // revert back all captured blocks
                 for (BlockSnapshot blocksnapshot : Lists.reverse(blockSnapshots)) {
-                    level.restoringBlockSnapshots = true;
+                    level.kilt$setRestoringBlockSnapshots(true);
                     blocksnapshot.restore(blocksnapshot.getFlags() | Block.UPDATE_CLIENTS);
-                    level.restoringBlockSnapshots = false;
+                    level.kilt$setRestoringBlockSnapshots(false);
                 }
             } else {
                 // Change the stack to its new content
@@ -665,7 +667,7 @@ public class CommonHooks {
                     player.awardStat(Stats.ITEM_USED.get(item));
             }
         }
-        level.capturedBlockSnapshots.clear();
+        level.kilt$getCapturedBlockSnapshots().clear();
 
         return ret;
     }
@@ -1111,8 +1113,8 @@ public class CommonHooks {
 
         finalMap.forEach((k, v) -> {
             AttributeSupplier supplier = DefaultAttributes.getSupplier(k);
-            AttributeSupplier.Builder newBuilder = supplier != null ? new AttributeSupplier.Builder(supplier) : new AttributeSupplier.Builder();
-            newBuilder.combine(v);
+            AttributeSupplier.Builder newBuilder = supplier != null ? AttributeSupplierBuilderInjection.create(supplier) : new AttributeSupplier.Builder();
+            ((AttributeSupplierBuilderInjection) newBuilder).combine(v);
             FORGE_ATTRIBUTES.put(k, newBuilder.build());
         });
     }
