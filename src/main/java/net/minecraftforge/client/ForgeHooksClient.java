@@ -192,9 +192,14 @@ public class ForgeHooksClient
 
     public static void popGuiLayer(Minecraft minecraft)
     {
+        kilt$popGuiLayer(minecraft, () -> minecraft.setScreen(null));
+    }
+
+    public static void kilt$popGuiLayer(Minecraft minecraft, Runnable original)
+    {
         if (guiLayers.size() == 0)
         {
-            minecraft.setScreen(null);
+            original.run();
             return;
         }
 
