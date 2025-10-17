@@ -103,14 +103,19 @@ public class ForgeGui extends Gui
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, float partialTick)
-    {
+    // Kilt: We need to call this before anything, so time to do that I guess!
+    public void kilt$setupRender() {
         this.screenWidth = this.minecraft.getWindow().getGuiScaledWidth();
         this.screenHeight = this.minecraft.getWindow().getGuiScaledHeight();
 
         rightHeight = 39;
         leftHeight = 39;
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, float partialTick)
+    {
+        // Kilt: moved to setupRender
 
         if (MinecraftForge.EVENT_BUS.post(new RenderGuiEvent.Pre(minecraft.getWindow(), guiGraphics, partialTick)))
         {
