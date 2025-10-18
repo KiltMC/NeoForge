@@ -31,6 +31,7 @@ public class PlayerRespawnPositionEvent extends PlayerEvent {
     private final DimensionTransition originalDimensionTransition;
     private final boolean fromEndFight;
     private boolean copyOriginalSpawnPosition;
+    private boolean kilt$hasCopyChanged = false;
 
     public PlayerRespawnPositionEvent(ServerPlayer player, DimensionTransition dimensionTransition, boolean fromEndFight) {
         super(player);
@@ -99,6 +100,11 @@ public class PlayerRespawnPositionEvent extends PlayerEvent {
      */
     public void setCopyOriginalSpawnPosition(boolean copyOriginalSpawnPosition) {
         this.copyOriginalSpawnPosition = copyOriginalSpawnPosition;
+        this.kilt$hasCopyChanged = true;
+    }
+
+    public boolean kilt$hasCopyChanged() {
+        return this.kilt$hasCopyChanged;
     }
 
     /**
