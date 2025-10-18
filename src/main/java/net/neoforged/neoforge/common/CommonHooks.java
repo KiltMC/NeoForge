@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -413,8 +414,13 @@ public class CommonHooks {
 
     @Nullable
     public static ItemEntity onPlayerTossEvent(Player player, ItemStack item, boolean includeName) {
+        return kilt$onPlayerTossEvent(player, () -> player.drop(item, false, includeName));
+    }
+
+    @Nullable
+    public static ItemEntity kilt$onPlayerTossEvent(Player player, Supplier<ItemEntity> original) {
         player.captureDrops(Lists.newArrayList());
-        ItemEntity ret = player.drop(item, false, includeName);
+        ItemEntity ret = original.get();
         player.captureDrops(null);
 
         if (ret == null)
