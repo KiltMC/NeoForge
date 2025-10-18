@@ -45,6 +45,18 @@ public record InsertingContents(int index) implements ComponentContents {
         TRANSLATION_STACK.get().pop();
     }
 
+    // Kilt: make sure it actually exists in here first.
+    @ApiStatus.Internal
+    public static boolean kilt$hasTranslationInStack(TranslatableContents contents) {
+        for (TranslatableContents other : TRANSLATION_STACK.get()) {
+            if (contents == other) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public <T> Optional<T> visit(FormattedText.ContentConsumer<T> visitor) {
         var translation = TRANSLATION_STACK.get().peek();
