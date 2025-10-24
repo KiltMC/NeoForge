@@ -57,18 +57,8 @@ public class RegisterEvent extends Event implements IModBusEvent
         {
             if (this.forgeRegistry != null)
                 ((IForgeRegistry) this.forgeRegistry).register(name, valueSupplier.get());
-            else if (this.vanillaRegistry != null) {
-                // Kilt: we need to work around mods like HexPsi that for some reason register to registries *in* the value supplier.
-                //       and for some reason Forge allows it.
-                T value = valueSupplier.get();
-                ResourceLocation existingKey = ((Registry) this.vanillaRegistry).getKey(value);
-                if (existingKey != null
-                    && existingKey.equals(name) // Kilt: this may very well be redundant.
-                )
-                    return;
-
-                Registry.register((Registry) this.vanillaRegistry, name, value);
-            }
+            else if (this.vanillaRegistry != null)
+                Registry.register((Registry) this.vanillaRegistry, name, valueSupplier.get());
         }
     }
 
