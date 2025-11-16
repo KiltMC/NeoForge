@@ -44,7 +44,8 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer
         List<BlockElement> elements = model.getElements();
         if (geometry != null)
         {
-            elements.clear();
+            if (!elements.isEmpty()) // Kilt: prevent a weird UnsupportedOperationException that can sometimes happen here
+                elements.clear();
             ((BlockModelInjection) model).kilt$getCustomData().setCustomGeometry(geometry);
         }
 
