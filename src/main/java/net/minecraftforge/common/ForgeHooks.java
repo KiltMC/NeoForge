@@ -1204,7 +1204,7 @@ public class ForgeHooks
         {
             AttributeSupplier supplier = DefaultAttributes.getSupplier(k);
             AttributeSupplier.Builder newBuilder = supplier != null ? AttributeSupplierBuilderInjection.create(supplier) : new AttributeSupplier.Builder();
-            ((AttributeSupplierBuilderInjection) newBuilder).combine(v);
+            newBuilder.combine(v);
             FORGE_ATTRIBUTES.put(k, newBuilder.build());
         });
     }
