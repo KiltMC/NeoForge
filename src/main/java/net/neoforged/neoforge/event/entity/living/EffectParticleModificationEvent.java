@@ -26,6 +26,13 @@ public class EffectParticleModificationEvent extends LivingEvent {
     private ParticleOptions options;
     private boolean isVisible;
 
+    // Kilt: Add check to see if the visibility is modified
+    private boolean kilt$wasVisibilityModified = false;
+
+    public boolean kilt$wasVisibilityModified() {
+        return kilt$wasVisibilityModified;
+    }
+
     public EffectParticleModificationEvent(LivingEntity entity, MobEffectInstance effect) {
         super(entity);
         this.effect = effect;
@@ -56,5 +63,7 @@ public class EffectParticleModificationEvent extends LivingEvent {
 
     public void setVisible(boolean visible) {
         isVisible = visible;
+        // Kilt: Add check to see if the visibility is modified
+        kilt$wasVisibilityModified = true;
     }
 }
