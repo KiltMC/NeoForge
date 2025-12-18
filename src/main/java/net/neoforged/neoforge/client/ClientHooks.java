@@ -197,6 +197,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.renderer.ShaderInstanceInjection;
+import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 
 /**
  * Class for various client-side-only hooks.
@@ -237,8 +239,13 @@ public class ClientHooks {
     }
 
     public static void popGuiLayer(Minecraft minecraft) {
+        kilt$popGuiLayer(minecraft, () -> minecraft.setScreen(null));
+    }
+
+    public static void kilt$popGuiLayer(Minecraft minecraft, Runnable onEmptyPop) {
         if (guiLayers.isEmpty()) {
-            minecraft.setScreen(null);
+            //minecraft.setScreen(null);
+            onEmptyPop.run(); // Kilt: Make sure to wrap
             return;
         }
 
@@ -785,7 +792,7 @@ public class ClientHooks {
 
         @SubscribeEvent
         public static void registerShaders(RegisterShadersEvent event) throws IOException {
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath("neoforge", "rendertype_entity_unlit_translucent"), DefaultVertexFormat.NEW_ENTITY), (p_172645_) -> {
+            event.registerShader(ShaderInstanceInjection.create(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath("neoforge", "rendertype_entity_unlit_translucent"), DefaultVertexFormat.NEW_ENTITY), (p_172645_) -> {
                 rendertypeEntityTranslucentUnlitShader = p_172645_;
             });
         }
@@ -1103,7 +1110,7 @@ public class ClientHooks {
         return event.getTooltip();
     }
 
-    private static final ExtensionInfo RECIPE_BOOK_TYPE_EXTENSION_INFO = RecipeBookType.getExtensionInfo();
+    private static final ExtensionInfo RECIPE_BOOK_TYPE_EXTENSION_INFO = RecipeBookTypeInjection.getExtensionInfo();
     private static final RecipeBookType[] RECIPE_BOOK_TYPES = RecipeBookType.values();
     private static RecipeBookType @Nullable [] cachedFilteredTypes = null;
 

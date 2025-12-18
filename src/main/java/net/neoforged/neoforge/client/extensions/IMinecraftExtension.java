@@ -34,6 +34,11 @@ public interface IMinecraftExtension {
         ClientHooks.popGuiLayer(self());
     }
 
+    // Kilt: make sure to wrap the original call.
+    default void kilt$popGuiLayer(Runnable onPop) {
+        ClientHooks.kilt$popGuiLayer(self(), onPop);
+    }
+
     /**
      * Retrieves the {@link Locale} set by the player.
      * Useful for creating string and number formatters.
