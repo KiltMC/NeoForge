@@ -52,7 +52,9 @@ public interface IForgeFluid
      *
      * @return the type of this fluid
      */
-    FluidType getFluidType();
+    default FluidType getFluidType() {
+        throw new RuntimeException();
+    }
 
     /**
      * Performs how an entity moves when within the fluid. If using custom

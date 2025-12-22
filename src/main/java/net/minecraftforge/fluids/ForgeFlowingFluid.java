@@ -6,6 +6,7 @@
 package net.minecraftforge.fluids;
 
 import java.util.Optional;
+
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -60,6 +61,10 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     @Override
     public FluidType getFluidType()
     {
+        // Kilt: Create injects into the super of this, so we must check do this.
+        if (this.fluidType == null) {
+            return FluidType.kilt$tryGetWrappingFluidType(super.getFluidType());
+        }
         return this.fluidType.get();
     }
 
@@ -242,34 +247,6 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
         {
             this.tickRate = tickRate;
             return this;
-        }
-
-        public Supplier<? extends Fluid> kilt$getFlowing() {
-            return flowing;
-        }
-
-        public Supplier<? extends Fluid> kilt$getStill() {
-            return still;
-        }
-
-        public Supplier<? extends Item> kilt$getBucket() {
-            return bucket;
-        }
-
-        public Supplier<? extends LiquidBlock> kilt$getBlock() {
-            return block;
-        }
-
-        public int kilt$getLevelDecreasePerBlock() {
-            return levelDecreasePerBlock;
-        }
-
-        public float kilt$getBlastResistance() {
-            return explosionResistance;
-        }
-
-        public int kilt$getTickRate() {
-            return tickRate;
         }
     }
 }
