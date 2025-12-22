@@ -243,5 +243,33 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
             this.tickRate = tickRate;
             return this;
         }
+
+        public Supplier<? extends Fluid> kilt$getFlowing() {
+            return flowing;
+        }
+
+        public Supplier<? extends Fluid> kilt$getStill() {
+            return still;
+        }
+
+        public Supplier<? extends Item> kilt$getBucket() {
+            return bucket;
+        }
+
+        public Supplier<? extends LiquidBlock> kilt$getBlock() {
+            return block;
+        }
+
+        public int kilt$getLevelDecreasePerBlock() {
+            return levelDecreasePerBlock;
+        }
+
+        public float kilt$getBlastResistance() {
+            return explosionResistance;
+        }
+
+        public int kilt$getTickRate() {
+            return tickRate;
+        }
     }
 }
