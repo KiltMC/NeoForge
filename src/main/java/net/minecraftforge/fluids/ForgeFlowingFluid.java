@@ -89,7 +89,7 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     @Override
     public boolean canConvertToSource(FluidState state, Level level, BlockPos pos)
     {
-        return this.getFluidType().canConvertToSource(state, level, pos);
+        return this.forge$getFluidType().canConvertToSource(state, level, pos);
     }
 
     @Override
@@ -153,7 +153,7 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     @Override
     public Optional<SoundEvent> getPickupSound()
     {
-        return Optional.ofNullable(getFluidType().getSound(SoundActions.BUCKET_FILL));
+        return Optional.ofNullable(forge$getFluidType().getSound(SoundActions.BUCKET_FILL));
     }
 
     public static class Flowing extends ForgeFlowingFluid

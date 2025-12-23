@@ -106,7 +106,7 @@ public class DynamicFluidContainerModel implements IUnbakedGeometry<DynamicFluid
         if (particleSprite == null && !coverIsMask) particleSprite = coverSprite;
 
         // If the fluid is lighter than air, rotate 180deg to turn it upside down
-        if (flipGas && fluid != Fluids.EMPTY && fluid.getFluidType().isLighterThanAir())
+        if (flipGas && fluid != Fluids.EMPTY && fluid.forge$getFluidType().isLighterThanAir())
         {
             modelState = new SimpleModelState(
                     modelState.getRotation().compose(
@@ -137,7 +137,7 @@ public class DynamicFluidContainerModel implements IUnbakedGeometry<DynamicFluid
                 var unbaked = UnbakedGeometryHelper.createUnbakedItemMaskElements(1, templateSprite.contents()); // Use template as mask
                 var quads = UnbakedGeometryHelper.bakeElements(unbaked, $ -> fluidSprite, transformedState, modelLocation); // Bake with fluid texture
 
-                var emissive = applyFluidLuminosity && fluid.getFluidType().getLightLevel() > 0;
+                var emissive = applyFluidLuminosity && fluid.forge$getFluidType().getLightLevel() > 0;
                 var renderTypes = getLayerRenderTypes(emissive);
                 if (emissive) QuadTransformers.settingMaxEmissivity().processInPlace(quads);
 

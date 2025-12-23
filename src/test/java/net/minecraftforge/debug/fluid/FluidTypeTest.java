@@ -197,7 +197,7 @@ public class FluidTypeTest
         // Log Fluid Types for all fluids
         event.enqueueWork(() ->
                 ForgeRegistries.FLUIDS.forEach(fluid ->
-                        logger.info("Fluid {} has FluidType {}", ForgeRegistries.FLUIDS.getKey(fluid), ForgeRegistries.FLUID_TYPES.get().getKey(fluid.getFluidType())))
+                        logger.info("Fluid {} has FluidType {}", ForgeRegistries.FLUIDS.getKey(fluid), ForgeRegistries.FLUID_TYPES.get().getKey(fluid.forge$getFluidType())))
         );
     }
 

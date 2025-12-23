@@ -85,7 +85,7 @@ public class CustomFluidContainerTest
                 }
                 else
                 {
-                    name.set(name.get() + " (" + fluidStack.getFluid().getFluidType().getDescription().getString() + ")");
+                    name.set(name.get() + " (" + fluidStack.getFluid().forge$getFluidType().getDescription().getString() + ")");
                 }
             });
             return Component.literal(name.get());
