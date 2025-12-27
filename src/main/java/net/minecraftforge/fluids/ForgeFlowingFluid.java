@@ -61,10 +61,6 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     @Override
     public FluidType getFluidType()
     {
-        // Kilt: Create injects into the super of this, so we must check do this.
-        if (this.fluidType == null) {
-            return FluidType.kilt$tryGetWrappingFluidType(super.getFluidType());
-        }
         return this.fluidType.get();
     }
 
