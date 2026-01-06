@@ -458,15 +458,15 @@ public class ForgeHooks
             state.getBlock().popExperience(level, pos, exp);
     }
 
-	public static int onBlockBreakEvent(Level level, GameType gameType, ServerPlayer entityPlayer, BlockPos pos)
-	{
-		return kilt$onBlockBreakEvent(
-				level, gameType, entityPlayer, pos,
-				() -> entityPlayer.getMainHandItem().getItem().canAttackBlock(level.getBlockState(pos), level, pos, entityPlayer)
-		);
-	}
+    public static int onBlockBreakEvent(Level level, GameType gameType, ServerPlayer entityPlayer, BlockPos pos)
+    {
+        return kilt$onBlockBreakEvent(
+                level, gameType, entityPlayer, pos,
+                () -> entityPlayer.getMainHandItem().getItem().canAttackBlock(level.getBlockState(pos), level, pos, entityPlayer)
+        );
+    }
 
-	// Kilt: Call original for better mod compatibility
+    // Kilt: Call original for better mod compatibility
     public static int kilt$onBlockBreakEvent(Level level, GameType gameType, ServerPlayer entityPlayer, BlockPos pos, BooleanSupplier original)
     {
         // Logic from tryHarvestBlock for pre-canceling the event
@@ -894,6 +894,19 @@ public class ForgeHooks
      */
     public static FluidType getVanillaFluidType(Fluid fluid)
     {
+        return kilt$getVanillaFluidType(fluid, true);
+    }
+
+    /**
+     * Returns a vanilla fluid type for the given fluid.
+     *
+     * @param fluid the fluid looking for its type
+     * @param includeFabricCheck If false it will skip {@link Fluid#getFluidType()}, which is useful to avoid stack overflow exceptions in some cases.
+     * @return the type of the fluid if vanilla
+     * @throws RuntimeException if the fluid is not a vanilla one
+     */
+    public static FluidType kilt$getVanillaFluidType(Fluid fluid, boolean includeFabricCheck)
+    {
         if (fluid == Fluids.EMPTY)
             return ForgeMod.EMPTY_TYPE.get();
         if (fluid == Fluids.WATER || fluid == Fluids.FLOWING_WATER)
@@ -903,9 +916,11 @@ public class ForgeHooks
         if (ForgeMod.MILK.filter(milk -> milk == fluid).isPresent() || ForgeMod.FLOWING_MILK.filter(milk -> milk == fluid).isPresent())
             return ForgeMod.MILK_TYPE.get();
 
-        var fabricFluidType = ((FluidExtension) fluid).getFluidType();
-        if (fabricFluidType != null) {
-            return FluidType.kilt$tryGetWrappingFluidType(fabricFluidType);
+        if (includeFabricCheck) {
+            var fabricFluidType = ((FluidExtension) fluid).getFluidType();
+            if (fabricFluidType != null) {
+                return FluidType.kilt$tryGetWrappingFluidType(fabricFluidType);
+            }
         }
 
         var handler = FluidVariantAttributes.getHandlerOrDefault(fluid);
@@ -1549,7 +1564,7 @@ public class ForgeHooks
      */
     public static void onLivingBreathe(LivingEntity entity, int consumeAirAmount, int refillAirAmount)
     {
-    	// Check things that vanilla considers to be air - these will cause the air supply to be increased.
+        // Check things that vanilla considers to be air - these will cause the air supply to be increased.
         boolean isAir = entity.getEyeInFluidType().isAir() || entity.level().getBlockState(BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ())).is(Blocks.BUBBLE_COLUMN);
         // The following effects cause the entity to not drown, but do not cause the air supply to be increased.
         boolean canBreathe = !entity.canDrownInFluidType(entity.getEyeInFluidType()) || MobEffectUtil.hasWaterBreathing(entity) || (entity instanceof Player && ((Player) entity).getAbilities().invulnerable);
