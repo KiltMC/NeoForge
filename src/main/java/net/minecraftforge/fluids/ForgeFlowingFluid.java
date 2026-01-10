@@ -25,6 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.SoundActions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +46,8 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     private final float explosionResistance;
     private final int tickRate;
 
+    private FluidType kilt$backupFluidType;
+
     protected ForgeFlowingFluid(Properties properties)
     {
         this.fluidType = properties.fluidType;
@@ -61,6 +64,17 @@ public abstract class ForgeFlowingFluid extends FlowingFluid
     @Override
     public FluidType getFluidType()
     {
+        if (this.fluidType == null) {
+            if (kilt$backupFluidType == null) {
+                var ft = super.getFluidType();
+                if (ft == null) {
+                    kilt$backupFluidType = ForgeHooks.kilt$getVanillaFluidType(this, false);
+                } else {
+                    kilt$backupFluidType = FluidType.kilt$tryGetWrappingFluidType(ft);
+                }
+            }
+            return kilt$backupFluidType;
+        }
         return this.fluidType.get();
     }
 
