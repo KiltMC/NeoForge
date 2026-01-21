@@ -131,8 +131,7 @@ public class ServerLifecycleHooks
             latch.countDown();
             exitLatch = null;
         }
-        // Kilt: Handled by ForgeConfigAPIPort
-        //ConfigTracker.INSTANCE.unloadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
+        ConfigTracker.INSTANCE.unloadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
     }
 
     public static MinecraftServer getCurrentServer()
