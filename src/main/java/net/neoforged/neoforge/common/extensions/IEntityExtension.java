@@ -8,6 +8,8 @@ package net.neoforged.neoforge.common.extensions;
 import java.util.Collection;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+
+import io.github.fabricators_of_create.porting_lib.entity.injects.EntityInjection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -34,7 +36,7 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.network.payload.AdvancedAddEntityPayload;
 import org.jetbrains.annotations.Nullable;
 
-public interface IEntityExtension extends INBTSerializable<CompoundTag> {
+public interface IEntityExtension extends INBTSerializable<CompoundTag>, EntityInjection {
     private Entity self() {
         return (Entity) this;
     }
@@ -222,7 +224,7 @@ public interface IEntityExtension extends INBTSerializable<CompoundTag> {
      *         state, {@code false} otherwise
      */
     default boolean isInFluidType(FluidState state) {
-        return this.isInFluidType(state.getFluidType());
+        return this.isInFluidType(state.neo$getFluidType());
     }
 
     /**
@@ -289,7 +291,7 @@ public interface IEntityExtension extends INBTSerializable<CompoundTag> {
      * @return {@code true} if the entity can start swimming, {@code false} otherwise
      */
     default boolean canStartSwimming() {
-        return !this.getEyeInFluidType().isAir() && this.canSwimInFluidType(this.getEyeInFluidType()) && this.canSwimInFluidType(this.self().level().getFluidState(this.self().blockPosition()).getFluidType());
+        return !this.getEyeInFluidType().isAir() && this.canSwimInFluidType(this.getEyeInFluidType()) && this.canSwimInFluidType(this.self().level().getFluidState(this.self().blockPosition()).neo$getFluidType());
     }
 
     /**

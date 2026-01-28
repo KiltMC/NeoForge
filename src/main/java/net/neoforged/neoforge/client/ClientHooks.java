@@ -197,6 +197,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.gui.GuiInjection;
 import xyz.bluspring.kilt.injections.client.renderer.ShaderInstanceInjection;
 import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 

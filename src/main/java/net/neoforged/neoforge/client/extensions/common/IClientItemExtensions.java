@@ -32,6 +32,7 @@ import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.IArmPoseTransformer;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.mixin.ItemRendererAccessor;
 
 /**
  * {@linkplain LogicalSide#CLIENT Client-only} extensions to {@link Item}.
@@ -174,7 +175,7 @@ public interface IClientItemExtensions {
      * By default, returns vanilla's block entity renderer.
      */
     default BlockEntityWithoutLevelRenderer getCustomRenderer() {
-        return Minecraft.getInstance().getItemRenderer().getBlockEntityRenderer();
+        return ((ItemRendererAccessor) Minecraft.getInstance().getItemRenderer()).getBlockEntityRenderer();
     }
 
     /**

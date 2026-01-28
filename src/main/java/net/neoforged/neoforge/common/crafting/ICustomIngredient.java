@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.world.item.crafting.IngredientInjection;
 
 /**
  * Interface that modders can implement to create new behaviors for {@link Ingredient}s.
@@ -71,6 +72,6 @@ public interface ICustomIngredient {
      */
     @ApiStatus.NonExtendable
     default Ingredient toVanilla() {
-        return new Ingredient(this);
+        return IngredientInjection.create(this);
     }
 }

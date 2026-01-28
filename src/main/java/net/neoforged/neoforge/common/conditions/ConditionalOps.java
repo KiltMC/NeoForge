@@ -17,6 +17,7 @@ import java.util.Optional;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.ExtraCodecs;
 import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
+import xyz.bluspring.kilt.mixin.resources.RegistryOpsAccessor;
 
 /**
  * Extension of {@link RegistryOps} that also encapsulates a {@link ICondition.IContext}.
@@ -26,7 +27,7 @@ public class ConditionalOps<T> extends RegistryOps<T> {
     private final ICondition.IContext context;
 
     public ConditionalOps(RegistryOps<T> ops, ICondition.IContext context) {
-        super(ops);
+        super(ops, ((RegistryOpsAccessor) ops).getLookupProvider());
         this.context = context;
     }
 

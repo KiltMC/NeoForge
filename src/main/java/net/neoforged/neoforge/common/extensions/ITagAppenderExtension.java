@@ -9,6 +9,7 @@ import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import xyz.bluspring.kilt.injections.data.tags.TagsProvider$TagAppenderInjection;
 
 public interface ITagAppenderExtension<T> {
     private TagsProvider.TagAppender<T> self() {
@@ -42,7 +43,7 @@ public interface ITagAppenderExtension<T> {
     }
 
     default TagsProvider.TagAppender<T> replace(boolean value) {
-        self().getInternalBuilder().replace(value);
+        ((TagsProvider$TagAppenderInjection) self()).getInternalBuilder().replace(value);
         return self();
     }
 
@@ -54,7 +55,7 @@ public interface ITagAppenderExtension<T> {
      */
     default TagsProvider.TagAppender<T> remove(final ResourceLocation location) {
         TagsProvider.TagAppender<T> builder = self();
-        builder.getInternalBuilder().removeElement(location);
+        ((TagsProvider$TagAppenderInjection) builder).getInternalBuilder().removeElement(location);
         return builder;
     }
 
@@ -106,7 +107,7 @@ public interface ITagAppenderExtension<T> {
      */
     default TagsProvider.TagAppender<T> remove(TagKey<T> tag) {
         TagsProvider.TagAppender<T> builder = self();
-        builder.getInternalBuilder().removeTag(tag.location());
+        ((TagsProvider$TagAppenderInjection) builder).getInternalBuilder().removeTag(tag.location());
         return builder;
     }
 

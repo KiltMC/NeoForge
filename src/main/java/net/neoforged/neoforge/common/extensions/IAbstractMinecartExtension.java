@@ -5,12 +5,13 @@
 
 package net.neoforged.neoforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.entity.injects.AbstractMinecartInjection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 
-public interface IAbstractMinecartExtension {
+public interface IAbstractMinecartExtension extends AbstractMinecartInjection {
     public static float DEFAULT_MAX_SPEED_AIR_LATERAL = 0.4f;
     public static float DEFAULT_MAX_SPEED_AIR_VERTICAL = -1.0f;
     public static double DEFAULT_AIR_DRAG = 0.95f;

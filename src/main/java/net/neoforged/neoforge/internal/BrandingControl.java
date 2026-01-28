@@ -16,7 +16,7 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.i18n.FMLTranslations;
 import net.neoforged.neoforge.client.ClientHooks;
-import net.neoforged.neoforge.forge.snapshots.ForgeSnapshotsMod;
+//import net.neoforged.neoforge.forge.snapshots.ForgeSnapshotsMod;
 import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
 
 public class BrandingControl {
@@ -29,7 +29,7 @@ public class BrandingControl {
             ImmutableList.Builder<String> brd = ImmutableList.builder();
             brd.add("Minecraft " + DetectedVersion.BUILT_IN.getName());
             int modCount = ModList.get().size();
-            brd.add(FMLTranslations.parseMessage("fml.menu.branding", ForgeSnapshotsMod.BRANDING_NAME + ' ' + NeoForgeVersion.getVersion(), modCount));
+            brd.add(FMLTranslations.parseMessage("fml.menu.branding", /*ForgeSnapshotsMod.BRANDING_NAME*/ "Kilt/NeoForge" + ' ' + NeoForgeVersion.getVersion(), modCount));
             brandings = brd.build();
             brandingsNoMC = brandings.subList(1, brandings.size());
         }
@@ -63,11 +63,13 @@ public class BrandingControl {
     }
 
     public static String getClientBranding() {
-        return ForgeSnapshotsMod.BRANDING_ID;
+//        return ForgeSnapshotsMod.BRANDING_ID;
+        return "kilt/neoforge";
     }
 
     public static String getServerBranding() {
-        return ForgeSnapshotsMod.BRANDING_ID;
+//        return ForgeSnapshotsMod.BRANDING_ID;
+        return "kilt/neoforge";
     }
 
     public static ResourceManagerReloadListener resourceManagerReloadListener() {

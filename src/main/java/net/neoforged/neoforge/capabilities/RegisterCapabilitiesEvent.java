@@ -7,6 +7,8 @@ package net.neoforged.neoforge.capabilities;
 
 import java.util.ArrayList;
 import java.util.Objects;
+
+import net.fabricmc.fabric.mixin.lookup.BlockEntityTypeAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -66,7 +68,7 @@ public class RegisterCapabilitiesEvent extends Event implements IModBusEvent {
             return provider.getCapability((BE) blockEntity, context);
         };
 
-        for (Block block : blockEntityType.getValidBlocks()) {
+        for (Block block : ((BlockEntityTypeAccessor) blockEntityType).getBlocks()) {
             Objects.requireNonNull(block);
             capability.providers.computeIfAbsent(block, b -> new ArrayList<>()).add(adaptedProvider);
         }

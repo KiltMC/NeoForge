@@ -47,7 +47,7 @@ public interface IFluidExtension {
      *
      * @return the type of this fluid
      */
-    FluidType getFluidType();
+    FluidType neo$getFluidType();
 
     /**
      * Performs how an entity moves when within the fluid. If using custom
@@ -61,7 +61,7 @@ public interface IFluidExtension {
      * @return {@code true} if custom movement logic is performed, {@code false} otherwise
      */
     default boolean move(FluidState state, LivingEntity entity, Vec3 movementVector, double gravity) {
-        return getFluidType().move(state, entity, movementVector, gravity);
+        return neo$getFluidType().move(state, entity, movementVector, gravity);
     }
 
     /**
@@ -73,7 +73,7 @@ public interface IFluidExtension {
      * @return {@code true} if the fluid can create a source, {@code false} otherwise
      */
     default boolean canConvertToSource(FluidState state, Level level, BlockPos pos) {
-        return getFluidType().canConvertToSource(state, level, pos);
+        return neo$getFluidType().canConvertToSource(state, level, pos);
     }
 
     /**
@@ -84,7 +84,7 @@ public interface IFluidExtension {
      * @return {@code true} if the boat can be used, {@code false} otherwise
      */
     default boolean supportsBoating(FluidState state, Boat boat) {
-        return getFluidType().supportsBoating(state, boat);
+        return neo$getFluidType().supportsBoating(state, boat);
     }
 
     /**
@@ -101,7 +101,7 @@ public interface IFluidExtension {
      */
     @Nullable
     default PathType getBlockPathType(FluidState state, BlockGetter level, BlockPos pos, @org.jetbrains.annotations.Nullable Mob mob, boolean canFluidLog) {
-        return getFluidType().getBlockPathType(state, level, pos, mob, canFluidLog);
+        return neo$getFluidType().getBlockPathType(state, level, pos, mob, canFluidLog);
     }
 
     /**
@@ -119,7 +119,7 @@ public interface IFluidExtension {
      */
     @Nullable
     default PathType getAdjacentBlockPathType(FluidState state, BlockGetter level, BlockPos pos, @org.jetbrains.annotations.Nullable Mob mob, PathType originalType) {
-        return getFluidType().getAdjacentBlockPathType(state, level, pos, mob, originalType);
+        return neo$getFluidType().getAdjacentBlockPathType(state, level, pos, mob, originalType);
     }
 
     /**
@@ -140,7 +140,7 @@ public interface IFluidExtension {
      * @return {@code true} if the block can be hydrated, {@code false} otherwise
      */
     default boolean canHydrate(FluidState state, BlockGetter getter, BlockPos pos, BlockState source, BlockPos sourcePos) {
-        return getFluidType().canHydrate(state, getter, pos, source, sourcePos);
+        return neo$getFluidType().canHydrate(state, getter, pos, source, sourcePos);
     }
 
     /**
@@ -152,6 +152,6 @@ public interface IFluidExtension {
      * @return {@code true} if the block can be extinguished, {@code false} otherwise
      */
     default boolean canExtinguish(FluidState state, BlockGetter getter, BlockPos pos) {
-        return getFluidType().canExtinguish(state, getter, pos);
+        return neo$getFluidType().canExtinguish(state, getter, pos);
     }
 }

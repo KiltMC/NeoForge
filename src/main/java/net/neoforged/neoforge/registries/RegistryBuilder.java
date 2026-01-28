@@ -113,9 +113,9 @@ public class RegistryBuilder<T> {
      * @see NewRegistryEvent#register(Registry)
      */
     public Registry<T> create() {
-        BaseMappedRegistry<T> registry = this.defaultKey != null
+        BaseMappedRegistry<T> registry = (BaseMappedRegistry<T>) (Object) (this.defaultKey != null
                 ? new DefaultedMappedRegistry<>(this.defaultKey.toString(), this.registryKey, Lifecycle.stable(), intrusiveHolders)
-                : new MappedRegistry<>(this.registryKey, Lifecycle.stable(), intrusiveHolders);
+                : new MappedRegistry<>(this.registryKey, Lifecycle.stable(), intrusiveHolders));
         this.callbacks.forEach(registry::addCallback);
         if (this.maxId != -1)
             registry.setMaxId(this.maxId);

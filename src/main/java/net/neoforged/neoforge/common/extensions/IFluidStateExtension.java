@@ -41,8 +41,8 @@ public interface IFluidStateExtension {
      *
      * @return the type of this fluid
      */
-    default FluidType getFluidType() {
-        return self().getType().getFluidType();
+    default FluidType neo$getFluidType() {
+        return self().getType().neo$getFluidType();
     }
 
     /**

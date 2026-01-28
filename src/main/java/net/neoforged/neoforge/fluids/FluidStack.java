@@ -467,7 +467,7 @@ public final class FluidStack implements MutableDataComponentHolder {
      * Returns the fluid type of this stack.
      */
     public FluidType getFluidType() {
-        return getFluid().getFluidType();
+        return getFluid().neo$getFluidType();
     }
 
     /**

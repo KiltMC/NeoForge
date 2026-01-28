@@ -11,6 +11,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import io.github.fabricators_of_create.porting_lib.item.injects.ItemInjection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.RegistryLookup;
@@ -63,7 +65,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 // TODO systemic review of all extension functions. lots of unused -C
-public interface IItemExtension {
+public interface IItemExtension extends ItemInjection, io.github.fabricators_of_create.porting_lib.entity.injects.ItemInjection {
     private Item self() {
         return (Item) this;
     }

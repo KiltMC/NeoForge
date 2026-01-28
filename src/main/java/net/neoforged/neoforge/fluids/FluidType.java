@@ -8,7 +8,6 @@ package net.neoforged.neoforge.fluids;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -50,7 +49,6 @@ import net.neoforged.neoforge.common.SoundActions;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
-import xyz.bluspring.kilt.mixin.FluidTypeAccessor;
 
 /**
  * A definition of common attributes, properties, and methods that is applied
@@ -63,7 +61,7 @@ import xyz.bluspring.kilt.mixin.FluidTypeAccessor;
  * can be implemented by overriding methods further in the call chain (on fluids,
  * entities, etc.).
  */
-public class FluidType extends io.github.fabricators_of_create.porting_lib.fluids.FluidType {
+public class FluidType {
     /**
      * The number of fluid units that a bucket represents.
      */
@@ -75,18 +73,23 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     public static final Lazy<Integer> SIZE = Lazy.of(() -> NeoForgeRegistries.FLUID_TYPES.keySet().size());
 
-    private static final Map<io.github.fabricators_of_create.porting_lib.fluids.FluidType, FluidType> kilt$wrappedFluidTypes = new ConcurrentHashMap<>();
-
-    public static FluidType kilt$tryGetWrappingFluidType(io.github.fabricators_of_create.porting_lib.fluids.FluidType fabricFluidType) {
-        if (fabricFluidType instanceof FluidType forgeFluidType) // just in case.
-            return forgeFluidType;
-
-        return kilt$wrappedFluidTypes.computeIfAbsent(fabricFluidType, FluidType::new);
-    }
-
-    public io.github.fabricators_of_create.porting_lib.fluids.FluidType kilt$wrapped;
-    public boolean kilt$isWrapped = false;
-
+    private String descriptionId;
+    private final double motionScale;
+    private final boolean canPushEntity;
+    private final boolean canSwim;
+    private final boolean canDrown;
+    private final float fallDistanceModifier;
+    private final boolean canExtinguish;
+    private final boolean canConvertToSource;
+    private final boolean supportsBoating;
+    @Nullable
+    private final PathType pathType, adjacentPathType;
+    private final boolean canHydrate;
+    private final int lightLevel;
+    private final int density;
+    private final int temperature;
+    private final int viscosity;
+    private final Rarity rarity;
     @Nullable
     private final DripstoneDripInfo dripInfo;
 
@@ -95,66 +98,30 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      */
     protected final Map<SoundAction, SoundEvent> sounds;
 
-    // Kilt: Add flag to know that a fluid type is wrapped.
-    public FluidType(final Properties properties, boolean isWrapped)
-    {
-        this(properties);
-        this.kilt$isWrapped = isWrapped;
-    }
-
-    // Kilt: Wrap around the existing Porting Lib fluid type if possible
-    private FluidType(io.github.fabricators_of_create.porting_lib.fluids.FluidType wrapped)
-    {
-        super(io.github.fabricators_of_create.porting_lib.fluids.FluidType.Properties.create()
-                .descriptionId(wrapped.getDescriptionId())
-                .motionScale(((FluidTypeAccessor) wrapped).getMotionScale())
-                .canPushEntity(((FluidTypeAccessor) wrapped).isCanPushEntity())
-                .canSwim(((FluidTypeAccessor) wrapped).isCanSwim())
-                .canDrown(((FluidTypeAccessor) wrapped).isCanDrown())
-                .fallDistanceModifier(((FluidTypeAccessor) wrapped).getFallDistanceModifier())
-                .canExtinguish(((FluidTypeAccessor) wrapped).isCanExtinguish())
-                .canConvertToSource(((FluidTypeAccessor) wrapped).isCanConvertToSource())
-                .supportsBoating(((FluidTypeAccessor) wrapped).isSupportsBoating())
-                .pathType(((FluidTypeAccessor) wrapped).getPathType())
-                .adjacentPathType(((FluidTypeAccessor) wrapped).getAdjacentPathType())
-                .canHydrate(((FluidTypeAccessor) wrapped).isCanHydrate())
-                .lightLevel(((FluidTypeAccessor) wrapped).getLightLevel())
-                .density(((FluidTypeAccessor) wrapped).getDensity())
-                .temperature(((FluidTypeAccessor) wrapped).getTemperature())
-                .viscosity(((FluidTypeAccessor) wrapped).getViscosity())
-                .rarity(((FluidTypeAccessor) wrapped).getRarity())
-        );
-//        this.sounds = ((FluidTypeAccessor) wrapped).getSounds(); TODO: convert sounds?
-        this.kilt$wrapped = wrapped;
-    }
-
     /**
      * Default constructor.
      *
      * @param properties the general properties of the fluid type
      */
     public FluidType(final Properties properties) {
-        super(io.github.fabricators_of_create.porting_lib.fluids.FluidType.Properties.create()
-                .descriptionId(properties.descriptionId)
-                .motionScale(properties.motionScale)
-                .canPushEntity(properties.canPushEntity)
-                .canSwim(properties.canSwim)
-                .canDrown(properties.canDrown)
-                .fallDistanceModifier(properties.fallDistanceModifier)
-                .canExtinguish(properties.canExtinguish)
-                .canConvertToSource(properties.canConvertToSource)
-                .supportsBoating(properties.supportsBoating)
-                .pathType(properties.pathType)
-//                .sound(properties.sounds)
-                .adjacentPathType(properties.adjacentPathType)
-                .canHydrate(properties.canHydrate)
-                .lightLevel(properties.lightLevel)
-                .density(properties.density)
-                .temperature(properties.temperature)
-                .viscosity(properties.viscosity)
-                .rarity(properties.rarity)
-        );
+        this.descriptionId = properties.descriptionId;
+        this.motionScale = properties.motionScale;
+        this.canPushEntity = properties.canPushEntity;
+        this.canSwim = properties.canSwim;
+        this.canDrown = properties.canDrown;
+        this.fallDistanceModifier = properties.fallDistanceModifier;
+        this.canExtinguish = properties.canExtinguish;
+        this.canConvertToSource = properties.canConvertToSource;
+        this.supportsBoating = properties.supportsBoating;
+        this.pathType = properties.pathType;
+        this.adjacentPathType = properties.adjacentPathType;
         this.sounds = ImmutableMap.copyOf(properties.sounds);
+        this.canHydrate = properties.canHydrate;
+        this.lightLevel = properties.lightLevel;
+        this.density = properties.density;
+        this.temperature = properties.temperature;
+        this.viscosity = properties.viscosity;
+        this.rarity = properties.rarity;
         this.dripInfo = properties.dripInfo;
     }
 
@@ -177,8 +144,6 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      * @return the identifier representing the name of the fluid type
      */
     public String getDescriptionId() {
-        if (kilt$wrapped != null)
-            return kilt$wrapped.getDescriptionId();
         if (this.descriptionId == null)
             this.descriptionId = Util.makeDescriptionId("fluid_type", NeoForgeRegistries.FLUID_TYPES.getKey(this));
         return this.descriptionId;
@@ -593,7 +558,7 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
      * <li>Send the BLOCK_CHANGE {@link GameEvent}</li>
      * <li>Play a sound as defined by the FluidType's {@link DripstoneDripInfo}</li>
      * </ul>
-     * 
+     *
      * @param fluid       the fluid that is dripping from a stalactite
      * @param level       the level the fluid is being placed in
      * @param cauldronPos the position of the cauldron this fluid is dripping into
@@ -903,13 +868,13 @@ public class FluidType extends io.github.fabricators_of_create.porting_lib.fluid
         private boolean supportsBoating = false;
         @Nullable
         private PathType pathType = PathType.WATER,
-                adjacentPathType = PathType.WATER_BORDER;
+            adjacentPathType = PathType.WATER_BORDER;
         private final Map<SoundAction, SoundEvent> sounds = new HashMap<>();
         private boolean canHydrate = false;
         private int lightLevel = 0,
-                density = 1000,
-                temperature = 300,
-                viscosity = 1000;
+            density = 1000,
+            temperature = 300,
+            viscosity = 1000;
         private Rarity rarity = Rarity.COMMON;
         @Nullable
         private DripstoneDripInfo dripInfo;

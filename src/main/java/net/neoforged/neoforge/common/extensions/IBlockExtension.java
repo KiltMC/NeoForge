@@ -7,6 +7,8 @@ package net.neoforged.neoforge.common.extensions;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
+
+import net.fabricmc.fabric.api.block.v1.FabricBlock;
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -87,9 +89,11 @@ import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.item.AxeItemInjection;
+import xyz.bluspring.kilt.injections.world.item.ShovelItemInjection;
 
 @SuppressWarnings("deprecation")
-public interface IBlockExtension {
+public interface IBlockExtension extends FabricBlock {
     private Block self() {
         return (Block) this;
     }
@@ -768,14 +772,14 @@ public interface IBlockExtension {
             return null;
 
         if (ItemAbilities.AXE_STRIP == itemAbility) {
-            return AxeItem.getAxeStrippingState(state);
+            return AxeItemInjection.getAxeStrippingState(state);
         } else if (ItemAbilities.AXE_SCRAPE == itemAbility) {
             return WeatheringCopper.getPrevious(state).orElse(null);
         } else if (ItemAbilities.AXE_WAX_OFF == itemAbility) {
             Block waxOffBlock = DataMapHooks.getBlockUnwaxed(state.getBlock());
             return Optional.ofNullable(waxOffBlock).map(block -> block.withPropertiesOf(state)).orElse(null);
         } else if (ItemAbilities.SHOVEL_FLATTEN == itemAbility) {
-            return ShovelItem.getShovelPathingState(state);
+            return ShovelItemInjection.getShovelPathingState(state);
         } else if (ItemAbilities.HOE_TILL == itemAbility) {
             // Logic copied from HoeItem#TILLABLES; needs to be kept in sync during updating
             Block block = state.getBlock();

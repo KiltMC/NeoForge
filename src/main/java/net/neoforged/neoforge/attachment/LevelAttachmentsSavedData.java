@@ -19,7 +19,7 @@ public class LevelAttachmentsSavedData extends SavedData {
     public static void init(ServerLevel level) {
         var factory = new SavedData.Factory<>(
                 () -> new LevelAttachmentsSavedData(level),
-                (tag, prov) -> new LevelAttachmentsSavedData(level, tag));
+                (tag, prov) -> new LevelAttachmentsSavedData(level, tag), null);
         // Querying the attachment a single time is enough to initialize it,
         // and make sure it gets saved when the level is saved.
         level.getDataStorage().computeIfAbsent(factory, NAME);
@@ -33,13 +33,13 @@ public class LevelAttachmentsSavedData extends SavedData {
 
     public LevelAttachmentsSavedData(ServerLevel level, CompoundTag tag) {
         this.level = level;
-        level.deserializeAttachments(level.registryAccess(), tag);
+        ((AttachmentHolder) (Object) level).deserializeAttachments(level.registryAccess(), tag);
     }
 
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
         // Make sure we don't return null
-        return Objects.requireNonNullElseGet(level.serializeAttachments(provider), CompoundTag::new);
+        return Objects.requireNonNullElseGet(((AttachmentHolder) (Object) level).serializeAttachments(provider), CompoundTag::new);
     }
 
     @Override

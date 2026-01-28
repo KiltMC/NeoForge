@@ -5,6 +5,7 @@
 
 package net.neoforged.neoforge.client.loading;
 
+/*
 import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -15,16 +16,22 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexSorting;
+*/
 import java.util.Optional;
 import java.util.function.Consumer;
+/*
 import java.util.function.Supplier;
 import net.minecraft.Util;
+*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
+/*
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
+ */
 import net.minecraft.server.packs.resources.ReloadInstance;
+/*
 import net.minecraft.util.Mth;
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
@@ -32,6 +39,7 @@ import net.neoforged.fml.loading.progress.ProgressMeter;
 import net.neoforged.fml.loading.progress.StartupNotificationManager;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL30C;
+ */
 
 /**
  * This is an implementation of the LoadingOverlay that calls back into the early window rendering, as part of the
@@ -42,7 +50,12 @@ import org.lwjgl.opengl.GL30C;
  * It is somewhat a copy of the superclass render method.
  */
 public class NeoForgeLoadingOverlay extends LoadingOverlay {
-    private final Minecraft minecraft;
+    public NeoForgeLoadingOverlay(Minecraft minecraft, ReloadInstance reload, Consumer<Optional<Throwable>> onFinish, boolean fadeIn) {
+        super(minecraft, reload, onFinish, fadeIn);
+    }
+
+    // Kilt: no
+    /*private final Minecraft minecraft;
     private final ReloadInstance reload;
     private final Consumer<Optional<Throwable>> onFinish;
     private final DisplayWindow displayWindow;
@@ -158,5 +171,5 @@ public class NeoForgeLoadingOverlay extends LoadingOverlay {
         bufferbuilder.addVertex(x0, y1, 0f).setColor(colour.redf(), colour.greenf(), colour.bluef(), fade);
         bufferbuilder.addVertex(x1, y1, 0f).setColor(colour.redf(), colour.greenf(), colour.bluef(), fade);
         bufferbuilder.addVertex(x1, y0, 0f).setColor(colour.redf(), colour.greenf(), colour.bluef(), fade);
-    }
+    }*/
 }

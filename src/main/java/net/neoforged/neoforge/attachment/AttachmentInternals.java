@@ -50,7 +50,7 @@ public final class AttachmentInternals {
      * Do not call directly, use {@link IEntityExtension#copyAttachmentsFrom(Entity, boolean)}.
      */
     public static void copyEntityAttachments(Entity from, Entity to, boolean isDeath) {
-        copyAttachments(from.registryAccess(), from, to, isDeath ? type -> type.copyOnDeath : type -> true);
+        copyAttachments(from.registryAccess(), (AttachmentHolder) (Object) from, (AttachmentHolder) (Object) to, isDeath ? type -> type.copyOnDeath : type -> true);
     }
 
     @SubscribeEvent

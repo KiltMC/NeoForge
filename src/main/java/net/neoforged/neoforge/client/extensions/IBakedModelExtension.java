@@ -25,6 +25,7 @@ import net.neoforged.neoforge.client.RenderTypeHelper;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.common.util.TriState;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.renderer.ItemBlockRenderTypesInjection;
 
 /**
  * Extension interface for {@link BakedModel}.
@@ -82,7 +83,7 @@ public interface IBakedModelExtension {
      * By default, defers query to {@link ItemBlockRenderTypes}.
      */
     default ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource rand, ModelData data) {
-        return ItemBlockRenderTypes.getRenderLayers(state);
+        return ItemBlockRenderTypesInjection.getRenderLayers(state);
     }
 
     /**

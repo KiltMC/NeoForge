@@ -53,7 +53,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext {
 
     @Nullable
     public IUnbakedGeometry<?> getCustomGeometry() {
-        return owner.parent != null && customGeometry == null ? owner.parent.customData.getCustomGeometry() : customGeometry;
+        return owner.parent != null && customGeometry == null ? owner.parent.kilt$getCustomData().getCustomGeometry() : customGeometry;
     }
 
     public void setCustomGeometry(IUnbakedGeometry<?> geometry) {
@@ -62,7 +62,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext {
 
     @Override
     public boolean isComponentVisible(String part, boolean fallback) {
-        return owner.parent != null && !visibilityData.hasCustomVisibility(part) ? owner.parent.customData.isComponentVisible(part, fallback) : visibilityData.isVisible(part, fallback);
+        return owner.parent != null && !visibilityData.hasCustomVisibility(part) ? owner.parent.kilt$getCustomData().isComponentVisible(part, fallback) : visibilityData.isVisible(part, fallback);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext {
     public Transformation getRootTransform() {
         if (rootTransform != null)
             return rootTransform;
-        return owner.parent != null ? owner.parent.customData.getRootTransform() : Transformation.identity();
+        return owner.parent != null ? owner.parent.kilt$getCustomData().getRootTransform() : Transformation.identity();
     }
 
     public void setRootTransform(Transformation rootTransform) {
@@ -111,7 +111,7 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext {
     public ResourceLocation getRenderTypeHint() {
         if (renderTypeHint != null)
             return renderTypeHint;
-        return owner.parent != null ? owner.parent.customData.getRenderTypeHint() : null;
+        return owner.parent != null ? owner.parent.kilt$getCustomData().getRenderTypeHint() : null;
     }
 
     public void setRenderTypeHint(ResourceLocation renderTypeHint) {

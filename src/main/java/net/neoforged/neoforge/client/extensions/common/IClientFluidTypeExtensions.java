@@ -26,6 +26,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.renderer.ScreenEffectRendererInjection;
 
 /**
  * {@linkplain LogicalSide#CLIENT Client-only} extensions to {@link FluidType}.
@@ -36,11 +37,11 @@ public interface IClientFluidTypeExtensions {
     IClientFluidTypeExtensions DEFAULT = new IClientFluidTypeExtensions() {};
 
     static IClientFluidTypeExtensions of(FluidState state) {
-        return of(state.getFluidType());
+        return of(state.neo$getFluidType());
     }
 
     static IClientFluidTypeExtensions of(Fluid fluid) {
-        return of(fluid.getFluidType());
+        return of(fluid.neo$getFluidType());
     }
 
     static IClientFluidTypeExtensions of(FluidType type) {
@@ -153,7 +154,7 @@ public interface IClientFluidTypeExtensions {
     default void renderOverlay(Minecraft mc, PoseStack poseStack) {
         ResourceLocation texture = this.getRenderOverlayTexture(mc);
         if (texture != null)
-            ScreenEffectRenderer.renderFluid(mc, poseStack, texture);
+            ScreenEffectRendererInjection.renderFluid(mc, poseStack, texture);
     }
 
     /**
