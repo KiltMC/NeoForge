@@ -34,6 +34,15 @@ public abstract class LivingSwapItemsEvent extends LivingEvent {
             this.toOffHand = entity.getMainHandItem(); //the offhand will be swapped with the main hand
         }
 
+        // Kilt: Pass the stacks to the event directly.
+        @ApiStatus.Internal
+        public Hands(LivingEntity entity, ItemStack toMainHand, ItemStack toOffHand) {
+            super(entity);
+            this.toMainHand = toMainHand;
+            this.toOffHand = toOffHand;
+        }
+        // Kilt end
+
         /**
          * Gets the item that will be swapped to the main hand of the entity.
          * 

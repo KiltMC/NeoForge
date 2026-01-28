@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * TODO: Implement support for {@link Block} or remove default implementations from vanilla block classes.
  */
-public interface IShearable {
+public interface IShearable extends io.github.fabricators_of_create.porting_lib.entity.extensions.IShearable {
     /**
      * Checks if this object can be sheared.
      * <p>

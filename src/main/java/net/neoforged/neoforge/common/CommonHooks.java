@@ -1152,6 +1152,14 @@ public class CommonHooks {
         return event;
     }
 
+    // Kilt: Add support for passing the swapped items directly
+    public static LivingSwapItemsEvent.Hands kilt$onLivingSwapHandItems(LivingEntity livingEntity, ItemStack toMainHand, ItemStack toOffHand) {
+        LivingSwapItemsEvent.Hands event = new LivingSwapItemsEvent.Hands(livingEntity, toMainHand, toOffHand);
+        NeoForge.EVENT_BUS.post(event);
+        return event;
+    }
+    // Kilt end
+
     @ApiStatus.Internal
     public static void writeAdditionalLevelSaveData(WorldData worldData, CompoundTag levelTag) {
         CompoundTag fmlData = new CompoundTag();
