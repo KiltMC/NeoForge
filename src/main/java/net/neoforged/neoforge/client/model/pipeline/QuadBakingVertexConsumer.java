@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.client.model.IQuadTransformer;
 import net.neoforged.neoforge.client.textures.UnitTextureAtlasSprite;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BakedQuadInjection;
 
 /**
  * Vertex consumer that outputs {@linkplain BakedQuad baked quads}.
@@ -137,7 +138,7 @@ public class QuadBakingVertexConsumer implements VertexConsumer {
             throw new IllegalStateException("Not enough vertices available. Vertices in buffer: " + vertexIndex);
         }
 
-        BakedQuad quad = new BakedQuad(quadData.clone(), tintIndex, direction, sprite, shade, hasAmbientOcclusion);
+        BakedQuad quad = BakedQuadInjection.withAo(quadData.clone(), tintIndex, direction, sprite, shade, hasAmbientOcclusion);
         vertexIndex = 0;
         building = false;
         Arrays.fill(quadData, 0);

@@ -64,7 +64,8 @@ public class DatapackBuiltinEntriesProvider extends RegistriesDatapackGenerator 
      * @param conditions a map containing conditions to append to registry objects
      */
     public DatapackBuiltinEntriesProvider(PackOutput output, CompletableFuture<RegistrySetBuilder.PatchedRegistries> registries, Map<ResourceKey<?>, List<ICondition>> conditions, Set<String> modIds) {
-        super(output, registries.thenApply(RegistrySetBuilder.PatchedRegistries::patches), modIds, conditions);
+        // Kilt TODO: do we need to support this?
+        super(output, registries.thenApply(RegistrySetBuilder.PatchedRegistries::patches)/*, modIds, conditions*/);
         this.fullRegistries = registries.thenApply(RegistrySetBuilder.PatchedRegistries::full);
     }
 

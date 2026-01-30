@@ -41,6 +41,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockElementFaceInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BlockElementInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.ItemTransformInjection;
 
 /**
  * General purpose model builder, contains all the commonalities between item
@@ -271,7 +274,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 JsonObject transform = new JsonObject();
                 ItemTransform vec = e.getValue();
                 if (vec.equals(ItemTransform.NO_TRANSFORM)) continue;
-                var hasRightRotation = !vec.rightRotation.equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
+                var hasRightRotation = !vec.getRightRotation().equals(ItemTransform.Deserializer.DEFAULT_ROTATION);
                 if (!vec.translation.equals(ItemTransform.Deserializer.DEFAULT_TRANSLATION)) {
                     transform.add("translation", serializeVector3f(e.getValue().translation));
                 }
@@ -282,7 +285,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     transform.add("scale", serializeVector3f(e.getValue().scale));
                 }
                 if (hasRightRotation) {
-                    transform.add("right_rotation", serializeVector3f(vec.rightRotation));
+                    transform.add("right_rotation", serializeVector3f(vec.getRightRotation()));
                 }
                 display.add(e.getKey().getSerializedName(), transform);
             }
@@ -589,7 +592,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().build(), (k1, k2) -> {
                         throw new IllegalArgumentException();
                     }, LinkedHashMap::new));
-            return new BlockElement(from, to, faces, rotation == null ? null : rotation.build(), shade, new ExtraFaceData(this.color, this.blockLight, this.skyLight, this.hasAmbientOcclusion));
+            return BlockElementInjection.create(from, to, faces, rotation == null ? null : rotation.build(), shade, new ExtraFaceData(this.color, this.blockLight, this.skyLight, this.hasAmbientOcclusion));
         }
 
         public T end() {
@@ -691,7 +694,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                 if (this.texture == null) {
                     throw new IllegalStateException("A model face must have a texture");
                 }
-                return new BlockElementFace(cullface, tintindex, texture, new BlockFaceUV(uvs, rotation.rotation), new ExtraFaceData(this.color, this.blockLight, this.skyLight, this.hasAmbientOcclusion), new MutableObject<>());
+                return BlockElementFaceInjection.create(cullface, tintindex, texture, new BlockFaceUV(uvs, rotation.rotation), new ExtraFaceData(this.color, this.blockLight, this.skyLight, this.hasAmbientOcclusion), new MutableObject<>());
             }
 
             public ElementBuilder end() {
@@ -827,7 +830,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
             }
 
             ItemTransform build() {
-                return new ItemTransform(rotation, translation, scale, rightRotation);
+                return ItemTransformInjection.create(rotation, translation, scale, rightRotation);
             }
 
             public TransformsBuilder end() {

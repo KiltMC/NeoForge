@@ -14,6 +14,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.world.item.crafting.IngredientInjection;
 
 @ApiStatus.Internal
 public class CraftingHelper {
@@ -25,7 +26,7 @@ public class CraftingHelper {
                     return CompoundIngredient.of(list.toArray(Ingredient[]::new));
                 }, i -> i), ingredient -> {
                     if (ingredient.isCustom()) {
-                        if (ingredient.getCustomIngredient() instanceof CompoundIngredient compound) {
+                        if (ingredient.neoforge$getCustomIngredient() instanceof CompoundIngredient compound) {
                             // Use [] syntax for CompoundIngredients.
                             return Either.left(compound.children());
                         }
@@ -44,7 +45,7 @@ public class CraftingHelper {
                 NeoForgeRegistries.INGREDIENT_TYPES.byNameCodec(),
                 ICustomIngredient::getType,
                 IngredientType::codec,
-                Ingredient.Value.MAP_CODEC)
+                IngredientInjection.ValueInjection.MAP_CODEC)
                 .xmap(either -> either.map(ICustomIngredient::toVanilla, v -> Ingredient.fromValues(Stream.of(v))), ingredient -> {
                     if (!ingredient.isCustom()) {
                         var values = ingredient.getValues();
@@ -54,7 +55,7 @@ public class CraftingHelper {
                         // Convert vanilla ingredients with 2+ values to a CompoundIngredient. Empty ingredients are not allowed here.
                         return Either.left(new CompoundIngredient(Stream.of(ingredient.getValues()).map(v -> Ingredient.fromValues(Stream.of(v))).toList()));
                     }
-                    return Either.left(ingredient.getCustomIngredient());
+                    return Either.left(ingredient.neoforge$getCustomIngredient());
                 })
                 .validate(ingredient -> {
                     if (!ingredient.isCustom() && ingredient.getValues().length == 0) {

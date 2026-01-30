@@ -25,7 +25,8 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 public final class NeoForgeItemTagsProvider extends ItemTagsProvider {
     public NeoForgeItemTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagLookup<Block>> blockTagProvider, ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, blockTagProvider, "neoforge", existingFileHelper);
+        super(output, lookupProvider, blockTagProvider/*, "neoforge", existingFileHelper*/);
+        this.kilt$addConstructorArgs("neoforge", existingFileHelper);
     }
 
     @SuppressWarnings("unchecked")

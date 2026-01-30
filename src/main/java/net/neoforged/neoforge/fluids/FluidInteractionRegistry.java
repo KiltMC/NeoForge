@@ -118,7 +118,7 @@ public final class FluidInteractionRegistry {
          * @param getState a function to transform the source fluid into a block state
          */
         public InteractionInformation(FluidType type, Function<FluidState, BlockState> getState) {
-            this((level, currentPos, relativePos, currentState) -> level.getFluidState(relativePos).getFluidType() == type, getState);
+            this((level, currentPos, relativePos, currentState) -> level.getFluidState(relativePos).neo$getFluidType() == type, getState);
         }
 
         /**

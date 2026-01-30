@@ -26,7 +26,8 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider {
     public NeoForgeDamageTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, "neoforge", existingFileHelper);
+        super(output, lookupProvider/*, "neoforge", existingFileHelper*/);
+        this.kilt$addConstructorArgs("neoforge", existingFileHelper);
     }
 
     private final Map<ResourceLocation, TagBuilder> vanillaBuilders = Maps.newLinkedHashMap();

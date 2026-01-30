@@ -198,6 +198,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import xyz.bluspring.kilt.injections.client.gui.GuiInjection;
+import xyz.bluspring.kilt.injections.client.gui.screens.MenuScreensInjection;
 import xyz.bluspring.kilt.injections.client.renderer.ShaderInstanceInjection;
 import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 
@@ -1030,7 +1031,7 @@ public class ClientHooks {
         ClientExtensionsManager.init();
         GameTestHooks.registerGametests();
         registerSpriteSourceTypes();
-        MenuScreens.init();
+        MenuScreensInjection.init();
         ModLoader.postEvent(new RegisterClientReloadListenersEvent(resourceManager));
         ModLoader.postEvent(new EntityRenderersEvent.RegisterLayerDefinitions());
         ModLoader.postEvent(new EntityRenderersEvent.RegisterRenderers());

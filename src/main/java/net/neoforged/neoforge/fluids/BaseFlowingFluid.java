@@ -60,7 +60,7 @@ public abstract class BaseFlowingFluid extends FlowingFluid {
     }
 
     @Override
-    public FluidType getFluidType() {
+    public FluidType neo$getFluidType() {
         return this.fluidType.get();
     }
 
@@ -135,7 +135,7 @@ public abstract class BaseFlowingFluid extends FlowingFluid {
 
     @Override
     public Optional<SoundEvent> getPickupSound() {
-        return Optional.ofNullable(getFluidType().getSound(SoundActions.BUCKET_FILL));
+        return Optional.ofNullable(neo$getFluidType().getSound(SoundActions.BUCKET_FILL));
     }
 
     public static class Flowing extends BaseFlowingFluid {

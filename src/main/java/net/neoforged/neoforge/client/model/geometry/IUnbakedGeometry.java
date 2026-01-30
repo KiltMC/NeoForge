@@ -16,6 +16,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
+import xyz.bluspring.kilt.workarounds.WrappedGeometryBakingContext;
 
 /**
  * General interface for any model that can be baked, superset of vanilla {@link UnbakedModel}.
@@ -25,8 +26,14 @@ import net.minecraft.resources.ResourceLocation;
  * @see IGeometryLoader
  * @see IGeometryBakingContext
  */
-public interface IUnbakedGeometry<T extends IUnbakedGeometry<T>> {
+public interface IUnbakedGeometry<T extends IUnbakedGeometry<T>> extends io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry<T> {
     BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides);
+
+    // Kilt: Wrap Porting Lib
+    @Override
+    default BakedModel bake(io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
+        return bake(WrappedGeometryBakingContext.wrap(context), baker, spriteGetter, modelState, overrides);
+    }
 
     /**
      * Resolve parents of nested {@link BlockModel}s which are later used in

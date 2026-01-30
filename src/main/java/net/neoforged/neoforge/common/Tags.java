@@ -25,6 +25,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.Fluid;
+import xyz.bluspring.kilt.injections.tags.BlockTagsInjection;
+import xyz.bluspring.kilt.injections.tags.FluidTagsInjection;
+import xyz.bluspring.kilt.injections.tags.ItemTagsInjection;
 
 public class Tags {
     public static class Blocks {
@@ -277,11 +280,11 @@ public class Tags {
         public static final TagKey<Block> VILLAGER_FARMLANDS = neoforgeTag("villager_farmlands");
 
         private static TagKey<Block> tag(String name) {
-            return BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+            return BlockTagsInjection.create(ResourceLocation.fromNamespaceAndPath("c", name));
         }
 
         private static TagKey<Block> neoforgeTag(String name) {
-            return BlockTags.create(ResourceLocation.fromNamespaceAndPath("neoforge", name));
+            return BlockTagsInjection.create(ResourceLocation.fromNamespaceAndPath("neoforge", name));
         }
     }
 
@@ -902,11 +905,11 @@ public class Tags {
         public static final TagKey<Item> ENCHANTABLES = tag("enchantables");
 
         private static TagKey<Item> tag(String name) {
-            return ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+            return ItemTagsInjection.create(ResourceLocation.fromNamespaceAndPath("c", name));
         }
 
         private static TagKey<Item> neoforgeTag(String name) {
-            return ItemTags.create(ResourceLocation.fromNamespaceAndPath("neoforge", name));
+            return ItemTagsInjection.create(ResourceLocation.fromNamespaceAndPath("neoforge", name));
         }
     }
 
@@ -985,7 +988,7 @@ public class Tags {
         public static final TagKey<Fluid> HIDDEN_FROM_RECIPE_VIEWERS = tag("hidden_from_recipe_viewers");
 
         private static TagKey<Fluid> tag(String name) {
-            return FluidTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+            return FluidTagsInjection.create(ResourceLocation.fromNamespaceAndPath("c", name));
         }
     }
 

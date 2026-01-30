@@ -16,7 +16,8 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 public class NeoForgeEntityTypeTagsProvider extends EntityTypeTagsProvider {
     public NeoForgeEntityTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, "neoforge", existingFileHelper);
+        super(output, lookupProvider/*, "neoforge", existingFileHelper*/);
+        this.kilt$addConstructorArgs("neoforge", existingFileHelper);
     }
 
     @Override

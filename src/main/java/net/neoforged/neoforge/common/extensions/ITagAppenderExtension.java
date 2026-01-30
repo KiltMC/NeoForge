@@ -5,13 +5,14 @@
 
 package net.neoforged.neoforge.common.extensions;
 
+import io.github.fabricators_of_create.porting_lib.extensions.common.TagAppenderExtension;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import xyz.bluspring.kilt.injections.data.tags.TagsProvider$TagAppenderInjection;
 
-public interface ITagAppenderExtension<T> {
+public interface ITagAppenderExtension<T> extends TagAppenderExtension {
     private TagsProvider.TagAppender<T> self() {
         return (TagsProvider.TagAppender<T>) this;
     }

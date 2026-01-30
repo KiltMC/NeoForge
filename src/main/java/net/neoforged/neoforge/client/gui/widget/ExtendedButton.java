@@ -11,6 +11,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import xyz.bluspring.kilt.injections.client.gui.components.ButtonInjection;
+import xyz.bluspring.kilt.mixin.client.gui.components.ButtonBuilderAccessor;
 
 /**
  * This class provides a button that fixes several bugs present in the vanilla GuiButton drawing code.
@@ -32,7 +34,9 @@ public class ExtendedButton extends Button {
     }
 
     public ExtendedButton(Button.Builder builder) {
-        super(builder);
+        // Kilt: We can't target super here, so this works.
+        super(((ButtonBuilderAccessor) builder).getX(), ((ButtonBuilderAccessor) builder).getY(), ((ButtonBuilderAccessor) builder).getWidth(), ((ButtonBuilderAccessor) builder).getHeight(), ((ButtonBuilderAccessor) builder).getMessage(), ((ButtonBuilderAccessor) builder).getOnPress(), ((ButtonBuilderAccessor) builder).getCreateNarration());
+        this.setTooltip(((ButtonBuilderAccessor) builder).getTooltip());
     }
 
     /**

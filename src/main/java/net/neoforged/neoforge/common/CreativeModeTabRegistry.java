@@ -188,7 +188,7 @@ public final class CreativeModeTabRegistry {
             final CreativeModeTab tab = value.value();
             final ResourceLocation name = value.unwrapKey().orElseThrow().location();
 
-            if (!tab.tabsBefore.isEmpty() || !tab.tabsAfter.isEmpty())
+            if (!tab.kilt$getTabsBefore().isEmpty() || !tab.kilt$getTabsAfter().isEmpty())
                 addTabOrder(tab, name);
             else {
                 // If there is no order specified ensure vanilla ordering by specifying the previous and next indexed tab as edges
@@ -205,7 +205,7 @@ public final class CreativeModeTabRegistry {
             final CreativeModeTab tab = value.value();
             final ResourceLocation name = value.unwrapKey().orElseThrow().location();
 
-            if (!tab.tabsBefore.isEmpty() || !tab.tabsAfter.isEmpty())
+            if (!tab.kilt$getTabsBefore().isEmpty() || !tab.kilt$getTabsAfter().isEmpty())
                 addTabOrder(tab, name);
             else // if there is no order specified ensure the tab comes after the last vanilla tab
                 edges.put(lastVanilla, name);
@@ -215,11 +215,11 @@ public final class CreativeModeTabRegistry {
     }
 
     private static void addTabOrder(CreativeModeTab tab, ResourceLocation name) {
-        for (final ResourceLocation after : tab.tabsAfter) {
+        for (final ResourceLocation after : tab.kilt$getTabsAfter()) {
             edges.put(name, after);
         }
 
-        for (final ResourceLocation before : tab.tabsBefore) {
+        for (final ResourceLocation before : tab.kilt$getTabsBefore()) {
             edges.put(before, name);
         }
     }

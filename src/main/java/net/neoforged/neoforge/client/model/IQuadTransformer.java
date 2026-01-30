@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.VertexFormatElement;
 import java.util.Arrays;
 import java.util.List;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import xyz.bluspring.kilt.injections.client.renderer.block.model.BakedQuadInjection;
 
 /**
  * Transformer for {@link BakedQuad baked quads}.
@@ -51,7 +52,7 @@ public interface IQuadTransformer {
 
     private static BakedQuad copy(BakedQuad quad) {
         var vertices = quad.getVertices();
-        return new BakedQuad(Arrays.copyOf(vertices, vertices.length), quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade(), quad.hasAmbientOcclusion());
+        return BakedQuadInjection.withAo(Arrays.copyOf(vertices, vertices.length), quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade(), quad.hasAmbientOcclusion());
     }
 
     private static int findOffset(VertexFormatElement element) {

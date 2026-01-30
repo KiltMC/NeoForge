@@ -166,10 +166,10 @@ public abstract class ModelEvent extends Event {
      * <p>This event is fired on the mod-specific event bus, only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class RegisterGeometryLoaders extends ModelEvent implements IModBusEvent {
-        private final Map<ResourceLocation, io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<?>> loaders;
+        private final Map<ResourceLocation, IGeometryLoader<?>> loaders;
 
         @ApiStatus.Internal
-        public RegisterGeometryLoaders(Map<ResourceLocation, io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<?>> loaders) {
+        public RegisterGeometryLoaders(Map<ResourceLocation, IGeometryLoader<?>> loaders) {
             this.loaders = loaders;
         }
 
@@ -179,7 +179,7 @@ public abstract class ModelEvent extends Event {
          * @param key    the ID of the loader
          * @param loader the geometry loader to register
          */
-        public void register(ResourceLocation key, io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<?> loader) {
+        public void register(ResourceLocation key, IGeometryLoader<?> loader) {
             Preconditions.checkArgument(!loaders.containsKey(key), "Geometry loader already registered: " + key);
             loaders.put(key, loader);
         }

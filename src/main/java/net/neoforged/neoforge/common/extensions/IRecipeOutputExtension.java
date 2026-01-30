@@ -24,7 +24,7 @@ public interface IRecipeOutputExtension {
     /**
      * Generates a recipe with the given conditions.
      */
-    void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions);
+    default void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {}
 
     /**
      * Builds a wrapper around this recipe output that adds conditions to all received recipes.

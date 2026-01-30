@@ -34,6 +34,11 @@ public class ConditionalRecipeOutput implements RecipeOutput {
         return inner.advancement();
     }
 
+    // Kilt: Need to have this available, or else we have compile errors.
+    @Override
+    public void accept(ResourceLocation location, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
+    }
+
     @Override
     public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
         ICondition[] innerConditions;

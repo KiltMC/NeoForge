@@ -95,9 +95,9 @@ public class UnbakedGeometryHelper {
      */
     @ApiStatus.Internal
     public static BakedModel bake(BlockModel blockModel, ModelBaker modelBaker, BlockModel owner, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, boolean guiLight3d) {
-        IUnbakedGeometry<?> customModel = blockModel.customData.getCustomGeometry();
+        IUnbakedGeometry<?> customModel = blockModel.kilt$getCustomData().getCustomGeometry();
         if (customModel != null)
-            return customModel.bake(blockModel.customData, modelBaker, spriteGetter, modelState, blockModel.getOverrides(modelBaker, owner, spriteGetter));
+            return customModel.bake(blockModel.kilt$getCustomData(), modelBaker, spriteGetter, modelState, blockModel.getOverrides(modelBaker, owner, spriteGetter));
 
         // Handle vanilla item models here, since vanilla has a shortcut for them
         if (blockModel.getRootModel() == ModelBakery.GENERATION_MARKER)

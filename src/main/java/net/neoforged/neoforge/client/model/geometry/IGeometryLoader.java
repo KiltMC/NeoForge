@@ -21,6 +21,6 @@ import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
  * @see ModelEvent.RegisterGeometryLoaders
  * @see RegisterClientReloadListenersEvent
  */
-public interface IGeometryLoader<T extends IUnbakedGeometry<T>> {
+public interface IGeometryLoader<T extends IUnbakedGeometry<T>> extends io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader<T> {
     T read(JsonObject jsonObject, JsonDeserializationContext deserializationContext) throws JsonParseException;
 }

@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.blaze3d.systems.RenderSystemInjection;
 
 @ApiStatus.Internal
 public final class ItemDecoratorHandler {
@@ -54,7 +55,7 @@ public final class ItemDecoratorHandler {
             return;
         }
 
-        RenderSystem.backupGlState(stateBackup);
+        RenderSystemInjection.backupGlState(stateBackup);
 
         resetRenderState();
         for (IItemDecorator itemDecorator : itemDecorators) {
@@ -62,7 +63,7 @@ public final class ItemDecoratorHandler {
                 resetRenderState();
         }
 
-        RenderSystem.restoreGlState(stateBackup);
+        RenderSystemInjection.restoreGlState(stateBackup);
     }
 
     private void resetRenderState() {

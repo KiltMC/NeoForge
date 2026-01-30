@@ -23,6 +23,7 @@ import net.neoforged.neoforgespi.language.ModFileScanData.AnnotationData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Type;
+import xyz.bluspring.kilt.injections.gametest.framework.GameTestRegistryInjection;
 
 public class GameTestHooks {
     private static boolean registeredGametests = false;
@@ -55,7 +56,7 @@ public class GameTestHooks {
                     .forEach(a -> addGameTestMethods(a, gameTestMethods));
 
             for (Method gameTestMethod : gameTestMethods) {
-                GameTestRegistry.register(gameTestMethod, enabledNamespaces);
+                GameTestRegistryInjection.register(gameTestMethod, enabledNamespaces);
             }
 
             registeredGametests = true;

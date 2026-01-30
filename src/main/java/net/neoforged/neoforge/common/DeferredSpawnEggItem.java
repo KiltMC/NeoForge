@@ -53,7 +53,7 @@ public class DeferredSpawnEggItem extends SpawnEggItem {
     }
 
     @Override
-    protected EntityType<?> getDefaultType() {
+    public EntityType<?> getDefaultType() {
         return this.typeSupplier.get();
     }
 

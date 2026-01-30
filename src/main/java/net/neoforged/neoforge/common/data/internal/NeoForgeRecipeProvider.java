@@ -103,6 +103,11 @@ public final class NeoForgeRecipeProvider extends VanillaRecipeProvider {
         specialReplacements.put(Items.CHEST, DifferenceIngredient.of(Ingredient.of(Tags.Items.CHESTS_WOODEN), Ingredient.of(Tags.Items.CHESTS_TRAPPED)));
 
         super.buildRecipes(new RecipeOutput() {
+            // Kilt: needs to be here
+            @Override
+            public void accept(ResourceLocation location, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
+            }
+
             @Override
             public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
                 Recipe<?> modified = enhance(id, recipe);
@@ -141,7 +146,7 @@ public final class NeoForgeRecipeProvider extends VanillaRecipeProvider {
     }
 
     @Override
-    protected CompletableFuture<?> buildAdvancement(CachedOutput p_253674_, HolderLookup.Provider p_323646_, AdvancementHolder p_301116_) {
+    public CompletableFuture<?> buildAdvancement(CachedOutput p_253674_, HolderLookup.Provider p_323646_, AdvancementHolder p_301116_) {
         // NOOP - We don't replace any of the advancement things yet...
         return CompletableFuture.allOf();
     }

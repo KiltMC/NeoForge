@@ -47,6 +47,7 @@ import net.neoforged.neoforge.registries.datamaps.builtin.ParrotImitation;
 import net.neoforged.neoforge.registries.datamaps.builtin.RaidHeroGift;
 import net.neoforged.neoforge.registries.datamaps.builtin.VibrationFrequency;
 import net.neoforged.neoforge.registries.datamaps.builtin.Waxable;
+import xyz.bluspring.kilt.injections.world.level.block.entity.AbstractFurnaceBlockEntityInjection;
 
 public class NeoForgeDataMapsProvider extends DataMapProvider {
     public NeoForgeDataMapsProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
@@ -64,7 +65,7 @@ public class NeoForgeDataMapsProvider extends DataMapProvider {
                 .forEach((biome, type) -> biomeVillagers.add(biome, new BiomeVillagerType(type), false));
 
         final var fuels = builder(NeoForgeDataMaps.FURNACE_FUELS);
-        AbstractFurnaceBlockEntity.buildFuels((value, time) -> value.ifLeft(item -> fuels.add(item.builtInRegistryHolder(), new FurnaceFuel(time), false))
+        AbstractFurnaceBlockEntityInjection.buildFuels((value, time) -> value.ifLeft(item -> fuels.add(item.builtInRegistryHolder(), new FurnaceFuel(time), false))
                 .ifRight(tag -> fuels.add(tag, new FurnaceFuel(time), false)));
         // Mojang decided to use an exclusion tag for nether wood
         fuels.remove(ItemTags.NON_FLAMMABLE_WOOD);
