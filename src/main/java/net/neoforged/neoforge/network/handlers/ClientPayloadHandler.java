@@ -44,6 +44,7 @@ import net.neoforged.neoforge.registries.RegistrySnapshot;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.bluspring.kilt.injections.client.gui.screens.MenuScreensInjection;
 
 @ApiStatus.Internal
 public final class ClientPayloadHandler {
@@ -94,7 +95,8 @@ public final class ClientPayloadHandler {
         try {
             Entity entity = context.player().level().getEntity(advancedAddEntityPayload.entityId());
             if (entity instanceof IEntityWithComplexSpawn entityAdditionalSpawnData) {
-                final RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(advancedAddEntityPayload.customPayload()), entity.registryAccess(), context.listener().getConnectionType());
+                final RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(advancedAddEntityPayload.customPayload()), entity.registryAccess());
+                buf.kilt$setConnectionType(context.listener().getConnectionType());
                 try {
                     entityAdditionalSpawnData.readSpawnData(buf);
                 } finally {
@@ -110,7 +112,8 @@ public final class ClientPayloadHandler {
     public static void handle(AdvancedOpenScreenPayload msg, IPayloadContext context) {
         Minecraft mc = Minecraft.getInstance();
         RegistryAccess registryAccess = mc.player.registryAccess();
-        final RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(msg.additionalData()), registryAccess, context.listener().getConnectionType());
+        final RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(msg.additionalData()), registryAccess);
+        buf.kilt$setConnectionType(context.listener().getConnectionType());
         try {
             createMenuScreen(msg.name(), msg.menuType(), msg.windowId(), buf);
         } catch (Throwable t) {
@@ -123,7 +126,7 @@ public final class ClientPayloadHandler {
 
     private static <T extends AbstractContainerMenu> void createMenuScreen(Component name, MenuType<T> menuType, int windowId, RegistryFriendlyByteBuf buf) {
         Minecraft mc = Minecraft.getInstance();
-        MenuScreens.getScreenFactory(menuType).ifPresent(f -> {
+        MenuScreensInjection.getScreenFactory(menuType).ifPresent(f -> {
             Screen s = f.create(menuType.create(windowId, mc.player.getInventory(), buf), mc.player.getInventory(), name);
             mc.player.containerMenu = ((MenuAccess<?>) s).getMenu();
             mc.setScreen(s);

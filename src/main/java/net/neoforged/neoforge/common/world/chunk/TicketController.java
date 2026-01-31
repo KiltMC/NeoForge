@@ -45,7 +45,7 @@ public record TicketController(ResourceLocation id, @Nullable LoadingValidationC
      * @param ticking {@code true} to make the chunk receive full chunk ticks even if there is no player nearby.
      */
     public boolean forceChunk(ServerLevel level, BlockPos owner, int chunkX, int chunkZ, boolean add, boolean ticking) {
-        return ForcedChunkManager.forceChunk(level, id, owner, chunkX, chunkZ, add, ticking, ticking ? ForcedChunkManager.BLOCK_TICKING : ForcedChunkManager.BLOCK, ForcedChunksSavedData::getBlockForcedChunks);
+        return ForcedChunkManager.forceChunk(level, id, owner, chunkX, chunkZ, add, ticking, ticking ? ForcedChunkManager.BLOCK_TICKING : ForcedChunkManager.BLOCK, ForcedChunksSavedData::neo$getBlockForcedChunks);
     }
 
     /**
@@ -65,6 +65,6 @@ public record TicketController(ResourceLocation id, @Nullable LoadingValidationC
      * @param ticking {@code true} to make the chunk receive full chunk ticks even if there is no player nearby.
      */
     public boolean forceChunk(ServerLevel level, UUID owner, int chunkX, int chunkZ, boolean add, boolean ticking) {
-        return ForcedChunkManager.forceChunk(level, id(), owner, chunkX, chunkZ, add, ticking, ticking ? ForcedChunkManager.ENTITY_TICKING : ForcedChunkManager.ENTITY, ForcedChunksSavedData::getEntityForcedChunks);
+        return ForcedChunkManager.forceChunk(level, id(), owner, chunkX, chunkZ, add, ticking, ticking ? ForcedChunkManager.ENTITY_TICKING : ForcedChunkManager.ENTITY, ForcedChunksSavedData::neo$getEntityForcedChunks);
     }
 }

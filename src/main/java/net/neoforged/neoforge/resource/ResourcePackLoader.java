@@ -54,6 +54,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.server.packs.metadata.pack.PackMetadataSectionInjection;
+import xyz.bluspring.kilt.injections.server.packs.repository.PackMetadataInjection;
 
 public class ResourcePackLoader {
     public static final String MOD_DATA_ID = "mod_data";
@@ -179,7 +181,7 @@ public class ResourcePackLoader {
             overlays = List.copyOf(overlays);
 
             if (metadata == null) {
-                return new Pack.Metadata(location.title(), PackCompatibility.COMPATIBLE, flags, overlays, primaryResources.isHidden());
+                return PackMetadataInjection.create(location.title(), PackCompatibility.COMPATIBLE, flags, overlays, primaryResources.isHidden());
             }
 
             final PackCompatibility compatibility;
@@ -188,7 +190,7 @@ public class ResourcePackLoader {
             } else {
                 compatibility = PackCompatibility.forVersion(Pack.getDeclaredPackVersions(location.id(), metadata), currentVersion);
             }
-            return new Pack.Metadata(metadata.description(), compatibility, flags, overlays, primaryResources.isHidden());
+            return PackMetadataInjection.create(metadata.description(), compatibility, flags, overlays, primaryResources.isHidden());
         }
     }
 
@@ -198,7 +200,7 @@ public class ResourcePackLoader {
         final String descriptionKey = packType == PackType.CLIENT_RESOURCES ? "fml.resources.modresources" : "fml.resources.moddata";
         return Pack.readMetaAndCreate(
                 new PackLocationInfo(id, Component.literal(name), PackSource.DEFAULT, Optional.empty()),
-                new EmptyPackResources.EmptyResourcesSupplier(new PackMetadataSection(Component.translatable(descriptionKey, hiddenPacks.size()),
+                new EmptyPackResources.EmptyResourcesSupplier(PackMetadataSectionInjection.create(Component.translatable(descriptionKey, hiddenPacks.size()),
                         SharedConstants.getCurrentVersion().getPackVersion(packType))),
                 packType,
                 new PackSelectionConfig(true, Pack.Position.TOP, false)).withChildren(hiddenPacks);

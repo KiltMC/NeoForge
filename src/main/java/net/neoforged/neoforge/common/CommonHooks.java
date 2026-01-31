@@ -224,9 +224,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import xyz.bluspring.kilt.injections.world.entity.AttributeSupplierBuilderInjection;
+import xyz.bluspring.kilt.injections.world.entity.ai.attributes.AttributeSupplierBuilderInjection;
 import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
-import xyz.bluspring.kilt.injections.world.level.LevelInjection;
 
 /**
  * Class for various common (i.e. client and server-side) hooks.

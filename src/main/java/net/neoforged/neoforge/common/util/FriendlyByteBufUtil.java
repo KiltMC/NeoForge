@@ -28,7 +28,8 @@ public class FriendlyByteBufUtil {
      * @return The written data.
      */
     public static byte[] writeCustomData(Consumer<RegistryFriendlyByteBuf> dataWriter, RegistryAccess registryAccess) {
-        final RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), registryAccess, ConnectionType.NEOFORGE);
+        final RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), registryAccess);
+        buf.kilt$setConnectionType(ConnectionType.NEOFORGE);
         try {
             dataWriter.accept(buf);
             buf.readerIndex(0);

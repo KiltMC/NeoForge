@@ -26,6 +26,7 @@ import net.minecraft.world.level.levelgen.DebugLevelSource;
 import net.neoforged.neoforge.registries.callback.AddCallback;
 import net.neoforged.neoforge.registries.callback.BakeCallback;
 import net.neoforged.neoforge.registries.callback.ClearCallback;
+import xyz.bluspring.kilt.injections.world.level.levelgen.DebugLevelSourceInjection;
 
 class NeoForgeRegistryCallbacks {
     static class BlockCallbacks implements AddCallback<Block>, ClearCallback<Block>, BakeCallback<Block> {
@@ -64,7 +65,7 @@ class NeoForgeRegistryCallbacks {
                 }
             }
 
-            DebugLevelSource.initValidStates();
+            DebugLevelSourceInjection.initValidStates();
         }
 
         private static class ClearableObjectIntIdentityMap<T> extends IdMapper<T> {

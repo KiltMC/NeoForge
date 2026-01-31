@@ -109,7 +109,7 @@ public class UnbakedGeometryHelper {
         }
 
         var elementsModel = new ElementsModel(blockModel.getElements());
-        return elementsModel.bake(blockModel.customData, modelBaker, spriteGetter, modelState, blockModel.getOverrides(modelBaker, owner, spriteGetter));
+        return elementsModel.bake(blockModel.kilt$getCustomData(), modelBaker, spriteGetter, modelState, blockModel.getOverrides(modelBaker, owner, spriteGetter));
     }
 
     /**

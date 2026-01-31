@@ -12,7 +12,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.neoforged.neoforge.client.extensions.IMenuProviderExtension;
 import net.neoforged.neoforge.network.IContainerFactory;
+import xyz.bluspring.kilt.util.KiltHelper;
 
 public interface IMenuTypeExtension<T> {
     /**
@@ -26,5 +28,7 @@ public interface IMenuTypeExtension<T> {
         return new MenuType<>(factory, FeatureFlags.DEFAULT_FLAGS);
     }
 
-    T create(int windowId, Inventory playerInv, RegistryFriendlyByteBuf extraData);
+    default T create(int windowId, Inventory playerInv, RegistryFriendlyByteBuf extraData) {
+        throw KiltHelper.createMixinException(IMenuTypeExtension.class, "create");
+    }
 }

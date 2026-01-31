@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+import com.mojang.serialization.JsonOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -29,8 +31,9 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.workarounds.ContextAwareReloadListenerWorkaround;
 
-public class LootModifierManager extends SimpleJsonResourceReloadListener {
+public class LootModifierManager extends SimpleJsonResourceReloadListener implements ContextAwareReloadListenerWorkaround {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -73,7 +76,7 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> resourceList, ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
-        DynamicOps<JsonElement> ops = this.makeConditionalOps();
+        DynamicOps<JsonElement> ops = this.kilt$asContextAware().makeConditionalOps();
         Builder<ResourceLocation, IGlobalLootModifier> builder = ImmutableMap.builder();
         for (Map.Entry<ResourceLocation, JsonElement> entry : resourceList.entrySet()) {
             ResourceLocation location = entry.getKey();

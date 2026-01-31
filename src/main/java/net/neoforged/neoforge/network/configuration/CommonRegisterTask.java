@@ -21,7 +21,7 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @ApiStatus.Internal
 public record CommonRegisterTask() implements ICustomConfigurationTask {
-    public static final Type TYPE = new Type(ResourceLocation.fromNamespaceAndPath(NeoForgeVersion.MOD_ID, "common_register"));
+    public static final Type TYPE = new Type(ResourceLocation.fromNamespaceAndPath(NeoForgeVersion.MOD_ID, "common_register").toString());
 
     @Override
     public Type type() {

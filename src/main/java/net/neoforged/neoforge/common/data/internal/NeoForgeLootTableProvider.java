@@ -64,10 +64,11 @@ public final class NeoForgeLootTableProvider extends LootTableProvider {
         super(packOutput, Set.of(), VanillaLootTableProvider.create(packOutput, provider).getTables(), provider);
     }
 
-    @Override
+    // Kilt TODO: properly implement this?
+    /*@Override
     protected void validate(WritableRegistry<LootTable> writableregistry, ValidationContext validationcontext, ProblemReporter.Collector problemreporter$collector) {
         // Do not validate against all registered loot tables
-    }
+    }*/
 
     @Override
     public List<LootTableProvider.SubProviderEntry> getTables() {

@@ -23,6 +23,7 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.neoforgespi.language.IModInfo;
+import xyz.bluspring.kilt.injections.server.packs.resources.BuiltInPackSourceInjection;
 
 /**
  * Fired on {@link PackRepository} creation to allow mods to add new pack finders.
@@ -78,7 +79,7 @@ public class AddPackFindersEvent extends Event implements IModBusEvent {
 
             var pack = Pack.readMetaAndCreate(
                     new PackLocationInfo("mod/" + packLocation, packNameDisplay, packSource, Optional.of(new KnownPack("neoforge", "mod/" + packLocation, version.toString()))),
-                    BuiltInPackSource.fromName((path) -> new PathPackResources(path, resourcePath)),
+                    BuiltInPackSourceInjection.fromName((path) -> new PathPackResources(path, resourcePath)),
                     packType,
                     new PackSelectionConfig(alwaysActive, packPosition, false));
 

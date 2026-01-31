@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 
 @ApiStatus.Internal
 public record CheckFeatureFlags(ServerConfigurationPacketListener listener) implements ConfigurationTask {
-    public static final Type TYPE = new Type(ResourceLocation.fromNamespaceAndPath("neoforge", "check_feature_flags"));
+    public static final Type TYPE = new Type(ResourceLocation.fromNamespaceAndPath("neoforge", "check_feature_flags").toString());
     private static final Logger LOGGER = LogUtils.getLogger();
     private static Set<ResourceLocation> moddedFlags = null;
 

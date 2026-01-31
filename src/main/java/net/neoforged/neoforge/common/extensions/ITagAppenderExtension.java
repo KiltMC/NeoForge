@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import xyz.bluspring.kilt.injections.data.tags.TagsProvider$TagAppenderInjection;
 
-public interface ITagAppenderExtension<T> extends TagAppenderExtension {
+public interface ITagAppenderExtension<T> extends TagAppenderExtension<T> {
     private TagsProvider.TagAppender<T> self() {
         return (TagsProvider.TagAppender<T>) this;
     }

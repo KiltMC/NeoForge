@@ -18,7 +18,7 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @ApiStatus.Internal
 public record CommonVersionTask() implements ICustomConfigurationTask {
-    public static final Type TYPE = new Type(ResourceLocation.fromNamespaceAndPath(NeoForgeVersion.MOD_ID, "common_version"));
+    public static final Type TYPE = new Type(ResourceLocation.fromNamespaceAndPath(NeoForgeVersion.MOD_ID, "common_version").toString());
 
     @Override
     public Type type() {

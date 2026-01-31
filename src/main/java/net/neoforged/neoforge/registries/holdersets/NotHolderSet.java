@@ -29,6 +29,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.resources.RegistryOpsInjection;
 
 /**
  * <p>Holderset that represents all elements of a registry not present in another holderset.
@@ -155,7 +156,7 @@ public class NotHolderSet<T> implements ICustomHolderSet<T> {
             return RecordCodecBuilder.<NotHolderSet<T>>mapCodec(
                     builder -> builder
                             .group(
-                                    RegistryOps.retrieveRegistryLookup(registryKey).forGetter(NotHolderSet::registryLookup),
+                                    RegistryOpsInjection.retrieveRegistryLookup(registryKey).forGetter(NotHolderSet::registryLookup),
                                     HolderSetCodec.create(registryKey, holderCodec, forceList).fieldOf("value").forGetter(NotHolderSet::value))
                             .apply(builder, NotHolderSet::new));
         }

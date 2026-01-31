@@ -23,6 +23,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import xyz.bluspring.kilt.injections.data.tags.TagsProvider$TagAppenderInjection;
 
 public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider {
     public NeoForgeDamageTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
@@ -36,7 +37,8 @@ public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider
     @Override
     protected TagAppender<DamageType> tag(TagKey<DamageType> tag) {
         if (inVanilla) {
-            return new TagAppender<>(this.vanillaBuilders.computeIfAbsent(tag.location(), location -> TagBuilder.create()), "minecraft") {};
+            // Kilt TODO: mod ID?
+            return new TagAppender<>(this.vanillaBuilders.computeIfAbsent(tag.location(), location -> TagBuilder.create())/*, "minecraft"*/) {};
         }
         return super.tag(tag);
     }
@@ -133,7 +135,8 @@ public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider
                 builders.forEach(builder -> builder.add(entry));
                 return super.add(entry);
             }
-        }, modId) {};
+            // Kilt TODO: mod ID?
+        }/*, modId*/) {};
     }
 
     @SafeVarargs

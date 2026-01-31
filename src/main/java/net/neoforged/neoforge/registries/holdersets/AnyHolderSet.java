@@ -26,6 +26,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.neoforged.neoforge.common.NeoForgeMod;
+import xyz.bluspring.kilt.injections.resources.RegistryOpsInjection;
 
 /**
  * <p>Holderset that represents all elements of a registry. Json format:</p>
@@ -101,7 +102,7 @@ public record AnyHolderSet<T>(HolderLookup.RegistryLookup<T> registryLookup) imp
     public static class Type implements HolderSetType {
         @Override
         public <T> MapCodec<? extends ICustomHolderSet<T>> makeCodec(ResourceKey<? extends Registry<T>> registryKey, Codec<Holder<T>> holderCodec, boolean forceList) {
-            return RegistryOps.retrieveRegistryLookup(registryKey)
+            return RegistryOpsInjection.retrieveRegistryLookup(registryKey)
                     .xmap(AnyHolderSet::new, AnyHolderSet::registryLookup);
         }
 

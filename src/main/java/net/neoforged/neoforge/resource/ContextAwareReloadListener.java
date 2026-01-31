@@ -51,7 +51,7 @@ public abstract class ContextAwareReloadListener implements PreparableReloadList
     /**
      * Creates a new {@link ConditionalOps} using {@link #getContext()} and {@link #getRegistryLookup()} ()}.
      */
-    protected final ConditionalOps<JsonElement> makeConditionalOps() {
+    public final ConditionalOps<JsonElement> makeConditionalOps() {
         return new ConditionalOps<>(getRegistryLookup().createSerializationContext(JsonOps.INSTANCE), getContext());
     }
 }

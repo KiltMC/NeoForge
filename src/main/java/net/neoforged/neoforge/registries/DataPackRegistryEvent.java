@@ -19,6 +19,7 @@ import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.resources.RegistryDataLoaderInjection;
 
 public abstract class DataPackRegistryEvent extends Event implements IModBusEvent {
     @ApiStatus.Internal
@@ -95,7 +96,7 @@ public abstract class DataPackRegistryEvent extends Event implements IModBusEven
          * @see #dataPackRegistry(ResourceKey, Codec, Codec)
          */
         public <T> void dataPackRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> codec, @Nullable Codec<T> networkCodec, Consumer<RegistryBuilder<T>> consumer) {
-            this.registryDataList.add(new DataPackRegistryData<>(new RegistryDataLoader.RegistryData<>(registryKey, codec, false, consumer), networkCodec));
+            this.registryDataList.add(new DataPackRegistryData<>(RegistryDataLoaderInjection.RegistryDataInjection.create(registryKey, codec, false, consumer), networkCodec));
         }
 
         void process() {

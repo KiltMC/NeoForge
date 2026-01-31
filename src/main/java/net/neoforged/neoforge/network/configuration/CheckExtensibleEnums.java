@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 
 @ApiStatus.Internal
 public record CheckExtensibleEnums(ServerConfigurationPacketListener listener) implements ConfigurationTask {
-    public static final Type TYPE = new Type(ResourceLocation.fromNamespaceAndPath("neoforge", "check_extensible_enum"));
+    public static final Type TYPE = new Type(ResourceLocation.fromNamespaceAndPath("neoforge", "check_extensible_enum").toString());
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final org.objectweb.asm.Type NETWORKED_ENUM = org.objectweb.asm.Type.getType(NetworkedEnum.class);
     private static final List<? extends Class<? extends Enum<?>>> NETWORKED_EXTENSIBLE_ENUM_CLASSES = collectNetworkedEnumClasses();

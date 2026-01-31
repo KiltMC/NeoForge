@@ -14,6 +14,7 @@ import net.neoforged.neoforge.client.loading.ClientModLoader;
 import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.mixin.client.gui.components.ButtonBuilderAccessor;
 
 /**
  * Custom button subclass to draw an indicator overlay on the button when updates are available.
@@ -27,7 +28,9 @@ public class ModsButton extends Button {
     private boolean hasCheckedForUpdates = false;
 
     public ModsButton(Builder builder) {
-        super(builder);
+        // Kilt: We can't target super here, so this works.
+        super(((ButtonBuilderAccessor) builder).getX(), ((ButtonBuilderAccessor) builder).getY(), ((ButtonBuilderAccessor) builder).getWidth(), ((ButtonBuilderAccessor) builder).getHeight(), ((ButtonBuilderAccessor) builder).getMessage(), ((ButtonBuilderAccessor) builder).getOnPress(), ((ButtonBuilderAccessor) builder).getCreateNarration());
+        this.setTooltip(((ButtonBuilderAccessor) builder).getTooltip());
     }
 
     @Override

@@ -465,7 +465,7 @@ public class FluidUtil {
         }
 
         Fluid fluid = resource.getFluid();
-        if (fluid == Fluids.EMPTY || !fluid.getFluidType().canBePlacedInLevel(level, pos, resource)) {
+        if (fluid == Fluids.EMPTY || !fluid.neo$getFluidType().canBePlacedInLevel(level, pos, resource)) {
             return false;
         }
 
@@ -484,7 +484,7 @@ public class FluidUtil {
             return false; // Non-air, solid, unreplacable block. We can't put fluid here.
         }
 
-        if (fluid.getFluidType().isVaporizedOnPlacement(level, pos, resource)) {
+        if (fluid.neo$getFluidType().isVaporizedOnPlacement(level, pos, resource)) {
             FluidStack result = fluidSource.drain(resource, IFluidHandler.FluidAction.EXECUTE);
             if (!result.isEmpty()) {
                 result.getFluidType().onVaporize(player, level, pos, result);

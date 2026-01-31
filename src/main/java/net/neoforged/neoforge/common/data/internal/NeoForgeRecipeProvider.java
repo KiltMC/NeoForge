@@ -64,7 +64,7 @@ public final class NeoForgeRecipeProvider extends VanillaRecipeProvider {
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput recipeOutput) {
+    public void buildRecipes(RecipeOutput recipeOutput) {
         replace(Items.STICK, Tags.Items.RODS_WOODEN);
         replace(Items.GOLD_INGOT, Tags.Items.INGOTS_GOLD);
         replace(Items.GOLD_NUGGET, Tags.Items.NUGGETS_GOLD);

@@ -143,7 +143,8 @@ class TagsCommand {
                 .orElseThrow(() -> UNKNOWN_REGISTRY.create(registryKey.location()));
 
         final ResourceLocation elementLocation = ResourceLocationArgument.getId(ctx, "element");
-        final ResourceKey<?> elementKey = ResourceKey.create(cast(registryKey), elementLocation);
+        // Kilt: We were having compile errors otherwise, calling ".location()" directly instead works.
+        final ResourceKey<?> elementKey = ResourceKey.create(registryKey.location(), elementLocation);
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         final Optional<Holder<?>> elementHolderOpt = registry.getHolder(TagsCommand.<ResourceKey>cast(elementKey));

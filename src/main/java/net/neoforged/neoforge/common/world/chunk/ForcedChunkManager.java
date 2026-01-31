@@ -33,6 +33,7 @@ import net.neoforged.fml.ModLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.world.level.saveddata.SavedDataInjection;
 
 @ParametersAreNonnullByDefault
 public class ForcedChunkManager {
@@ -66,7 +67,7 @@ public class ForcedChunkManager {
      * Checks if a level has any forced chunks. Mainly used for seeing if a level should continue ticking with no players in it.
      */
     public static boolean hasForcedChunks(ServerLevel level) {
-        ForcedChunksSavedData data = level.getDataStorage().get(new SavedData.Factory<>(ForcedChunksSavedData::new, ForcedChunksSavedData::load), "chunks");
+        ForcedChunksSavedData data = level.getDataStorage().get(SavedDataInjection.FactoryInjection.create(ForcedChunksSavedData::new, ForcedChunksSavedData::load), "chunks");
         if (data == null) return false;
         return !data.getChunks().isEmpty() || !data.getBlockForcedChunks().isEmpty() || !data.getEntityForcedChunks().isEmpty();
     }
@@ -133,8 +134,8 @@ public class ForcedChunkManager {
 
         if (!controllers.isEmpty()) {
             //If we have any callbacks, gather all owned tickets by controller for both blocks and entities
-            final Map<ResourceLocation, Map<BlockPos, TicketSet>> blockTickets = gatherTicketsById(saveData.getBlockForcedChunks());
-            final Map<ResourceLocation, Map<UUID, TicketSet>> entityTickets = gatherTicketsById(saveData.getEntityForcedChunks());
+            final Map<ResourceLocation, Map<BlockPos, TicketSet>> blockTickets = gatherTicketsById(saveData.neo$getBlockForcedChunks());
+            final Map<ResourceLocation, Map<UUID, TicketSet>> entityTickets = gatherTicketsById(saveData.neo$getEntityForcedChunks());
             //Fire the callbacks allowing them to remove any tickets they don't want anymore
             controllers.forEach((value) -> {
                 boolean hasBlockTicket = blockTickets.containsKey(value.getKey());
@@ -147,10 +148,10 @@ public class ForcedChunkManager {
             });
         }
         //Reinstate the chunks that we want to load
-        reinstatePersistentChunks(level, BLOCK, saveData.getBlockForcedChunks().chunks, false);
-        reinstatePersistentChunks(level, BLOCK_TICKING, saveData.getBlockForcedChunks().tickingChunks, true);
-        reinstatePersistentChunks(level, ENTITY, saveData.getEntityForcedChunks().chunks, false);
-        reinstatePersistentChunks(level, ENTITY_TICKING, saveData.getEntityForcedChunks().tickingChunks, true);
+        reinstatePersistentChunks(level, BLOCK, saveData.neo$getBlockForcedChunks().chunks, false);
+        reinstatePersistentChunks(level, BLOCK_TICKING, saveData.neo$getBlockForcedChunks().tickingChunks, true);
+        reinstatePersistentChunks(level, ENTITY, saveData.neo$getEntityForcedChunks().chunks, false);
+        reinstatePersistentChunks(level, ENTITY_TICKING, saveData.neo$getEntityForcedChunks().tickingChunks, true);
     }
 
     /**

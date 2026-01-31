@@ -36,6 +36,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import xyz.bluspring.kilt.injections.core.registries.BuiltInRegistriesInjection;
+import xyz.bluspring.kilt.injections.world.entity.SpawnPlacementsInjection;
 
 @ApiStatus.Internal
 public class GameData {
@@ -101,7 +103,7 @@ public class GameData {
             throw aggregate;
         } else {
             CommonHooks.modifyAttributes();
-            SpawnPlacements.fireSpawnPlacementEvent();
+            SpawnPlacementsInjection.fireSpawnPlacementEvent();
             ModLoader.postEvent(new BlockEntityTypeAddBlocksEvent());
             CreativeModeTabRegistry.sortTabs();
             if (FMLEnvironment.dist.isClient()) {
@@ -128,7 +130,7 @@ public class GameData {
         ordered.add(Registries.ATTRIBUTE.location()); // Vanilla order is incorrect, both Item and MobEffect depend on Attribute at construction time.
         ordered.add(Registries.DATA_COMPONENT_TYPE.location()); // Vanilla order is incorrect, Item depends on data components at construction time.
         ordered.add(Registries.ARMOR_MATERIAL.location()); // Vanilla order is incorrect, ArmorItem depends on armor materials at construction time.
-        ordered.addAll(BuiltInRegistries.getVanillaRegistrationOrder());
+        ordered.addAll(BuiltInRegistriesInjection.getVanillaRegistrationOrder());
         ordered.addAll(BuiltInRegistries.REGISTRY.keySet().stream().sorted(ResourceLocation::compareNamespaced).toList());
         return ordered;
     }
