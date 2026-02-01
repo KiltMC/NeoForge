@@ -13,7 +13,6 @@ import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
-import net.minecraft.server.packs.repository.BuiltInPackSource;
 import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -23,7 +22,7 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.neoforgespi.language.IModInfo;
-import xyz.bluspring.kilt.injections.server.packs.resources.BuiltInPackSourceInjection;
+import xyz.bluspring.kilt.injections.server.packs.repository.BuiltInPackSourceInjection;
 
 /**
  * Fired on {@link PackRepository} creation to allow mods to add new pack finders.
