@@ -37,7 +37,8 @@ import org.jetbrains.annotations.Nullable;
  * }
  */
 public class BlockEntityTypeAddBlocksEvent extends Event implements IModBusEvent {
-    private final Function<BlockEntityType<?>, ? extends Class<?>> memoizedCommonSuperClass = Util.memoize((BlockEntityType<?> blockEntityType) -> getCommonSuperClassForExistingValidBlocks(blockEntityType.getValidBlocks()));
+    // Kilt: have to do a cast for some reason? otherwise it fails to compile correctly.
+    private final Function<BlockEntityType<?>, ? extends Class<?>> memoizedCommonSuperClass = (Function<BlockEntityType<?>, ? extends Class<?>>) (Object) Util.memoize((BlockEntityType<?> blockEntityType) -> getCommonSuperClassForExistingValidBlocks(blockEntityType.getValidBlocks()));
 
     public BlockEntityTypeAddBlocksEvent() {}
 

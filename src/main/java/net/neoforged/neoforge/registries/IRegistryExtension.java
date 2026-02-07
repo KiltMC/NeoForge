@@ -6,6 +6,8 @@
 package net.neoforged.neoforge.registries;
 
 import java.util.Map;
+
+import net.fabricmc.fabric.api.event.registry.FabricRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -22,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * 
  * @param <T> the type of registry entries
  */
-public interface IRegistryExtension<T> {
+public interface IRegistryExtension<T> extends FabricRegistry {
     private Registry<T> self() {
         return (Registry<T>) this;
     }
