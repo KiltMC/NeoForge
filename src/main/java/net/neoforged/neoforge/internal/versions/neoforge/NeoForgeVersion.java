@@ -41,7 +41,9 @@ public class NeoForgeVersion {
     }
 
     public static VersionChecker.Status getStatus() {
-        return VersionChecker.getResult(ModList.get().getModFileById(MOD_ID).getMods().get(0)).status();
+        // Kilt: We're not supporting this.
+        return VersionChecker.Status.FAILED;
+        //return VersionChecker.getResult(ModList.get().getModFileById(MOD_ID).getMods().get(0)).status();
     }
 
     @Nullable

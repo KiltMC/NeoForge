@@ -117,7 +117,7 @@ public class ClientModLoader extends CommonModLoader {
             // We're in an early error state, config is not available. Assume true.
         }
 
-        if (error != null) {
+        if (error != null && false) { // Kilt: no
             // Double check we have the langs loaded for forge
             LanguageHook.loadBuiltinLanguages();
             File dumpedLocation = CrashReportExtender.dumpModLoadingCrashReport(LOGGER, error.getIssues(), mc.gameDirectory);
@@ -129,7 +129,7 @@ public class ClientModLoader extends CommonModLoader {
         NeoForge.EVENT_BUS.start();
 
         if (!warnings.isEmpty()) {
-            if (showWarnings) {
+            if (showWarnings && false) { // Kilt: FUCK THAT.
                 return () -> mc.setScreen(new LoadingErrorScreen(warnings, null, initialScreensTask));
             }
 

@@ -6,6 +6,7 @@
 package net.neoforged.neoforge.common.extensions;
 
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.models.geometry.extensions.TransformationExtension;
 import net.minecraft.core.Direction;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -14,7 +15,7 @@ import org.joml.Vector4f;
 /**
  * Extension interface for {@link Transformation}.
  */
-public interface ITransformationExtension {
+public interface ITransformationExtension extends TransformationExtension {
     private Transformation self() {
         return (Transformation) this;
     }
