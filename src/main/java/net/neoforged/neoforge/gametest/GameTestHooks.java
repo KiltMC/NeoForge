@@ -86,9 +86,10 @@ public class GameTestHooks {
     public static String getTemplateNamespace(Method method) {
         GameTest gameTest = method.getAnnotation(GameTest.class);
 
-        if (gameTest != null && !gameTest.templateNamespace().isEmpty()) {
+        // Kilt TODO: fix
+        /*if (gameTest != null && !gameTest.templateNamespace().isEmpty()) {
             return gameTest.templateNamespace();
-        }
+        }*/
 
         GameTestHolder gameTestHolder = method.getDeclaringClass().getAnnotation(GameTestHolder.class);
 

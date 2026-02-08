@@ -107,7 +107,7 @@ public abstract class BaseMappedRegistry<T> implements Registry<T>, IRegistryExt
         return value == null ? -1 : this.getId(value);
     }
 
-    protected void clear(boolean full) {
+    public void clear(boolean full) {
         this.kilt$clear(full);
     }
 
@@ -122,7 +122,7 @@ public abstract class BaseMappedRegistry<T> implements Registry<T>, IRegistryExt
      * Register a key <-> ID mapping.
      * <b>The IDs must be registered in increasing order.</b>
      */
-    protected abstract void registerIdMapping(ResourceKey<T> key, int id);
+    public abstract void registerIdMapping(ResourceKey<T> key, int id);
 
     public abstract void unfreeze();
 

@@ -6,13 +6,15 @@
 package net.neoforged.neoforge.common.extensions;
 
 import java.util.Set;
+
+import io.github.fabricators_of_create.porting_lib.entity.injects.MobEffectInjection;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.common.EffectCure;
 import net.neoforged.neoforge.common.EffectCures;
 
-public interface IMobEffectExtension {
+public interface IMobEffectExtension extends MobEffectInjection {
     private MobEffect self() {
         return (MobEffect) this;
     }
@@ -20,7 +22,7 @@ public interface IMobEffectExtension {
     /***
      * Fill the given set with the {@link EffectCure}s this effect should be curable with by default
      */
-    default void fillEffectCures(Set<EffectCure> cures, MobEffectInstance effectInstance) {
+    default void neo$fillEffectCures(Set<EffectCure> cures, MobEffectInstance effectInstance) {
         cures.addAll(EffectCures.DEFAULT_CURES);
         if (self() == MobEffects.POISON.value()) {
             cures.add(EffectCures.HONEY);

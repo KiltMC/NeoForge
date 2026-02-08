@@ -33,11 +33,19 @@ public class EntityTeleportEvent extends EntityEvent implements ICancellableEven
     protected double targetY;
     protected double targetZ;
 
+    private final Vec3 kilt$originalTarget;
+
+    @ApiStatus.Internal
+    public Vec3 kilt$getOriginalTarget() {
+        return this.kilt$originalTarget;
+    }
+
     public EntityTeleportEvent(Entity entity, double targetX, double targetY, double targetZ) {
         super(entity);
         this.targetX = targetX;
         this.targetY = targetY;
         this.targetZ = targetZ;
+        this.kilt$originalTarget = new Vec3(targetX, targetY, targetZ);
     }
 
     public double getTargetX() {
@@ -173,6 +181,13 @@ public class EntityTeleportEvent extends EntityEvent implements ICancellableEven
         private float attackDamage;
         private final HitResult hitResult;
 
+        private final float kilt$originalAttackDamage;
+
+        @ApiStatus.Internal
+        public float kilt$getOriginalAttackDamage() {
+            return this.kilt$originalAttackDamage;
+        }
+
         @ApiStatus.Internal
         public EnderPearl(ServerPlayer entity, double targetX, double targetY, double targetZ, ThrownEnderpearl pearlEntity, float attackDamage, HitResult hitResult) {
             super(entity, targetX, targetY, targetZ);
@@ -180,6 +195,7 @@ public class EntityTeleportEvent extends EntityEvent implements ICancellableEven
             this.player = entity;
             this.attackDamage = attackDamage;
             this.hitResult = hitResult;
+            this.kilt$originalAttackDamage = attackDamage;
         }
 
         public ThrownEnderpearl getPearlEntity() {

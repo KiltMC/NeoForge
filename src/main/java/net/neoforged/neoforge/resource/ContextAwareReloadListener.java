@@ -44,7 +44,7 @@ public abstract class ContextAwareReloadListener implements PreparableReloadList
     /**
      * Returns the registry access held by this listener, or {@link RegistryAccess#EMPTY} if it is unavailable.
      */
-    public final HolderLookup.Provider getRegistryLookup() {
+    public HolderLookup.Provider getRegistryLookup() {
         return this.registryLookup;
     }
 
