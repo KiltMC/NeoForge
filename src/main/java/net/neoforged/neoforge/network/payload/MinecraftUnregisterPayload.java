@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
+@Deprecated(forRemoval = true) // Kilt: Use RegistrationPayload instead.
 public record MinecraftUnregisterPayload(Set<ResourceLocation> forgottenChannels) implements CustomPacketPayload {
     public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("unregister");
     public static final Type<MinecraftUnregisterPayload> TYPE = new Type<>(ID);

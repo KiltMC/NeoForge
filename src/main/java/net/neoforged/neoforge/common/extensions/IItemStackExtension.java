@@ -506,6 +506,11 @@ public interface IItemStackExtension {
     default ItemAttributeModifiers getAttributeModifiers() {
         ItemAttributeModifiers defaultModifiers = self().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 
+        // Kilt: Extensibility time
+        return kilt$getAttributeModifiers(defaultModifiers);
+    }
+
+    default ItemAttributeModifiers kilt$getAttributeModifiers(ItemAttributeModifiers defaultModifiers) {
         if (defaultModifiers.modifiers().isEmpty()) {
             defaultModifiers = self().getItem().getDefaultAttributeModifiers(self());
         }

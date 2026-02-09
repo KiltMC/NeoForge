@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import net.fabricmc.fabric.impl.networking.RegistrationPayload;
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.FriendlyByteBuf;
@@ -99,8 +101,9 @@ public class NetworkRegistry {
      * TODO: Separate by protocol + flow.
      */
     private static final Map<ResourceLocation, StreamCodec<FriendlyByteBuf, ? extends CustomPacketPayload>> BUILTIN_PAYLOADS = ImmutableMap.of(
-            MinecraftRegisterPayload.ID, MinecraftRegisterPayload.STREAM_CODEC,
-            MinecraftUnregisterPayload.ID, MinecraftUnregisterPayload.STREAM_CODEC,
+            // Kilt: Fabric API should be used instead here.
+//            MinecraftRegisterPayload.ID, MinecraftRegisterPayload.STREAM_CODEC,
+//            MinecraftUnregisterPayload.ID, MinecraftUnregisterPayload.STREAM_CODEC,
             ModdedNetworkQueryPayload.ID, ModdedNetworkQueryPayload.STREAM_CODEC,
             ModdedNetworkPayload.ID, ModdedNetworkPayload.STREAM_CODEC,
             ModdedNetworkSetupFailedPayload.ID, ModdedNetworkSetupFailedPayload.STREAM_CODEC,
@@ -381,7 +384,7 @@ public class NetworkRegistry {
         ImmutableSet.Builder<ResourceLocation> nowListeningOn = ImmutableSet.builder();
         nowListeningOn.addAll(getInitialListeningChannels(listener.flow()));
         nowListeningOn.addAll(setup.getChannels(ConnectionProtocol.CONFIGURATION).keySet());
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
     }
 
     /**
@@ -420,7 +423,7 @@ public class NetworkRegistry {
                 .filter(registration -> registration.getValue().matchesFlow(listener.flow()))
                 .filter(registration -> registration.getValue().optional())
                 .forEach(registration -> nowListeningOn.add(registration.getKey()));
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
 
         return true;
     }
@@ -516,7 +519,7 @@ public class NetworkRegistry {
         final ImmutableSet.Builder<ResourceLocation> nowListeningOn = ImmutableSet.builder();
         nowListeningOn.addAll(getInitialListeningChannels(listener.flow()));
         nowListeningOn.addAll(setup.getChannels(ConnectionProtocol.CONFIGURATION).keySet());
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
     }
 
     /**
@@ -572,7 +575,7 @@ public class NetworkRegistry {
                 .filter(registration -> registration.getValue().matchesFlow(listener.flow()))
                 .filter(registration -> registration.getValue().optional())
                 .forEach(registration -> nowListeningOn.add(registration.getKey()));
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
     }
 
     /**
@@ -711,8 +714,10 @@ public class NetworkRegistry {
 
     public static Set<ResourceLocation> getInitialServerUnregisterChannels() {
         final ImmutableSet.Builder<ResourceLocation> nowForgottenChannels = ImmutableSet.builder();
-        nowForgottenChannels.add(MinecraftRegisterPayload.ID);
-        nowForgottenChannels.add(MinecraftUnregisterPayload.ID);
+
+        // Kilt: Fabric API should be handling this.
+//        nowForgottenChannels.add(MinecraftRegisterPayload.ID);
+//        nowForgottenChannels.add(MinecraftUnregisterPayload.ID);
         PAYLOAD_REGISTRATIONS.get(ConnectionProtocol.PLAY).entrySet().stream()
                 .filter(registration -> registration.getValue().flow().isEmpty() || registration.getValue().flow().get() == PacketFlow.SERVERBOUND)
                 .filter(registration -> registration.getValue().optional())
@@ -794,18 +799,18 @@ public class NetworkRegistry {
         final ImmutableSet.Builder<ResourceLocation> notListeningAnymoreOn = ImmutableSet.builder();
         notListeningAnymoreOn.addAll(getInitialListeningChannels(listener.flow()));
         notListeningAnymoreOn.addAll(setup.getChannels(ConnectionProtocol.CONFIGURATION).keySet());
-        listener.send(new MinecraftUnregisterPayload(notListeningAnymoreOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.UNREGISTER, List.copyOf(notListeningAnymoreOn.build()))); // Kilt: Use Fabric API
 
         final ImmutableSet.Builder<ResourceLocation> nowListeningOn = ImmutableSet.builder();
-        nowListeningOn.add(MinecraftRegisterPayload.ID);
-        nowListeningOn.add(MinecraftUnregisterPayload.ID);
+//        nowListeningOn.add(MinecraftRegisterPayload.ID);
+//        nowListeningOn.add(MinecraftUnregisterPayload.ID); // Kilt: Fabric API should be handling this.
         if (listener.getConnectionType().isNeoForge()) {
             nowListeningOn.add(ModdedNetworkQueryPayload.ID);
         } else {
             // For non-Neo connections, send the registered channels
             nowListeningOn.addAll(getCommonPlayChannels(listener.flow()));
         }
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
     }
 
     public static ConnectionType getConnectionType(Connection connection) {

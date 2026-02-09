@@ -10,6 +10,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
@@ -543,14 +544,29 @@ public class CommonHooks {
      * @param tool        The tool used when breaking the block; may be empty
      */
     public static void handleBlockDrops(ServerLevel level, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, List<ItemEntity> drops, @Nullable Entity breaker, ItemStack tool) {
-        BlockDropsEvent event = new BlockDropsEvent(level, pos, state, blockEntity, drops, breaker, tool);
+        kilt$handleBlockDrops(level, pos, state, blockEntity, kilt$associateDrops(drops, level), breaker, tool, () -> state.spawnAfterBreak(level, pos, tool, false));
+    }
+
+    private static Map<ItemEntity, Runnable> kilt$associateDrops(List<ItemEntity> drops, ServerLevel level) {
+        var map = new HashMap<ItemEntity, Runnable>();
+
+        for (ItemEntity drop : drops) {
+            map.put(drop, () -> level.addFreshEntity(drop));
+        }
+
+        return map;
+    }
+
+    // Kilt: Mod compatibility time
+    public static void kilt$handleBlockDrops(ServerLevel level, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, Map<ItemEntity, Runnable> drops, @Nullable Entity breaker, ItemStack tool, Runnable dropXpHandler) {
+        BlockDropsEvent event = new BlockDropsEvent(level, pos, state, blockEntity, new ArrayList<>(drops.keySet()), breaker, tool);
         NeoForge.EVENT_BUS.post(event);
         if (!event.isCanceled()) {
             for (ItemEntity entity : event.getDrops()) {
-                level.addFreshEntity(entity);
+                drops.getOrDefault(entity, () -> level.addFreshEntity(entity)).run();
             }
-            // Always pass false for the dropXP (last) param to spawnAfterBreak since we handle XP.
-            state.spawnAfterBreak((ServerLevel) level, pos, tool, false);
+            // Always pass false for the dropXP (last) param to spawnAfterBreak since we handle XP. // Kilt TODO: is this true for us?
+            dropXpHandler.run();
             if (event.getDroppedExperience() > 0) {
                 state.getBlock().popExperience(level, pos, event.getDroppedExperience());
             }

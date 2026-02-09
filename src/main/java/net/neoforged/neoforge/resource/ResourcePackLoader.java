@@ -69,9 +69,10 @@ public class ResourcePackLoader {
     }
 
     public static void populatePackRepository(PackRepository resourcePacks, PackType packType, boolean trusted) {
-        findResourcePacks();
         // First add the mod's builtin packs
-        resourcePacks.addPackFinder(buildPackFinder(modResourcePacks, packType));
+        // Kilt: Handled by Fabric
+//        findResourcePacks();
+//        resourcePacks.addPackFinder(buildPackFinder(modResourcePacks, packType));
         // Then fire the event to add more packs
         ModLoader.postEvent(new AddPackFindersEvent(packType, resourcePacks::addPackFinder, trusted));
     }

@@ -38,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.knit.loader.KnitLoader;
 
 @ApiStatus.Internal
 public class ClientModLoader extends CommonModLoader {
@@ -47,6 +48,13 @@ public class ClientModLoader extends CommonModLoader {
     private static boolean loadingComplete;
     @Nullable
     private static ModLoadingException error;
+
+    private static void kilt$displayModErrors() {
+        // Kilt: Just display the error immediately, man.
+        if (error != null) {
+            KnitLoader.Companion.getInstance().displayError("Kilt: Failed to load NeoForge mods!", error);
+        }
+    }
 
     public static void begin(final Minecraft minecraft, final PackRepository defaultResourcePacks, final ReloadableResourceManager mcResourceManager) {
         // force log4j to shutdown logging in a shutdown hook. This is because we disable default shutdown hook so the server properly logs it's shutdown
@@ -60,6 +68,7 @@ public class ClientModLoader extends CommonModLoader {
             begin(ImmediateWindowHandler::renderTick, false);
         } catch (ModLoadingException e) {
             error = e;
+            kilt$displayModErrors();
         }
         if (error == null) {
             ResourcePackLoader.populatePackRepository(defaultResourcePacks, PackType.CLIENT_RESOURCES, false);
@@ -85,6 +94,7 @@ public class ClientModLoader extends CommonModLoader {
             r.run();
         } catch (ModLoadingException e) {
             if (error == null) error = e;
+            kilt$displayModErrors();
         }
     }
 
@@ -117,12 +127,16 @@ public class ClientModLoader extends CommonModLoader {
             // We're in an early error state, config is not available. Assume true.
         }
 
-        if (error != null && false) { // Kilt: no
+        if (error != null) {
             // Double check we have the langs loaded for forge
-            LanguageHook.loadBuiltinLanguages();
+//            LanguageHook.loadBuiltinLanguages(); // Kilt: No
             File dumpedLocation = CrashReportExtender.dumpModLoadingCrashReport(LOGGER, error.getIssues(), mc.gameDirectory);
             // Ignore incoming initial screens task, the subsequent screens are unreachable in an error state
-            return () -> mc.setScreen(new LoadingErrorScreen(error.getIssues(), dumpedLocation, () -> {}));
+//            return () -> mc.setScreen(new LoadingErrorScreen(error.getIssues(), dumpedLocation, () -> {})); // Kilt: No
+
+            // Kilt: We're doing it ourselves.
+            kilt$displayModErrors();
+            return () -> {};
         }
 
         // We can finally start the game eventbus up

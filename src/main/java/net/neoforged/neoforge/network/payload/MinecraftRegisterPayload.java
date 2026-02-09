@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
+@Deprecated(forRemoval = true) // Kilt: Use RegistrationPayload instead.
 public record MinecraftRegisterPayload(Set<ResourceLocation> newChannels) implements CustomPacketPayload {
     public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("register");
     public static final Type<MinecraftRegisterPayload> TYPE = new Type<>(ID);
