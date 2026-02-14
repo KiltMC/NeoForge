@@ -46,7 +46,7 @@ public class ConfigurationInitialization {
     @SubscribeEvent
     private static void configureModdedClient(RegisterConfigurationTasksEvent event) {
         ServerConfigurationPacketListener listener = event.getListener();
-        if (listener.hasChannel(CommonVersionPayload.TYPE) && listener.hasChannel(CommonRegisterPayload.TYPE)) {
+        if (listener.hasChannel(CommonVersionPayload.TYPE) && listener.hasChannel(CommonRegisterPayload.TYPE) && false) { // Kilt: We don't need these tasks with Fabric
             event.register(new CommonVersionTask());
             event.register(new CommonRegisterTask());
         }

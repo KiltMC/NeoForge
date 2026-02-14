@@ -24,7 +24,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.networking.RegistrationPayload;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.FriendlyByteBuf;
@@ -75,6 +82,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Unique;
 
 /**
  * Core registry for all modded networking.
@@ -106,9 +114,11 @@ public class NetworkRegistry {
 //            MinecraftUnregisterPayload.ID, MinecraftUnregisterPayload.STREAM_CODEC,
             ModdedNetworkQueryPayload.ID, ModdedNetworkQueryPayload.STREAM_CODEC,
             ModdedNetworkPayload.ID, ModdedNetworkPayload.STREAM_CODEC,
-            ModdedNetworkSetupFailedPayload.ID, ModdedNetworkSetupFailedPayload.STREAM_CODEC,
-            CommonVersionPayload.ID, CommonVersionPayload.STREAM_CODEC,
-            CommonRegisterPayload.ID, CommonRegisterPayload.STREAM_CODEC);
+            ModdedNetworkSetupFailedPayload.ID, ModdedNetworkSetupFailedPayload.STREAM_CODEC
+            // Kilt: Same here
+//            CommonVersionPayload.ID, CommonVersionPayload.STREAM_CODEC,
+//            CommonRegisterPayload.ID, CommonRegisterPayload.STREAM_CODEC
+    );
 
     /**
      * Registry of all custom payload handlers. The initial state of this map should reflect the protocols which support custom payloads.
@@ -181,6 +191,53 @@ public class NetworkRegistry {
             }
 
             byProtocol.put(type.id(), reg);
+
+            // Kilt: Register directly to Fabric API
+            if (protocol == ConnectionProtocol.CONFIGURATION) {
+                if (flow.isEmpty() || flow.orElseThrow().isClientbound()) {
+                    PayloadTypeRegistry.configurationS2C().register(type, (StreamCodec<? super FriendlyByteBuf, T>) codec);
+
+                    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+                        KiltClientPayloadReceiver.kilt$handleClientConfigurationReceiver(type, handler);
+                    }
+                }
+
+                if (flow.isEmpty() || flow.orElseThrow().isServerbound()) {
+                    PayloadTypeRegistry.configurationC2S().register(type, (StreamCodec<? super FriendlyByteBuf, T>) codec);
+                    ServerConfigurationNetworking.registerGlobalReceiver(type, (packet, ctx) -> {
+                        handler.handle(packet, new ServerPayloadContext(ctx.networkHandler(), type.id()));
+                    });
+                }
+            } else if (protocol == ConnectionProtocol.PLAY) {
+                if (flow.isEmpty() || flow.orElseThrow().isClientbound()) {
+                    PayloadTypeRegistry.playS2C().register(type, (StreamCodec<? super FriendlyByteBuf, T>) codec);
+
+                    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+                        KiltClientPayloadReceiver.kilt$handleClientPlayReceiver(type, handler);
+                    }
+                }
+
+                if (flow.isEmpty() || flow.orElseThrow().isServerbound()) {
+                    PayloadTypeRegistry.playC2S().register(type, (StreamCodec<? super FriendlyByteBuf, T>) codec);
+                    ServerPlayNetworking.registerGlobalReceiver(type, (packet, ctx) -> {
+                        handler.handle(packet, new ServerPayloadContext(ctx.player().connection, type.id()));
+                    });
+                }
+            }
+        }
+    }
+
+    private static class KiltClientPayloadReceiver {
+        public static <T extends CustomPacketPayload> void kilt$handleClientPlayReceiver(CustomPacketPayload.Type<T> type, IPayloadHandler<T> handler) {
+            ClientPlayNetworking.registerGlobalReceiver(type, (payload, ctx) -> {
+                handler.handle(payload, new ClientPayloadContext(ctx.player().connection, type.id()));
+            });
+        }
+
+        public static <T extends CustomPacketPayload> void kilt$handleClientConfigurationReceiver(CustomPacketPayload.Type<T> type, IPayloadHandler<T> handler) {
+            ClientConfigurationNetworking.registerGlobalReceiver(type, (payload, ctx) -> {
+                handler.handle(payload, new ClientPayloadContext(ctx.networkHandler(), type.id()));
+            });
         }
     }
 
@@ -215,7 +272,8 @@ public class NetworkRegistry {
 
             // These two checks can only be hit on receipt of a payload, as senders will be checked before reaching this method.
             if (registration == null) {
-                LOGGER.warn("No registration for payload {}; refusing to decode.", id);
+                // Kilt: Too much log spam, no.
+//                LOGGER.warn("No registration for payload {}; refusing to decode.", id);
                 return null;
             }
 
@@ -244,6 +302,8 @@ public class NetworkRegistry {
         return !(payload instanceof DiscardedPayload) && !"minecraft".equals(payload.type().id().getNamespace());
     }
 
+    @Unique public static final ThreadLocal<Boolean> kilt$wasHandled = ThreadLocal.withInitial(() -> false);
+
     /**
      * Handles modded payloads on the server. Invoked after built-in handling.
      * <p>
@@ -257,8 +317,9 @@ public class NetworkRegistry {
         NetworkPayloadSetup payloadSetup = ChannelAttributes.getPayloadSetup(listener.getConnection());
         // Check if channels were negotiated.
         if (payloadSetup == null) {
-            LOGGER.warn("Received a modded payload before channel negotiation; disconnecting.");
-            listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Payload Setup)".formatted(NeoForgeVersion.getVersion())));
+            // Kilt: WHY IS THIS A THING?!
+//            LOGGER.warn("Received a modded payload before channel negotiation; disconnecting.");
+//            listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Payload Setup)".formatted(NeoForgeVersion.getVersion())));
             return;
         }
 
@@ -270,23 +331,27 @@ public class NetworkRegistry {
 
             // Check if the channel should even be processed.
             if (channel == null && !hasAdhocChannel(listener.protocol(), context.payloadId(), PacketFlow.SERVERBOUND)) {
-                LOGGER.warn("Received a modded payload {} with an unknown or unaccepted channel; disconnecting.", context.payloadId());
-                listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Channel for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
+                // Kilt: WHY IS THIS A THING?!
+//                LOGGER.warn("Received a modded payload {} with an unknown or unaccepted channel; disconnecting.", context.payloadId());
+//                listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Channel for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
                 return;
             }
 
             PayloadRegistration registration = PAYLOAD_REGISTRATIONS.get(listener.protocol()).get(context.payloadId());
             if (registration == null) {
-                LOGGER.error("Received a modded payload {} with no registration; disconnecting.", context.payloadId());
-                listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Handler for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
-                dumpStackToLog(); // This case is only likely when handling packets without serialization, i.e. from a compound listener, so this can help debug why.
+                // Kilt: No thanks!
+//                LOGGER.error("Received a modded payload {} with no registration; disconnecting.", context.payloadId());
+//                listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Handler for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
+//                dumpStackToLog(); // This case is only likely when handling packets without serialization, i.e. from a compound listener, so this can help debug why.
                 return;
             }
 
+            kilt$wasHandled.set(true);
             registration.handler().handle(packet.payload(), context);
         } else {
-            LOGGER.error("Received a modded payload {} while not in the configuration or play phase; disconnecting.", context.payloadId());
-            listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (Invalid Protocol %s)".formatted(NeoForgeVersion.getVersion(), listener.protocol().name())));
+            // Kilt: Still no!
+//            LOGGER.error("Received a modded payload {} while not in the configuration or play phase; disconnecting.", context.payloadId());
+//            listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (Invalid Protocol %s)".formatted(NeoForgeVersion.getVersion(), listener.protocol().name())));
         }
     }
 
@@ -303,8 +368,9 @@ public class NetworkRegistry {
         NetworkPayloadSetup payloadSetup = ChannelAttributes.getPayloadSetup(listener.getConnection());
         // Check if channels were negotiated.
         if (payloadSetup == null) {
-            LOGGER.warn("Received a modded payload before channel negotiation; disconnecting.");
-            listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Payload Setup)".formatted(NeoForgeVersion.getVersion())));
+            // Kilt: WHY IS THIS A THING?!
+//            LOGGER.warn("Received a modded payload before channel negotiation; disconnecting.");
+//            listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Payload Setup)".formatted(NeoForgeVersion.getVersion())));
             return;
         }
 
@@ -316,23 +382,26 @@ public class NetworkRegistry {
 
             // Check if the channel should even be processed.
             if (channel == null && !hasAdhocChannel(listener.protocol(), packet.payload().type().id(), PacketFlow.CLIENTBOUND)) {
-                LOGGER.warn("Received a modded payload with an unknown or unaccepted channel; disconnecting.");
-                listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Channel for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
+                // Kilt: WHY IS THIS A THING?!
+//                LOGGER.warn("Received a modded payload with an unknown or unaccepted channel; disconnecting.");
+//                listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Channel for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
                 return;
             }
 
             PayloadRegistration registration = PAYLOAD_REGISTRATIONS.get(listener.protocol()).get(context.payloadId());
             if (registration == null) {
-                LOGGER.error("Received a modded payload with no registration; disconnecting.");
-                listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Handler for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
-                dumpStackToLog(); // This case is only likely when handling packets without serialization, i.e. from a compound listener, so this can help debug why.
+                // Kilt: Nope!
+//                LOGGER.error("Received a modded payload with no registration; disconnecting.");
+//                listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Handler for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
+//                dumpStackToLog(); // This case is only likely when handling packets without serialization, i.e. from a compound listener, so this can help debug why.
                 return;
             }
 
             registration.handler().handle(packet.payload(), context);
         } else {
-            LOGGER.error("Received a modded payload while not in the configuration or play phase. Disconnecting.");
-            listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (Invalid Protocol %s)".formatted(NeoForgeVersion.getVersion(), listener.protocol().name())));
+            // Kilt: Still no!
+//            LOGGER.error("Received a modded payload while not in the configuration or play phase. Disconnecting.");
+//            listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (Invalid Protocol %s)".formatted(NeoForgeVersion.getVersion(), listener.protocol().name())));
         }
     }
 
