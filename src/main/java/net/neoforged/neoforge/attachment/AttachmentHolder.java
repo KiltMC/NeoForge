@@ -78,6 +78,7 @@ public abstract class AttachmentHolder implements IAttachmentHolder, AttachmentH
         if (ret == null) {
             ret = type.defaultValueSupplier.apply(getExposedHolder());
             attachments.put(type, ret);
+            syncData(type);
         }
         return ret;
     }
@@ -97,7 +98,9 @@ public abstract class AttachmentHolder implements IAttachmentHolder, AttachmentH
     public <T> @Nullable T setData(AttachmentType<T> type, T data) {
         validateAttachmentType(type);
         Objects.requireNonNull(data);
-        return (T) getAttachmentMap().put(type, data);
+        var previousData = (T) getAttachmentMap().put(type, data);
+        syncData(type);
+        return previousData;
     }
 
     @Override
@@ -107,7 +110,9 @@ public abstract class AttachmentHolder implements IAttachmentHolder, AttachmentH
         if (attachments == null) {
             return null;
         }
-        return (T) attachments.remove(type);
+        var previousData = (T) attachments.remove(type);
+        syncData(type);
+        return previousData;
     }
 
     /**
@@ -141,6 +146,8 @@ public abstract class AttachmentHolder implements IAttachmentHolder, AttachmentH
 
     /**
      * Reads serializable attachments from a tag previously created via {@link #serializeAttachments(HolderLookup.Provider)}.
+     *
+     * <p>This does not trigger {@link IAttachmentHolder#syncData syncing} of the deserialized attachments.
      */
     public final void deserializeAttachments(HolderLookup.Provider provider, CompoundTag tag) {
         for (var key : tag.getAllKeys()) {
@@ -184,6 +191,11 @@ public abstract class AttachmentHolder implements IAttachmentHolder, AttachmentH
 
         public void deserializeInternal(HolderLookup.Provider provider, CompoundTag tag) {
             deserializeAttachments(provider, tag);
+        }
+
+        @Override
+        public void syncData(AttachmentType<?> type) {
+            exposedHolder.syncData(type);
         }
     }
 }

@@ -68,6 +68,7 @@ import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -357,7 +358,7 @@ public class CommonHooks {
             armorMap.put(slot, new ArmorHurtEvent.ArmorEntry(armorPiece, damageAfterFireResist));
         }
 
-        ArmorHurtEvent event = NeoForge.EVENT_BUS.post(new ArmorHurtEvent(armorMap, armoredEntity));
+        ArmorHurtEvent event = NeoForge.EVENT_BUS.post(new ArmorHurtEvent(armorMap, armoredEntity, source));
         if (event.isCanceled()) return;
         event.getArmorMap().forEach((slot, entry) -> entry.armorItemStack.hurtAndBreak((int) entry.newDamage, armoredEntity, slot));
     }
@@ -741,10 +742,19 @@ public class CommonHooks {
         return e.getXp();
     }
 
+    /**
+     * @deprecated Use {@link #onGrindstoneTake(Container, ContainerLevelAccess, Player, Function) the player version} instead
+     */
+    @Deprecated(forRemoval = true, since = "1.21.8")
     public static boolean onGrindstoneTake(Container inputSlots, ContainerLevelAccess access, Function<Level, Integer> xpFunction) {
+        return onGrindstoneTake(inputSlots, access, null, xpFunction);
+    }
+
+    //TODO remove nullable annotation from player once method above is removed
+    public static boolean onGrindstoneTake(Container inputSlots, ContainerLevelAccess access, @Nullable Player player, Function<Level, Integer> xpFunction) {
         access.execute((l, p) -> {
             int xp = xpFunction.apply(l);
-            GrindstoneEvent.OnTakeItem e = new GrindstoneEvent.OnTakeItem(inputSlots.getItem(0), inputSlots.getItem(1), xp);
+            GrindstoneEvent.OnTakeItem e = new GrindstoneEvent.OnTakeItem(access, player, inputSlots.getItem(0), inputSlots.getItem(1), xp);
             if (NeoForge.EVENT_BUS.post(e).isCanceled()) {
                 return;
             }
@@ -1175,17 +1185,25 @@ public class CommonHooks {
     }
     // Kilt end
 
+    @Nullable
+    private static ListTag modList;
+
     @ApiStatus.Internal
     public static void writeAdditionalLevelSaveData(WorldData worldData, CompoundTag levelTag) {
+        if (CommonHooks.modList == null) {
+            var mods = ModList.get().getMods();
+            var modListTag = new ListTag(mods.size());
+            mods.forEach(mi -> {
+                final CompoundTag mod = new CompoundTag(2);
+                mod.putString("ModId", mi.getModId());
+                mod.putString("ModVersion", MavenVersionTranslator.artifactVersionToString(mi.getVersion()));
+                modListTag.add(mod);
+            });
+            CommonHooks.modList = modListTag;
+        }
+
         CompoundTag fmlData = new CompoundTag();
-        ListTag modList = new ListTag();
-        ModList.get().getMods().forEach(mi -> {
-            final CompoundTag mod = new CompoundTag();
-            mod.putString("ModId", mi.getModId());
-            mod.putString("ModVersion", MavenVersionTranslator.artifactVersionToString(mi.getVersion()));
-            modList.add(mod);
-        });
-        fmlData.put("LoadingModList", modList);
+        fmlData.put("LoadingModList", CommonHooks.modList);
 
         LOGGER.debug(WORLDPERSISTENCE, "Gathered mod list to write to world save {}", worldData.getLevelName());
         levelTag.put("fml", fmlData);
@@ -1582,6 +1600,18 @@ public class CommonHooks {
             return ClientHooks.resolveLookup(key);
         }
         return null;
+    }
+
+    /**
+     * Extracts a {@link HolderLookup.Provider} from the given {@code ops}, if possible.
+     *
+     * @throws IllegalArgumentException if the ops were not created using a {@linkplain HolderLookup.Provider}
+     */
+    public static HolderLookup.Provider extractLookupProvider(RegistryOps<?> ops) {
+        if (ops.lookupProvider instanceof RegistryOps.HolderLookupAdapter hla) {
+            return hla.lookupProvider;
+        }
+        throw new IllegalArgumentException("Registry ops has lookup provider " + ops.lookupProvider + " which is not a HolderLookupAdapter");
     }
 
     /**
