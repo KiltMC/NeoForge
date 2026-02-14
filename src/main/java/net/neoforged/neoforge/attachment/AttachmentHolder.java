@@ -18,12 +18,13 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import xyz.bluspring.kilt.workarounds.AttachmentHolderWorkaround;
 
 /**
  * Implementation class for objects that can hold data attachments.
  * For the user-facing methods, see {@link IAttachmentHolder}.
  */
-public abstract class AttachmentHolder implements IAttachmentHolder {
+public abstract class AttachmentHolder implements IAttachmentHolder, AttachmentHolderWorkaround {
     public static final String ATTACHMENTS_NBT_KEY = "neoforge:attachments";
     private static final boolean IN_DEV = !FMLLoader.isProduction();
     private static final Logger LOGGER = LogUtils.getLogger();
