@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
+import net.fabricmc.fabric.impl.registry.sync.DynamicRegistriesImpl;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
@@ -46,7 +47,7 @@ public final class DataPackRegistriesHooks {
         DATA_PACK_REGISTRIES.add(loaderData);
         if (data.networkCodec() != null) {
             SYNCED_CUSTOM_REGISTRIES.add(loaderData.key());
-            NETWORKABLE_REGISTRIES.add(new RegistryDataLoader.RegistryData<T>(loaderData.key(), data.networkCodec(), false));
+            //NETWORKABLE_REGISTRIES.add(new RegistryDataLoader.RegistryData<T>(loaderData.key(), data.networkCodec(), false)); // Kilt: Handled by Fabric API
 
             // Kilt: Register into Fabric API
             DynamicRegistries.registerSynced(loaderData.key(), loaderData.elementCodec(), data.networkCodec());
