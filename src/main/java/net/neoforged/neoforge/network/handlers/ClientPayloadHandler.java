@@ -26,6 +26,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.attachment.AttachmentSync;
 import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 import net.neoforged.neoforge.common.world.LevelChunkAuxiliaryLightManager;
@@ -172,7 +173,7 @@ public final class ClientPayloadHandler {
                 if (blockEntity == null) {
                     LOGGER.warn("Received synced attachments from unknown block entity");
                 } else {
-                    AttachmentSync.receiveSyncedDataAttachments(blockEntity, context.player().registryAccess(), payload.types(), payload.syncPayload());
+                    AttachmentSync.receiveSyncedDataAttachments((AttachmentHolder) (Object) blockEntity, context.player().registryAccess(), payload.types(), payload.syncPayload());
                 }
             }
             case SyncAttachmentsPayload.ChunkTarget(var pos) -> {
@@ -188,11 +189,11 @@ public final class ClientPayloadHandler {
                 if (entity == null) {
                     LOGGER.warn("Received synced attachments from unknown entity");
                 } else {
-                    AttachmentSync.receiveSyncedDataAttachments(entity, entity.registryAccess(), payload.types(), payload.syncPayload());
+                    AttachmentSync.receiveSyncedDataAttachments((AttachmentHolder) (Object) entity, entity.registryAccess(), payload.types(), payload.syncPayload());
                 }
             }
             case SyncAttachmentsPayload.LevelTarget() -> {
-                AttachmentSync.receiveSyncedDataAttachments(context.player().level(), context.player().registryAccess(), payload.types(), payload.syncPayload());
+                AttachmentSync.receiveSyncedDataAttachments((AttachmentHolder) (Object) context.player().level(), context.player().registryAccess(), payload.types(), payload.syncPayload());
             }
         }
     }

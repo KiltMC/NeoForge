@@ -226,6 +226,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.injections.nbt.CompoundTagInjection;
+import xyz.bluspring.kilt.injections.nbt.ListTagInjection;
 import xyz.bluspring.kilt.injections.world.entity.ai.attributes.AttributeSupplierBuilderInjection;
 import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 
@@ -1192,9 +1194,9 @@ public class CommonHooks {
     public static void writeAdditionalLevelSaveData(WorldData worldData, CompoundTag levelTag) {
         if (CommonHooks.modList == null) {
             var mods = ModList.get().getMods();
-            var modListTag = new ListTag(mods.size());
+            var modListTag = ListTagInjection.create(mods.size());
             mods.forEach(mi -> {
-                final CompoundTag mod = new CompoundTag(2);
+                final CompoundTag mod = CompoundTagInjection.create(2);
                 mod.putString("ModId", mi.getModId());
                 mod.putString("ModVersion", MavenVersionTranslator.artifactVersionToString(mi.getVersion()));
                 modListTag.add(mod);

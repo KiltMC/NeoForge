@@ -70,7 +70,7 @@ public final class AttachmentSync {
     };
 
     private static SyncAttachmentsPayload.Target syncTarget(AttachmentHolder holder) {
-        return switch (holder) {
+        return switch ((Object) holder) {
             case BlockEntity blockEntity -> new SyncAttachmentsPayload.BlockEntityTarget(blockEntity.getBlockPos());
             case AttachmentHolder.AsField asField when asField.getExposedHolder() instanceof LevelChunk chunk -> new SyncAttachmentsPayload.ChunkTarget(chunk.getPos());
             case Entity entity -> new SyncAttachmentsPayload.EntityTarget(entity.getId());
@@ -115,7 +115,7 @@ public final class AttachmentSync {
         if (type.syncHandler == null || !(blockEntity.getLevel() instanceof ServerLevel serverLevel)) {
             return;
         }
-        syncUpdate(blockEntity, type, serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(blockEntity.getBlockPos()), false));
+        syncUpdate((AttachmentHolder) (Object) blockEntity, type, serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(blockEntity.getBlockPos()), false));
     }
 
     public static void syncChunkUpdate(LevelChunk chunk, AttachmentHolder.AsField holder, AttachmentType<?> type) {
@@ -137,14 +137,14 @@ public final class AttachmentSync {
             newPlayers.add(serverPlayer);
             players = newPlayers;
         }
-        syncUpdate(entity, type, players);
+        syncUpdate((AttachmentHolder) (Object) entity, type, players);
     }
 
     public static void syncLevelUpdate(ServerLevel level, AttachmentType<?> type) {
         if (type.syncHandler == null) {
             return;
         }
-        syncUpdate(level, type, level.players());
+        syncUpdate((AttachmentHolder) (Object) level, type, level.players());
     }
 
     /**
@@ -196,7 +196,7 @@ public final class AttachmentSync {
             packets.add(chunkPayload.toVanillaClientbound());
         }
         for (var blockEntity : event.getChunk().getBlockEntities().values()) {
-            var blockEntityPayload = syncInitialAttachments(blockEntity, event.getPlayer());
+            var blockEntityPayload = syncInitialAttachments((AttachmentHolder) (Object) blockEntity, event.getPlayer());
             if (blockEntityPayload != null) {
                 packets.add(blockEntityPayload.toVanillaClientbound());
             }
@@ -210,7 +210,7 @@ public final class AttachmentSync {
      * Handles initial syncing of entity attachments, except for a player's own attachments.
      */
     public static void syncInitialEntityAttachments(Entity entity, ServerPlayer to, Consumer<Packet<? super ClientGamePacketListener>> packetConsumer) {
-        var packet = syncInitialAttachments(entity, to);
+        var packet = syncInitialAttachments((AttachmentHolder) (Object) entity, to);
         if (packet != null) {
             packetConsumer.accept(packet.toVanillaClientbound());
         }
@@ -220,7 +220,7 @@ public final class AttachmentSync {
      * Handles initial syncing of a player's own attachments.
      */
     public static void syncInitialPlayerAttachments(ServerPlayer player) {
-        var packet = syncInitialAttachments(player, player);
+        var packet = syncInitialAttachments((AttachmentHolder) (Object) player, player);
         if (packet != null) {
             player.connection.send(packet.toVanillaClientbound());
         }
@@ -230,14 +230,15 @@ public final class AttachmentSync {
      * Handles initial syncing of level attachments. Needs to be called for login, respawn and teleports.
      */
     public static void syncInitialLevelAttachments(ServerLevel level, ServerPlayer to) {
-        var packet = syncInitialAttachments(level, to);
+        var packet = syncInitialAttachments((AttachmentHolder) (Object) level, to);
         if (packet != null) {
             to.connection.send(packet.toVanillaClientbound());
         }
     }
 
     public static void receiveSyncedDataAttachments(AttachmentHolder holder, RegistryAccess registryAccess, List<AttachmentType<?>> types, byte[] bytes) {
-        var buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(bytes), registryAccess, ConnectionType.NEOFORGE);
+        var buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(bytes), registryAccess);
+        buf.kilt$setConnectionType(ConnectionType.NEOFORGE);
         try {
             for (var type : types) {
                 @SuppressWarnings("unchecked")
