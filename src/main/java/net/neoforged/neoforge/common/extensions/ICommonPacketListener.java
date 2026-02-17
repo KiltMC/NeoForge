@@ -25,7 +25,7 @@ public interface ICommonPacketListener extends PacketListener {
     /**
      * Sends a packet to the target of this listener.
      */
-    void send(Packet<?> packet);
+    //void send(Packet<?> packet); // Kilt: We need workarounds :D
 
     /**
      * Sends a payload to the target of this listener.

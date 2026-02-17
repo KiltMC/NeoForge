@@ -13,6 +13,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import xyz.bluspring.kilt.workarounds.ICommonPacketListenerWorkaround;
 
 /**
  * Extension class for {@link ServerGamePacketListener}
@@ -45,6 +46,6 @@ public interface IServerGamePacketListenerExtension extends IServerCommonPacketL
             packets.add(new ClientboundCustomPayloadPacket(payload));
         }
 
-        self().send(new ClientboundBundlePacket(packets));
+        ((ICommonPacketListenerWorkaround) self()).send(new ClientboundBundlePacket(packets));
     }
 }

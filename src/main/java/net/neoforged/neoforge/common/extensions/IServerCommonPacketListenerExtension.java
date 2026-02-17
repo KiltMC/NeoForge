@@ -11,6 +11,7 @@ import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.workarounds.ICommonPacketListenerWorkaround;
 
 /**
  * Extension interface for {@link ServerCommonPacketListener}
@@ -21,7 +22,7 @@ public interface IServerCommonPacketListenerExtension extends ICommonPacketListe
      */
     @Override
     default void send(CustomPacketPayload payload) {
-        this.send(new ClientboundCustomPayloadPacket(payload));
+        ((ICommonPacketListenerWorkaround) this).send(new ClientboundCustomPayloadPacket(payload));
     }
 
     /**
