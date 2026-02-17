@@ -14,7 +14,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import org.jetbrains.annotations.Nullable;
 
-public interface MutableDataComponentHolder extends DataComponentHolder {
+public interface MutableDataComponentHolder extends DataComponentHolder, io.github.fabricators_of_create.porting_lib.core.util.MutableDataComponentHolder {
     /**
      * Sets a data component.
      */
