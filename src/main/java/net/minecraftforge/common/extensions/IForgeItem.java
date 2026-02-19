@@ -242,7 +242,7 @@ public interface IForgeItem extends ItemExtensions, io.github.fabricators_of_cre
     default ItemStack getCraftingRemainingItem(ItemStack itemStack)
     {
         // Kilt: Use Fabric API
-        return self().getCraftingRemainingItem(itemStack);
+        return self().getRecipeRemainder(itemStack);
 
         /*
         if (!hasCraftingRemainingItem(itemStack))
