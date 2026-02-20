@@ -33,6 +33,7 @@ import net.minecraftforge.resource.PathPackResources;
 import net.minecraftforge.server.LanguageHook;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.injections.client.OptionsInjection;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class ClientModLoader
         loading = false;
         loadingComplete = true;
         // reload game settings on main thread
-        syncExecutor.execute(()->mc.options.load());
+        syncExecutor.execute(()->((OptionsInjection) mc.options).load(true));
     }
 
     public static VersionChecker.Status checkForUpdates()

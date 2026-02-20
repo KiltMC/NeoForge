@@ -10,6 +10,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileWatcher;
 import com.electronwill.nightconfig.core.io.ParsingException;
 import com.electronwill.nightconfig.core.io.WritingMode;
+import com.electronwill.nightconfig.toml.TomlFormat;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -31,7 +32,9 @@ public class ConfigFileTypeHandler {
     public Function<ModConfig, CommentedFileConfig> reader(Path configBasePath) {
         return (c) -> {
             final Path configPath = configBasePath.resolve(c.getFileName());
-            final CommentedFileConfig configData = CommentedFileConfig.builder(configPath).sync().
+            final CommentedFileConfig configData = CommentedFileConfig.builder(configPath,
+                    TomlFormat.instance() // Kilt: Force TOML format, replicates what Forge Config API Port is doing.
+                ).sync().
                     preserveInsertionOrder().
                     autosave().
                     onFileNotFound((newfile, configFormat)-> setupConfigFile(c, newfile, configFormat)).

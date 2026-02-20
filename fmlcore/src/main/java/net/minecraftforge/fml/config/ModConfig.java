@@ -8,8 +8,10 @@ package net.minecraftforge.fml.config;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.loading.StringUtils;
+import xyz.bluspring.kilt.loader.WrappedFabricModContainer;
 
 import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
@@ -37,6 +39,15 @@ public class ModConfig
 
     public ModConfig(final Type type, final IConfigSpec<?> spec, final ModContainer activeContainer) {
         this(type, spec, activeContainer, defaultConfigName(type, activeContainer.getModId()));
+    }
+
+    // Kilt: Forge Config API Port support
+    public ModConfig(final Type type, final IConfigSpec<?> spec, String modId, final String fileName) {
+        this(type, spec, new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), fileName);
+    }
+
+    public ModConfig(final Type type, final IConfigSpec<?> spec, String modId) {
+        this(type, spec, new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()));
     }
 
     private static String defaultConfigName(Type type, String modId) {

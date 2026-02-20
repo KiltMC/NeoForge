@@ -5,11 +5,50 @@
 
 package net.minecraftforge.common;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import net.minecraftforge.fml.Logging;
+import net.minecraftforge.fml.config.IConfigSpec;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+
+import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.core.EnumGetMethod;
+import com.electronwill.nightconfig.core.ConfigSpec.CorrectionAction;
+import com.electronwill.nightconfig.core.ConfigSpec.CorrectionListener;
+import com.electronwill.nightconfig.core.InMemoryFormat;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
+import com.electronwill.nightconfig.core.file.FileConfig;
+import com.electronwill.nightconfig.core.utils.UnmodifiableConfigWrapper;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
+
 /*
  * Like {@link com.electronwill.nightconfig.core.ConfigSpec} except in builder format, and extended to accept comments, language keys,
  * and other things Forge configs would find useful.
  */
-/*public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> implements IConfigSpec<ForgeConfigSpec>//TODO: Remove extends and pipe everything through getSpec/getValues?
+public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> implements IConfigSpec<ForgeConfigSpec>//TODO: Remove extends and pipe everything through getSpec/getValues?
 {
     private final Map<List<String>, String> levelComments;
     private final Map<List<String>, String> levelTranslationKeys;
@@ -43,10 +82,10 @@ package net.minecraftforge.common;
             String configName = config instanceof FileConfig ? ((FileConfig) config).getNioPath().toString() : config.toString();
             LOGGER.warn(Logging.CORE, "Configuration file {} is not correct. Correcting", configName);
             correct(config,
-                    (action, path, incorrectValue, correctedValue) ->
-                            LOGGER.warn(Logging.CORE, "Incorrect key {} was corrected from {} to its default, {}. {}", DOT_JOINER.join( path ), incorrectValue, correctedValue, incorrectValue == correctedValue ? "This seems to be an error." : ""),
-                    (action, path, incorrectValue, correctedValue) ->
-                            LOGGER.debug(Logging.CORE, "The comment on key {} does not match the spec. This may create a backup.", DOT_JOINER.join( path )));
+                (action, path, incorrectValue, correctedValue) ->
+                    LOGGER.warn(Logging.CORE, "Incorrect key {} was corrected from {} to its default, {}. {}", DOT_JOINER.join( path ), incorrectValue, correctedValue, incorrectValue == correctedValue ? "This seems to be an error." : ""),
+                (action, path, incorrectValue, correctedValue) ->
+                    LOGGER.debug(Logging.CORE, "The comment on key {} does not match the spec. This may create a backup.", DOT_JOINER.join( path )));
 
             if (config instanceof FileConfig) {
                 ((FileConfig) config).save();
@@ -228,7 +267,7 @@ package net.minecraftforge.common;
             if (!string1.isEmpty() && !string2.isEmpty())
             {
                 return WINDOWS_NEWLINE.matcher(string1).replaceAll("\n")
-                        .equals(WINDOWS_NEWLINE.matcher(string2).replaceAll("\n"));
+                    .equals(WINDOWS_NEWLINE.matcher(string2).replaceAll("\n"));
 
             }
         }
@@ -612,7 +651,7 @@ package net.minecraftforge.common;
             {
                 if (FMLEnvironment.production)
                     LOGGER.warn(Logging.CORE, "Detected a comment that is all whitespace for config option {}, which causes obscure bugs in Forge's config system and will cause a crash in the future. Please report this to the mod author.",
-                            DOT_JOINER.join(path));
+                        DOT_JOINER.join(path));
                 else
                     throw new IllegalStateException("Can not build comment for config option " + DOT_JOINER.join(path) + " as it comprises entirely of blank lines/whitespace. This is not allowed as it causes a \"constantly correcting config\" bug with NightConfig in Forge's config system.");
 
@@ -796,7 +835,7 @@ package net.minecraftforge.common;
          * @throws NullPointerException if the {@link ForgeConfigSpec config spec} object that will contain this has
          *                              not yet been built
          * @throws IllegalStateException if the associated config has not yet been loaded
-         *//*
+         */
         @Override
         public T get()
         {
@@ -831,7 +870,7 @@ package net.minecraftforge.common;
 
         /**
          * {@return the default value for the configuration setting}
-         *//*
+         */
         public T getDefault()
         {
             return defaultSupplier.get();
@@ -940,4 +979,3 @@ package net.minecraftforge.common;
         return Lists.newArrayList(DOT_SPLITTER.split(path));
     }
 }
-*/

@@ -26,7 +26,8 @@ public interface IForgePlayer extends PlayerAttributesExtensions {
      * @return The entity reach of this player.
      */
     default double getEntityReach() {
-        double range = self().getAttributeValue(ForgeMod.ENTITY_REACH.get());
+        double range = self().getAttributeValue(ForgeMod.ENTITY_REACH.get())
+            + 3.0; // Kilt TODO: ReachEntityAttributes does a base of 0, which Forge mods don't expect! How the fuck do we deal with this?
         return range == 0 ? 0 : range + (self().isCreative() ? 3 : 0);
     }
 
@@ -37,7 +38,8 @@ public interface IForgePlayer extends PlayerAttributesExtensions {
      * @return The reach distance of this player.
      */
     default double getBlockReach() {
-        double reach = self().getAttributeValue(ForgeMod.BLOCK_REACH.get());
+        double reach = self().getAttributeValue(ForgeMod.BLOCK_REACH.get())
+            + 4.5; // Kilt TODO: ReachEntityAttributes does a base of 0, which Forge mods don't expect! How the fuck do we deal with this?
         return reach == 0 ? 0 : reach + (self().isCreative() ? 0.5 : 0);
     }
 
