@@ -7,6 +7,8 @@ package net.neoforged.neoforge.common.extensions;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
+
+import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -50,7 +52,7 @@ import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
-public interface IBlockStateExtension {
+public interface IBlockStateExtension extends FabricBlockState {
     private BlockState self() {
         return (BlockState) this;
     }
