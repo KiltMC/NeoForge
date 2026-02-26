@@ -25,6 +25,8 @@ public class CalculatePlayerTurnEvent extends Event {
     private double mouseSensitivity;
     private boolean cinematicCameraEnabled;
 
+    public boolean kilt$wasModified;
+
     @ApiStatus.Internal
     public CalculatePlayerTurnEvent(double mouseSensitivity, boolean cinematicCameraEnabled) {
         setMouseSensitivity(mouseSensitivity);
@@ -61,5 +63,6 @@ public class CalculatePlayerTurnEvent extends Event {
      */
     public void setCinematicCameraEnabled(boolean cinematicCameraEnabled) {
         this.cinematicCameraEnabled = cinematicCameraEnabled;
+        this.kilt$wasModified = true;
     }
 }
