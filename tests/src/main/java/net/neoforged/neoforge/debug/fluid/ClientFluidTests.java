@@ -38,7 +38,7 @@ public class ClientFluidTests {
         @Override
         public boolean shouldHideAdjacentFluidFace(BlockState state, Direction selfFace, FluidState adjacentFluid) {
             if (selfFace == HIDE_DIRECTION) {
-                return adjacentFluid.getFluidType() == Fluids.WATER.getFluidType();
+                return adjacentFluid.neo$getFluidType() == Fluids.WATER.neo$getFluidType();
             } else {
                 return super.shouldHideAdjacentFluidFace(state, selfFace, adjacentFluid);
             }

@@ -9,18 +9,12 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
-import java.util.Map;
-import java.util.function.Function;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -32,15 +26,14 @@ import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.NeoForgeRenderTypes;
 import net.neoforged.neoforge.client.RenderTypeGroup;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
-import net.neoforged.neoforge.client.model.geometry.StandaloneGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.UnbakedGeometryHelper;
+import net.neoforged.neoforge.client.model.geometry.*;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * A dynamic fluid container model, capable of re-texturing itself at runtime to match the contained fluid.
@@ -99,7 +92,7 @@ public class DynamicFluidContainerModel implements IUnbakedGeometry<DynamicFluid
         if (particleSprite == null && !coverIsMask) particleSprite = coverSprite;
 
         // If the fluid is lighter than air, rotate 180deg to turn it upside down
-        if (flipGas && fluid != Fluids.EMPTY && fluid.getFluidType().isLighterThanAir()) {
+        if (flipGas && fluid != Fluids.EMPTY && fluid.neo$getFluidType().isLighterThanAir()) {
             modelState = new SimpleModelState(
                     modelState.getRotation().compose(
                             new Transformation(null, new Quaternionf(0, 0, 1, 0), null, null)));
@@ -126,7 +119,7 @@ public class DynamicFluidContainerModel implements IUnbakedGeometry<DynamicFluid
                 var unbaked = UnbakedGeometryHelper.createUnbakedItemMaskElements(1, templateSprite); // Use template as mask
                 var quads = UnbakedGeometryHelper.bakeElements(unbaked, $ -> fluidSprite, transformedState); // Bake with fluid texture
 
-                var emissive = applyFluidLuminosity && fluid.getFluidType().getLightLevel() > 0;
+                var emissive = applyFluidLuminosity && fluid.neo$getFluidType().getLightLevel() > 0;
                 var renderTypes = getLayerRenderTypes(emissive);
                 if (emissive) QuadTransformers.settingMaxEmissivity().processInPlace(quads);
 

@@ -6,8 +6,6 @@
 package net.neoforged.neoforge.fluids;
 
 import com.google.common.base.Preconditions;
-import java.util.Objects;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
@@ -36,6 +34,9 @@ import net.neoforged.neoforge.fluids.capability.wrappers.BucketPickupHandlerWrap
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.Optional;
 
 public class FluidUtil {
     private FluidUtil() {}
@@ -519,7 +520,7 @@ public class FluidUtil {
      * or {@link #tryPlaceFluid(Player, Level, InteractionHand, BlockPos, IFluidHandler, FluidStack)}
      */
     private static IFluidHandler getFluidBlockHandler(Fluid fluid, Level level, BlockPos pos) {
-        BlockState state = fluid.getFluidType().getBlockForFluidState(level, pos, fluid.defaultFluidState());
+        BlockState state = fluid.neo$getFluidType().getBlockForFluidState(level, pos, fluid.defaultFluidState());
         return new BlockWrapper(state, level, pos);
     }
 

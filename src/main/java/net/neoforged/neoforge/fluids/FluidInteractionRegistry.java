@@ -5,12 +5,6 @@
 
 package net.neoforged.neoforge.fluids;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -20,6 +14,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.EventHooks;
+
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * A registry which defines the interactions a source fluid can have with its
@@ -57,7 +54,7 @@ public final class FluidInteractionRegistry {
         FluidState state = level.getFluidState(pos);
         for (Direction direction : LiquidBlock.POSSIBLE_FLOW_DIRECTIONS) {
             BlockPos relativePos = pos.relative(direction.getOpposite());
-            List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(state.getFluidType(), Collections.emptyList());
+            List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(state.neo$getFluidType(), Collections.emptyList());
             for (InteractionInformation interaction : interactions) {
                 if (interaction.predicate().test(level, pos, relativePos, state)) {
                     interaction.interaction().interact(level, pos, relativePos, state);
