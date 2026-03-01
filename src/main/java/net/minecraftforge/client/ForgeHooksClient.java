@@ -1059,6 +1059,8 @@ public class ForgeHooksClient
 
         boolean needsWrap = false;
 
+        // Kilt: Disable text wrapping, otherwise we have duplication when the text tries to wrap.
+        /*
         int tooltipX = mouseX + 12;
         if (tooltipX + tooltipTextWidth + 4 > screenWidth)
         {
@@ -1078,6 +1080,7 @@ public class ForgeHooksClient
             tooltipTextWidth = event.getMaxWidth();
             needsWrap = true;
         }
+         */
 
         int tooltipTextWidthF = tooltipTextWidth;
         if (needsWrap)

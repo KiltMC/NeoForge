@@ -30,6 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.server.command.ConfigCommand;
 import net.minecraftforge.server.command.ForgeCommand;
+import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.world.entity.MobInjection;
 
 public class ForgeInternalHandler
@@ -115,7 +116,8 @@ public class ForgeInternalHandler
         ConfigCommand.register(event.getDispatcher());
     }
 
-    private static LootModifierManager INSTANCE;
+    // Kilt: Certain Fabric mods call the loot tables really early. We need to make sure we don't cause problems.
+    private static LootModifierManager INSTANCE = new LootModifierManager(true);
 
     @SubscribeEvent
     public void onResourceReload(AddReloadListenerEvent event)

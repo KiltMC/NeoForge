@@ -34,6 +34,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
+import xyz.bluspring.kilt.Kilt;
 
 public class LootModifierManager extends SimpleJsonResourceReloadListener {
     public static final Logger LOGGER = LogManager.getLogger();
@@ -41,6 +42,14 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener {
 
     private Map<ResourceLocation, IGlobalLootModifier> registeredLootModifiers = ImmutableMap.of();
     private static final String folder = "loot_modifiers";
+
+    private boolean kilt$isUnloadedWorkaround = false;
+
+    // Kilt: Make sure we can notify when we're using the unloaded workarounds.
+    public LootModifierManager(boolean isUnloadedWorkaround) {
+        this();
+        this.kilt$isUnloadedWorkaround = isUnloadedWorkaround;
+    }
 
     public LootModifierManager() {
         super(GSON_INSTANCE, folder);
@@ -89,6 +98,10 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener {
      * An immutable collection of the registered loot modifiers in layered order.
      */
     public Collection<IGlobalLootModifier> getAllLootMods() {
+        if (this.kilt$isUnloadedWorkaround) {
+            Kilt.Companion.getLogger().warn("[Kilt] Loot modifiers have been called too early, or our reload listener didn't get registered. If datapacks have already loaded, you're actively in a world and you're seeing this message, this is a bug! Please report this onto our GitHub issues page once you've identified what other mod is causing this to occur.");
+        }
+
         return registeredLootModifiers.values();
     }
 
