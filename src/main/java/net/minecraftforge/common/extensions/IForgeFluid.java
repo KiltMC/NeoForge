@@ -52,7 +52,9 @@ public interface IForgeFluid
      *
      * @return the type of this fluid
      */
-    FluidType getFluidType();
+    default FluidType forge$getFluidType() {
+        throw new RuntimeException();
+    }
 
     /**
      * Performs how an entity moves when within the fluid. If using custom
@@ -67,7 +69,7 @@ public interface IForgeFluid
      */
     default boolean move(FluidState state, LivingEntity entity, Vec3 movementVector, double gravity)
     {
-        return getFluidType().move(state, entity, movementVector, gravity);
+        return forge$getFluidType().move(state, entity, movementVector, gravity);
     }
 
     /**
@@ -80,7 +82,7 @@ public interface IForgeFluid
      */
     default boolean canConvertToSource(FluidState state, Level level, BlockPos pos)
     {
-        return getFluidType().canConvertToSource(state, level, pos);
+        return forge$getFluidType().canConvertToSource(state, level, pos);
     }
 
     /**
@@ -92,7 +94,7 @@ public interface IForgeFluid
      */
     default boolean supportsBoating(FluidState state, Boat boat)
     {
-        return getFluidType().supportsBoating(state, boat);
+        return forge$getFluidType().supportsBoating(state, boat);
     }
 
     /**
@@ -106,7 +108,7 @@ public interface IForgeFluid
      */
     default boolean shouldUpdateWhileBoating(FluidState state, Boat boat, Entity rider)
     {
-        return getFluidType().shouldUpdateWhileBoating(state, boat, rider);
+        return forge$getFluidType().shouldUpdateWhileBoating(state, boat, rider);
     }
 
     /**
@@ -124,7 +126,7 @@ public interface IForgeFluid
     @Nullable
     default BlockPathTypes getBlockPathType(FluidState state, BlockGetter level, BlockPos pos, @org.jetbrains.annotations.Nullable Mob mob, boolean canFluidLog)
     {
-        return getFluidType().getBlockPathType(state, level, pos, mob, canFluidLog);
+        return forge$getFluidType().getBlockPathType(state, level, pos, mob, canFluidLog);
     }
 
     /**
@@ -143,7 +145,7 @@ public interface IForgeFluid
     @Nullable
     default BlockPathTypes getAdjacentBlockPathType(FluidState state, BlockGetter level, BlockPos pos, @org.jetbrains.annotations.Nullable Mob mob, BlockPathTypes originalType)
     {
-        return getFluidType().getAdjacentBlockPathType(state, level, pos, mob, originalType);
+        return forge$getFluidType().getAdjacentBlockPathType(state, level, pos, mob, originalType);
     }
 
     /**
@@ -165,7 +167,7 @@ public interface IForgeFluid
      */
     default boolean canHydrate(FluidState state, BlockGetter getter, BlockPos pos, BlockState source, BlockPos sourcePos)
     {
-        return getFluidType().canHydrate(state, getter, pos, source, sourcePos);
+        return forge$getFluidType().canHydrate(state, getter, pos, source, sourcePos);
     }
 
     /**
@@ -178,6 +180,6 @@ public interface IForgeFluid
      */
     default boolean canExtinguish(FluidState state, BlockGetter getter, BlockPos pos)
     {
-        return getFluidType().canExtinguish(state, getter, pos);
+        return forge$getFluidType().canExtinguish(state, getter, pos);
     }
 }

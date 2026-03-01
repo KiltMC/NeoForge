@@ -48,7 +48,7 @@ public interface IForgeFluidState
      */
     default FluidType getFluidType()
     {
-        return self().getType().getFluidType();
+        return self().getType().forge$getFluidType();
     }
 
     /**

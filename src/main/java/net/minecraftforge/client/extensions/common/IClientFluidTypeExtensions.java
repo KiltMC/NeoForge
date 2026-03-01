@@ -57,7 +57,7 @@ public interface IClientFluidTypeExtensions
 
     static IClientFluidTypeExtensions of(Fluid fluid)
     {
-        var fluidType = fluid.getFluidType();
+        var fluidType = fluid.forge$getFluidType();
 
         // Kilt: Try to handle Fabric fluid types
         if (fluidType.kilt$isWrapped) {

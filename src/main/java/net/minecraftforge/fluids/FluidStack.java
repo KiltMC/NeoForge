@@ -50,9 +50,6 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
             })
     );
 
-    private boolean isEmpty;
-    private int amount;
-    private CompoundTag tag;
     private Holder.Reference<Fluid> fluidDelegate;
 
     public FluidStack(Fluid fluid, int amount)
@@ -69,7 +66,6 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
             throw new IllegalArgumentException("Cannot create a fluidstack from an unregistered fluid");
         }
         this.fluidDelegate = ForgeRegistries.FLUIDS.getDelegateOrThrow(fluid);
-        this.amount = amount;
 
         updateEmpty();
     }
@@ -80,13 +76,13 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
         if (nbt != null)
         {
-            tag = nbt.copy();
+            super.setTag(nbt.copy());
         }
     }
 
     public FluidStack(FluidStack stack, int amount)
     {
-        this(stack.getFluid(), amount, stack.tag);
+        this(stack.getFluid(), amount, stack.getTag());
     }
 
     /**
@@ -114,7 +110,7 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
         if (nbt.contains("Tag", Tag.TAG_COMPOUND))
         {
-            stack.tag = nbt.getCompound("Tag");
+            stack.setTag(nbt.getCompound("Tag"));
         }
         return stack;
     }
@@ -122,11 +118,11 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
     public CompoundTag writeToNBT(CompoundTag nbt)
     {
         nbt.putString("FluidName", ForgeRegistries.FLUIDS.getKey(getFluid()).toString());
-        nbt.putInt("Amount", amount);
+        nbt.putInt("Amount", forge$getAmount());
 
-        if (tag != null)
+        if (getTag() != null)
         {
-            nbt.put("Tag", tag);
+            nbt.put("Tag", getTag());
         }
         return nbt;
     }
@@ -135,7 +131,7 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
     {
         buf.writeRegistryId(ForgeRegistries.FLUIDS, getFluid());
         buf.writeVarInt(forge$getAmount());
-        buf.writeNbt(tag);
+        buf.writeNbt(getTag());
     }
 
     public static FluidStack readFromPacket(FriendlyByteBuf buf)
@@ -149,7 +145,7 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     public final Fluid getFluid()
     {
-        return isEmpty ? Fluids.EMPTY : fluidDelegate.value();
+        return super.isEmpty() ? Fluids.EMPTY : fluidDelegate.value();
     }
 
     public final Fluid getRawFluid()
@@ -158,11 +154,11 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
     }
 
     public boolean isEmpty() {
-        return isEmpty;
+        return super.isEmpty();
     }
 
     protected void updateEmpty() {
-        isEmpty = getRawFluid() == Fluids.EMPTY || amount <= 0;
+
     }
 
     public int forge$getAmount()
@@ -185,59 +181,59 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     public boolean hasTag()
     {
-        return tag != null;
+        return super.hasTag();
     }
 
     public CompoundTag getTag()
     {
-        return tag;
+        return super.getTag();
     }
 
     public void setTag(CompoundTag tag)
     {
         if (getRawFluid() == Fluids.EMPTY) throw new IllegalStateException("Can't modify the empty stack.");
-        this.tag = tag;
+        super.setTag(tag);
     }
 
     public CompoundTag getOrCreateTag()
     {
-        if (tag == null)
+        if (getTag() == null)
             setTag(new CompoundTag());
-        return tag;
+        return getTag();
     }
 
     public CompoundTag getChildTag(String childName)
     {
-        if (tag == null)
+        if (getTag() == null)
             return null;
-        return tag.getCompound(childName);
+        return getTag().getCompound(childName);
     }
 
     public CompoundTag getOrCreateChildTag(String childName)
     {
         getOrCreateTag();
-        CompoundTag child = tag.getCompound(childName);
-        if (!tag.contains(childName, Tag.TAG_COMPOUND))
+        CompoundTag child = getTag().getCompound(childName);
+        if (!getTag().contains(childName, Tag.TAG_COMPOUND))
         {
-            tag.put(childName, child);
+            getTag().put(childName, child);
         }
         return child;
     }
 
     public void removeChildTag(String childName)
     {
-        if (tag != null)
-            tag.remove(childName);
+        if (getTag() != null)
+            getTag().remove(childName);
     }
 
     public Component getDisplayName()
     {
-        return this.getFluid().getFluidType().getDescription(this);
+        return this.getFluid().forge$getFluidType().getDescription(this);
     }
 
     public String getTranslationKey()
     {
-        return this.getFluid().getFluidType().getDescriptionId(this);
+        return this.getFluid().forge$getFluidType().getDescriptionId(this);
     }
 
     /**
@@ -245,7 +241,7 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
      */
     public FluidStack copy()
     {
-        return new FluidStack(getFluid(), amount, tag);
+        return new FluidStack(getFluid(), forge$getAmount(), getTag());
     }
 
     /**
@@ -262,7 +258,7 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     private boolean isFluidStackTagEqual(FluidStack other)
     {
-        return tag == null ? other.tag == null : other.tag != null && tag.equals(other.tag);
+        return getTag() == null ? other.getTag() == null : other.getTag() != null && getTag().equals(other.getTag());
     }
 
     /**

@@ -136,7 +136,7 @@ public class FluidUtil
                             tryFluidTransfer(containerFluidHandler, fluidSource, maxAmount, true);
                             if (player != null)
                             {
-                                SoundEvent soundevent = simulatedTransfer.getFluid().getFluidType().getSound(simulatedTransfer, SoundActions.BUCKET_FILL);
+                                SoundEvent soundevent = simulatedTransfer.getFluid().forge$getFluidType().getSound(simulatedTransfer, SoundActions.BUCKET_FILL);
 
                                 if (soundevent != null)
                                 {
@@ -190,7 +190,7 @@ public class FluidUtil
 
                     if (doDrain && player != null)
                     {
-                        SoundEvent soundevent = transfer.getFluid().getFluidType().getSound(transfer, SoundActions.BUCKET_EMPTY);
+                        SoundEvent soundevent = transfer.getFluid().forge$getFluidType().getSound(transfer, SoundActions.BUCKET_EMPTY);
 
                         if (soundevent != null)
                         {
@@ -557,7 +557,7 @@ public class FluidUtil
         }
 
         Fluid fluid = resource.getFluid();
-        if (fluid == Fluids.EMPTY || !fluid.getFluidType().canBePlacedInLevel(level, pos, resource))
+        if (fluid == Fluids.EMPTY || !fluid.forge$getFluidType().canBePlacedInLevel(level, pos, resource))
         {
             return false;
         }
@@ -579,12 +579,12 @@ public class FluidUtil
             return false; // Non-air, solid, unreplacable block. We can't put fluid here.
         }
 
-        if (fluid.getFluidType().isVaporizedOnPlacement(level, pos, resource))
+        if (fluid.forge$getFluidType().isVaporizedOnPlacement(level, pos, resource))
         {
             FluidStack result = fluidSource.drain(resource, IFluidHandler.FluidAction.EXECUTE);
             if (!result.isEmpty())
             {
-                result.getFluid().getFluidType().onVaporize(player, level, pos, result);
+                result.getFluid().forge$getFluidType().onVaporize(player, level, pos, result);
                 return true;
             }
         }
@@ -603,7 +603,7 @@ public class FluidUtil
             FluidStack result = tryFluidTransfer(handler, fluidSource, resource, true);
             if (!result.isEmpty())
             {
-                SoundEvent soundevent = resource.getFluid().getFluidType().getSound(resource, SoundActions.BUCKET_EMPTY);
+                SoundEvent soundevent = resource.getFluid().forge$getFluidType().getSound(resource, SoundActions.BUCKET_EMPTY);
 
                 if (soundevent != null)
                 {
@@ -624,7 +624,7 @@ public class FluidUtil
      */
     private static IFluidHandler getFluidBlockHandler(Fluid fluid, Level level, BlockPos pos)
     {
-        BlockState state = fluid.getFluidType().getBlockForFluidState(level, pos, fluid.defaultFluidState());
+        BlockState state = fluid.forge$getFluidType().getBlockForFluidState(level, pos, fluid.defaultFluidState());
         return new BlockWrapper(state, level, pos);
     }
 
@@ -674,6 +674,6 @@ public class FluidUtil
             }
         }
 
-        return fluid.getFluidType().getBucket(fluidStack);
+        return fluid.forge$getFluidType().getBucket(fluidStack);
     }
 }
