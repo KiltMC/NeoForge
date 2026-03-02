@@ -79,6 +79,16 @@ public class ExistingFileHelper {
     private final boolean enable;
     private final Multimap<PackType, ResourceLocation> generated = HashMultimap.create();
 
+    public final Collection<Path> kilt$existingPacks;
+    public final Set<String> kilt$existingMods;
+    public final boolean kilt$enable;
+    public final @Nullable String kilt$assetIndex;
+    public final @Nullable File kilt$assetsDir;
+
+    public io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper kilt$asPortingLib() {
+        return new io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper(kilt$existingPacks, kilt$existingMods, kilt$enable, kilt$assetIndex, kilt$assetsDir);
+    }
+
     /**
      * Create a new helper. This should probably <em>NOT</em> be used by mods, as
      * the instance provided by forge is designed to be a central instance that
@@ -93,6 +103,12 @@ public class ExistingFileHelper {
      * @param assetsDir the directory in which to find vanilla assets and indexes
      */
     public ExistingFileHelper(Collection<Path> existingPacks, final Set<String> existingMods, boolean enable, @Nullable final String assetIndex, @Nullable final File assetsDir) {
+        this.kilt$existingPacks = existingPacks;
+        this.kilt$existingMods = existingMods;
+        this.kilt$enable = enable;
+        this.kilt$assetIndex = assetIndex;
+        this.kilt$assetsDir = assetsDir;
+
         List<PackResources> candidateClientResources = new ArrayList<>();
         List<PackResources> candidateServerResources = new ArrayList<>();
 

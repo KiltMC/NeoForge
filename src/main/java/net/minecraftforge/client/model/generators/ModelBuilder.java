@@ -380,7 +380,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
                     if (face.tintIndex != -1) {
                         faceObj.addProperty("tintindex", face.tintIndex);
                     }
-                    if (!((BlockElementInjection) face).getFaceData().equals(ForgeFaceData.DEFAULT)) {
+                    if (!((BlockElementFaceInjection) face).getFaceData().equals(ForgeFaceData.DEFAULT)) {
                         faceObj.add("forge_data", ForgeFaceData.CODEC.encodeStart(JsonOps.INSTANCE, ((BlockElementInjection) face).getFaceData()).result().get());
                     }
                     faces.add(dir.getSerializedName(), faceObj);
