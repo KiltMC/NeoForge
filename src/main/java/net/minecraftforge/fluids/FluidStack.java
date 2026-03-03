@@ -158,21 +158,12 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
     }
 
     protected void updateEmpty() {
-        if (isEmpty()) {
-            super.setTag(null);
-        }
+
     }
 
     public int forge$getAmount()
     {
         return (int) getAmount();
-    }
-
-    @Override
-    public io.github.fabricators_of_create.porting_lib.fluids.FluidStack setAmount(long amount) {
-        super.setAmount(amount);
-        updateEmpty();
-        return this;
     }
 
     public void setAmount(int amount)
@@ -195,6 +186,7 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     public CompoundTag getTag()
     {
+        if (isEmpty()) return null;
         return super.getTag();
     }
 
