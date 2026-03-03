@@ -21,6 +21,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import xyz.bluspring.kilt.util.forge.fluid.FluidTransferUtils;
 
 import java.util.Optional;
 
@@ -54,7 +55,7 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     public FluidStack(Fluid fluid, int amount)
     {
-        super(fluid, amount);
+        super(fluid, FluidTransferUtils.toDroplets(amount));
         if (fluid == null)
         {
             LOGGER.fatal("Null fluid supplied to fluidstack. Did you try and create a stack for an unregistered fluid?");
@@ -106,7 +107,18 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
         {
             return EMPTY;
         }
-        FluidStack stack = new FluidStack(fluid, nbt.getInt("Amount"));
+
+        // Kilt: Allow droplets
+        int amount;
+        if (nbt.contains("Amount", Tag.TAG_INT)) {
+            amount = nbt.getInt("Amount");
+        } else if (nbt.contains("Amount", Tag.TAG_LONG)) {
+            amount = FluidTransferUtils.toMillibuckets(nbt.getLong("Amount"));
+        } else {
+            amount = 0;
+        }
+
+        FluidStack stack = new FluidStack(fluid, amount);
 
         if (nbt.contains("Tag", Tag.TAG_COMPOUND))
         {
@@ -163,20 +175,20 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     public int forge$getAmount()
     {
-        return (int) getAmount();
+        return FluidTransferUtils.toMillibuckets(getAmount());
     }
 
     public void setAmount(int amount)
     {
-        setAmount((long) amount);
+        setAmount(FluidTransferUtils.toDroplets(amount));
     }
 
     public void grow(int amount) {
-        grow((long) amount);
+        grow(FluidTransferUtils.toDroplets(amount));
     }
 
     public void shrink(int amount) {
-        shrink((long) amount);
+        shrink(FluidTransferUtils.toDroplets(amount));
     }
 
     public boolean hasTag()
