@@ -186,6 +186,7 @@ public class FluidStack extends io.github.fabricators_of_create.porting_lib.flui
 
     public CompoundTag getTag()
     {
+        if (isEmpty()) return null;
         return super.getTag();
     }
 
