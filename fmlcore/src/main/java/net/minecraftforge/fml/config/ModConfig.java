@@ -11,6 +11,7 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.loading.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.loader.WrappedFabricModContainer;
 
 import java.io.ByteArrayInputStream;
@@ -96,9 +97,14 @@ public class ModConfig
         return ((CommentedFileConfig)this.configData).getNioPath();
     }
 
-    public void acceptSyncedConfig(byte[] bytes) {
-        setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(bytes)));
-        fireEvent(IConfigEvent.reloading(this));
+    public void acceptSyncedConfig(byte @Nullable [] bytes) {
+        if (bytes != null) {
+            setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(bytes)));
+            fireEvent(IConfigEvent.reloading(this));
+        } else {
+            setConfigData(null);
+            fireEvent(IConfigEvent.unloading(this));
+        }
     }
 
     public enum Type {
