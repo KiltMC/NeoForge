@@ -11,7 +11,6 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.loading.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.loader.WrappedFabricModContainer;
 
 import java.io.ByteArrayInputStream;
@@ -97,14 +96,17 @@ public class ModConfig
         return ((CommentedFileConfig)this.configData).getNioPath();
     }
 
-    public void acceptSyncedConfig(byte @Nullable [] bytes) {
-        if (bytes != null) {
-            setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(bytes)));
-            fireEvent(IConfigEvent.reloading(this));
-        } else {
+    public void acceptSyncedConfig(byte[] bytes) {
+        // Kilt: Handle null config data, because Forge Config API Port requires us to.
+        if (bytes == null) {
             setConfigData(null);
             fireEvent(IConfigEvent.unloading(this));
+            return;
         }
+
+        // original code
+        setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(bytes)));
+        fireEvent(IConfigEvent.reloading(this));
     }
 
     public enum Type {
