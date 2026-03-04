@@ -97,6 +97,14 @@ public class ModConfig
     }
 
     public void acceptSyncedConfig(byte[] bytes) {
+        // Kilt: Handle null config data, because Forge Config API Port requires us to.
+        if (bytes == null) {
+            setConfigData(null);
+            fireEvent(IConfigEvent.unloading(this));
+            return;
+        }
+
+        // original code
         setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(bytes)));
         fireEvent(IConfigEvent.reloading(this));
     }
