@@ -10,15 +10,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceLinkedOpenHashMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -47,6 +38,10 @@ import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 /**
  * Utility code to support {@link IAttributeExtension}.
@@ -323,7 +318,8 @@ public class AttributeUtil {
      * 
      * @return If called on the client, the current tooltip flag, otherwise {@link TooltipFlag#NORMAL}
      */
-    private static TooltipFlag getTooltipFlag() {
+    // Kilt: bump to public
+    public static TooltipFlag getTooltipFlag() {
         if (FMLEnvironment.dist.isClient()) {
             return ClientAccess.getTooltipFlag();
         }

@@ -6,18 +6,14 @@
 package net.neoforged.neoforge.common.conditions;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.Encoder;
-import com.mojang.serialization.MapCodec;
-import java.util.List;
-import java.util.Optional;
+import com.mojang.serialization.*;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.ExtraCodecs;
 import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
 import xyz.bluspring.kilt.mixin.resources.RegistryOpsAccessor;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Extension of {@link RegistryOps} that also encapsulates a {@link ICondition.IContext}.
@@ -85,6 +81,12 @@ public class ConditionalOps<T> extends RegistryOps<T> {
         return Codec.of(
                 ownerCodec.listOf(),
                 NeoForgeExtraCodecs.listWithOptionalElements(createConditionalCodec(ownerCodec)));
+    }
+
+    public static <T> Codec<List<T>> kilt$decodeListWithElementConditions(final Codec<T> ownerCodec, final Codec<List<T>> listCodec) {
+        return Codec.of(
+            listCodec,
+            NeoForgeExtraCodecs.listWithOptionalElements(createConditionalCodec(ownerCodec)));
     }
 
     /**
