@@ -1675,9 +1675,13 @@ public class CommonHooks {
     }
 
     public static RecipeBookType[] getFilteredRecipeBookTypeValues() {
+        return kilt$getFilteredRecipeBookTypeValues(RecipeBookType.values());
+    }
+
+    public static RecipeBookType[] kilt$getFilteredRecipeBookTypeValues(RecipeBookType[] original) {
         if (FMLEnvironment.dist.isClient()) {
-            return ClientHooks.getFilteredRecipeBookTypeValues();
+            return ClientHooks.kilt$getFilteredRecipeBookTypeValues(original);
         }
-        return RecipeBookType.values();
+        return original;
     }
 }

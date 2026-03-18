@@ -7,6 +7,12 @@ package net.neoforged.neoforge.common.extensions;
 
 import java.util.Collection;
 import java.util.Collections;
+
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.client.model.data.ModelDataManager;
+import net.neoforged.neoforge.entity.PartEntity;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -14,10 +20,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.client.model.data.ModelDataManager;
-import net.neoforged.neoforge.entity.PartEntity;
-import org.jetbrains.annotations.Nullable;
 
 public interface ILevelExtension {
     /**
@@ -166,6 +168,10 @@ public interface ILevelExtension {
      * @see #getDescriptionKey()
      */
     default Component getDescription() {
-        return Component.translatableWithFallback(getDescriptionKey(), self().dimension().location().toString());
+        return this.kilt$getDescription(self().dimension().location().toString());
+    }
+
+    default Component kilt$getDescription(String fallback) {
+        return Component.translatableWithFallback(getDescriptionKey(), fallback);
     }
 }
