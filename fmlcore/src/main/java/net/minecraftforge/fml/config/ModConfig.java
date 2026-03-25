@@ -27,13 +27,19 @@ public class ModConfig
     private final ConfigFileTypeHandler configHandler;
     private CommentedConfig configData;
     private Callable<Void> saveHandler;
+    private final boolean kilt$shouldAllowMultipleConfigs;
 
     public ModConfig(final Type type, final IConfigSpec<?> spec, final ModContainer container, final String fileName) {
+        this(type, spec, container, fileName, false);
+    }
+
+    protected ModConfig(final Type type, final IConfigSpec<?> spec, final ModContainer container, final String fileName, boolean allowMultiple) {
         this.type = type;
         this.spec = spec;
         this.fileName = fileName;
         this.container = container;
         this.configHandler = ConfigFileTypeHandler.TOML;
+        this.kilt$shouldAllowMultipleConfigs = allowMultiple;
         ConfigTracker.INSTANCE.trackConfig(this);
     }
 
@@ -43,11 +49,11 @@ public class ModConfig
 
     // Kilt: Forge Config API Port support
     public ModConfig(final Type type, final IConfigSpec<?> spec, String modId, final String fileName) {
-        this(type, spec, new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), fileName);
+        this(type, spec, new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), fileName, true);
     }
 
     public ModConfig(final Type type, final IConfigSpec<?> spec, String modId) {
-        this(type, spec, new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()));
+        this(type, spec, modId, defaultConfigName(type, modId));
     }
 
     private static String defaultConfigName(Type type, String modId) {
@@ -107,6 +113,10 @@ public class ModConfig
         // original code
         setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(bytes)));
         fireEvent(IConfigEvent.reloading(this));
+    }
+
+    public boolean kilt$shouldAllowMultipleConfigs() {
+        return this.kilt$shouldAllowMultipleConfigs;
     }
 
     public enum Type {

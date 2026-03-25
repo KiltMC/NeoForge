@@ -50,7 +50,7 @@ public class ConfigTracker {
         this.configSets.get(config.getType()).add(config);
         this.configsByMod.computeIfAbsent(config.getModId(), (k)->new EnumMap<>(ModConfig.Type.class)).put(config.getType(), config);
         // Kilt: Forge Config API Port adds this as a feature where mods can have multiple configs of the same type... so we need to support it, unfortunately.
-        if (kilt$shouldUseMultipleConfigs(config.getModId())) {
+        if (config.kilt$shouldAllowMultipleConfigs()) {
             this.kilt$configsByMod.computeIfAbsent(config.getModId(), (k)->new EnumMap<>(ModConfig.Type.class)).computeIfAbsent(config.getType(), type -> new ArrayList<>()).add(config);
             this.kilt$loadTrackedConfig(config); // Kilt: if that's the case, we should immediately load it.
         }
@@ -72,7 +72,7 @@ public class ConfigTracker {
     }
 
     private boolean kilt$shouldUseMultipleConfigs(String modId) {
-        return !Kilt.Companion.getLoader().hasMod(modId);
+        return !Kilt.Companion.getLoader().hasMod(modId) && FabricLoader.getInstance().isModLoaded(modId);
     }
 
     public void loadConfigs(ModConfig.Type type, Path configBasePath) {
