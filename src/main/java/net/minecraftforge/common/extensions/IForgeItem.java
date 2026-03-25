@@ -581,7 +581,7 @@ public interface IForgeItem extends ItemExtensions, io.github.fabricators_of_cre
 
     default Map<Enchantment, Integer> kilt$getAllEnchantments(ItemStack stack, Supplier<Map<Enchantment, Integer>> original)
     {
-        if (KiltHelper.INSTANCE.hasMethodOverride(this.getClass(), Item.class, "getAllEnchantments", ItemStack.class)) {
+        if (KiltHelper.INSTANCE.hasMethodOverride(this.getClass(), IForgeItem.class, "getAllEnchantments", ItemStack.class)) {
             return this.getAllEnchantments(stack);
         }
 

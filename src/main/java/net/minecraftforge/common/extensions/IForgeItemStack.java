@@ -200,7 +200,7 @@ public interface IForgeItemStack extends ICapabilitySerializable<CompoundTag>, I
 
     default Map<Enchantment, Integer> kilt$getAllEnchantments(Supplier<Map<Enchantment, Integer>> original)
     {
-        if (KiltHelper.INSTANCE.hasMethodOverride(this.getClass(), ItemStack.class, "getAllEnchantments")) {
+        if (KiltHelper.INSTANCE.hasMethodOverride(this.getClass(), IForgeItemStack.class, "getAllEnchantments")) {
             return this.getAllEnchantments();
         }
 
