@@ -1084,12 +1084,19 @@ public class ForgeHooks
         EntityDataSerializer<?> serializer = vanilla.byId(id);
         if (serializer == null)
         {
-            // ForgeRegistries.DATA_SERIALIZERS is a deferred register now, so if this method is called too early, the registry will be null
-            ForgeRegistry<EntityDataSerializer<?>> registry = (ForgeRegistry<EntityDataSerializer<?>>) ForgeRegistries.ENTITY_DATA_SERIALIZERS.get();
-            if (registry != null)
-                serializer = registry.getValue(id);
+            return kilt$getSerializer(id);
         }
         return serializer;
+    }
+
+    @Nullable
+    public static EntityDataSerializer<?> kilt$getSerializer(int id) {
+        // ForgeRegistries.DATA_SERIALIZERS is a deferred register now, so if this method is called too early, the registry will be null
+        ForgeRegistry<EntityDataSerializer<?>> registry = (ForgeRegistry<EntityDataSerializer<?>>) ForgeRegistries.ENTITY_DATA_SERIALIZERS.get();
+        if (registry != null)
+            return registry.getValue(id);
+
+        return null;
     }
 
     public static int getSerializerId(EntityDataSerializer<?> serializer, CrudeIncrementalIntIdentityHashBiMap<EntityDataSerializer<?>> vanilla)
@@ -1097,12 +1104,18 @@ public class ForgeHooks
         int id = vanilla.getId(serializer);
         if (id < 0)
         {
-            // ForgeRegistries.DATA_SERIALIZERS is a deferred register now, so if this method is called too early, the registry will be null
-            ForgeRegistry<EntityDataSerializer<?>> registry = (ForgeRegistry<EntityDataSerializer<?>>) ForgeRegistries.ENTITY_DATA_SERIALIZERS.get();
-            if (registry != null)
-                id = registry.getID(serializer);
+            return kilt$getSerializerId(serializer);
         }
         return id;
+    }
+
+    public static int kilt$getSerializerId(EntityDataSerializer<?> serializer) {
+        // ForgeRegistries.DATA_SERIALIZERS is a deferred register now, so if this method is called too early, the registry will be null
+        ForgeRegistry<EntityDataSerializer<?>> registry = (ForgeRegistry<EntityDataSerializer<?>>) ForgeRegistries.ENTITY_DATA_SERIALIZERS.get();
+        if (registry != null)
+            return registry.getID(serializer);
+
+        return -1;
     }
 
     public static boolean canEntityDestroy(Level level, BlockPos pos, LivingEntity entity)
