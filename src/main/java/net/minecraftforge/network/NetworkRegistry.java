@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -38,6 +39,8 @@ public class NetworkRegistry
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker NETREGISTRY = MarkerManager.getMarker("NETREGISTRY");
+
+    private static final AtomicBoolean kilt$acceptsVanillaConnections = new AtomicBoolean(false);
 
     private static Map<ResourceLocation, NetworkInstance> instances = Collections.synchronizedMap(new HashMap<>());
 
@@ -79,7 +82,12 @@ public class NetworkRegistry
         return listRejectedVanillaMods(NetworkInstance::tryServerVersionOnClient);
     }
 
+    public static void kilt$enableVanillaConnections() {
+        kilt$acceptsVanillaConnections.set(true);
+    }
+
     public static boolean acceptsVanillaClientConnections() {
+        if (kilt$acceptsVanillaConnections.get()) return true;
         return (instances.isEmpty() || getServerNonVanillaNetworkMods().isEmpty()) && DataPackRegistriesHooks.getSyncedCustomRegistries().isEmpty();
     }
 
