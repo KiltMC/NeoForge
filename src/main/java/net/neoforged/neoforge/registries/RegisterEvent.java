@@ -45,8 +45,7 @@ public class RegisterEvent extends Event implements IModBusEvent {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T> void register(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation name, Supplier<T> valueSupplier) {
         if (this.registryKey.equals(registryKey)) {
-            if (!this.registry.containsKey(name)) // Kilt: only register if it hasn't already been registered
-                Registry.register((Registry) this.registry, name, valueSupplier.get());
+            Registry.register((Registry) this.registry, name, valueSupplier.get());
         }
     }
 
@@ -60,10 +59,7 @@ public class RegisterEvent extends Event implements IModBusEvent {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T> void register(ResourceKey<? extends Registry<T>> registryKey, Consumer<RegisterHelper<T>> consumer) {
         if (this.registryKey.equals(registryKey)) {
-            consumer.accept((name, value) -> {
-                if (!this.registry.containsKey(name)) // Kilt: only register if it hasn't already been registered
-                    Registry.register((Registry) this.registry, name, value);
-            });
+            consumer.accept((name, value) -> Registry.register((Registry) this.registry, name, value));
         }
     }
 
