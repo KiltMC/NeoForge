@@ -22,6 +22,7 @@ import net.neoforged.bus.api.IEventBus;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -247,6 +248,9 @@ public class DeferredRegister<T> {
 
     public <I extends T> DeferredHolder<T, I> kilt$registerImmediate(final String name, final Function<ResourceLocation, ? extends I> func) {
         DeferredHolder<T, I> holder = this.register(name, func);
+        if (this.getRegistry().get() instanceof MappedRegistry<T> mappedRegistry)
+            mappedRegistry.unfreeze();
+
         Registry.register(this.getRegistry().get(), holder.getKey(), func.apply(holder.getId()));
         return holder;
     }
