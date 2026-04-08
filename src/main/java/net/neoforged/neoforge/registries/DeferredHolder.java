@@ -150,7 +150,7 @@ public class DeferredHolder<R, T extends R> implements Holder<R>, Supplier<T> {
 
         Registry<R> registry = getRegistry();
         if (registry != null) {
-            this.holder = registry.getHolder(this.key).orElse(null);
+            this.holder = registry.getHolder(this.key).orElse(Registry.registerForHolder(registry, this.key, this.value()));
         } else if (throwOnMissingRegistry) {
             throw new IllegalStateException("Registry not present for " + this + ": " + this.key.registry());
         }
