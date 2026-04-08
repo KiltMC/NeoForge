@@ -23,6 +23,8 @@ public class PlayerSpawnPhantomsEvent extends PlayerEvent {
     private int phantomsToSpawn;
     private Result result = Result.DEFAULT;
 
+    public boolean kilt$wasModified = false;
+
     public PlayerSpawnPhantomsEvent(Player player, int phantomsToSpawn) {
         super(player);
         this.phantomsToSpawn = phantomsToSpawn;
@@ -42,6 +44,7 @@ public class PlayerSpawnPhantomsEvent extends PlayerEvent {
      */
     public void setPhantomsToSpawn(int phantomsToSpawn) {
         this.phantomsToSpawn = phantomsToSpawn;
+        this.kilt$wasModified = true;
     }
 
     /**
