@@ -17,6 +17,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+
+import net.neoforged.bus.api.IEventBus;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
@@ -29,8 +33,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.neoforged.bus.api.IEventBus;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A helper class to aid in registering objects to modded and {@linkplain BuiltInRegistries vanilla registries} and
@@ -236,6 +238,17 @@ public class DeferredRegister<T> {
         }
 
         return ret;
+    }
+
+    // Kilt: Immediately register these to the registry ASAP.
+    public <I extends T> DeferredHolder<T, I> kilt$registerImmediate(final String name, final Supplier<? extends I> sup) {
+        return this.kilt$registerImmediate(name, key -> sup.get());
+    }
+
+    public <I extends T> DeferredHolder<T, I> kilt$registerImmediate(final String name, final Function<ResourceLocation, ? extends I> func) {
+        DeferredHolder<T, I> holder = this.register(name, func);
+        Registry.register(this.getRegistry().get(), holder.getKey(), func.apply(holder.getId()));
+        return holder;
     }
 
     /**

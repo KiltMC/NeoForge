@@ -7,13 +7,15 @@ package net.neoforged.neoforge.registries;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import net.neoforged.bus.api.Event;
+import net.neoforged.fml.event.IModBusEvent;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.Event;
-import net.neoforged.fml.event.IModBusEvent;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Fired for each registry when it is ready to have modded objects registered.
@@ -45,7 +47,8 @@ public class RegisterEvent extends Event implements IModBusEvent {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T> void register(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation name, Supplier<T> valueSupplier) {
         if (this.registryKey.equals(registryKey)) {
-            Registry.register((Registry) this.registry, name, valueSupplier.get());
+            if (!this.registry.containsKey(name)) // Kilt: Make sure we're not accidentally registering twice.
+                Registry.register((Registry) this.registry, name, valueSupplier.get());
         }
     }
 
@@ -59,7 +62,10 @@ public class RegisterEvent extends Event implements IModBusEvent {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T> void register(ResourceKey<? extends Registry<T>> registryKey, Consumer<RegisterHelper<T>> consumer) {
         if (this.registryKey.equals(registryKey)) {
-            consumer.accept((name, value) -> Registry.register((Registry) this.registry, name, value));
+            consumer.accept((name, value) -> {
+                if (!this.registry.containsKey(name)) // Kilt: Make sure we're not accidentally registering twice.
+                    Registry.register((Registry) this.registry, name, value);
+            });
         }
     }
 
