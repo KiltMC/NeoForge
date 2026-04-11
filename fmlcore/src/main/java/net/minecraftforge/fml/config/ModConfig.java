@@ -85,7 +85,7 @@ public class ModConfig
         return this.configData;
     }
 
-    void setConfigData(final CommentedConfig configData) {
+    public void setConfigData(final CommentedConfig configData) {
         this.configData = configData;
         this.spec.acceptConfig(this.configData);
     }
