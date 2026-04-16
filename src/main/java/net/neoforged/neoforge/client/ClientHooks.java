@@ -859,7 +859,8 @@ public class ClientHooks {
 
         boolean needsWrap = false;
 
-        int tooltipX = mouseX + 12;
+        // Kilt: no text wrapping
+        /*int tooltipX = mouseX + 12;
         if (tooltipX + tooltipTextWidth + 4 > screenWidth) {
             tooltipX = mouseX - 16 - tooltipTextWidth;
             if (tooltipX < 4) // if the tooltip doesn't fit on the screen
@@ -875,7 +876,7 @@ public class ClientHooks {
         if (event.getMaxWidth() > 0 && tooltipTextWidth > event.getMaxWidth()) {
             tooltipTextWidth = event.getMaxWidth();
             needsWrap = true;
-        }
+        }*/
 
         int tooltipTextWidthF = tooltipTextWidth;
         if (needsWrap) {
