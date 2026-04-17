@@ -5,13 +5,15 @@
 
 package net.neoforged.neoforge.client;
 
-import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderType;
 
@@ -101,6 +103,15 @@ public sealed class ChunkRenderTypeSet implements Iterable<RenderType> {
 
     public boolean isEmpty() {
         return bits.isEmpty();
+    }
+
+    public int kilt$size() {
+        int size = 0;
+        for (RenderType type : this) {
+            size++;
+        }
+
+        return size;
     }
 
     public boolean contains(RenderType renderType) {
