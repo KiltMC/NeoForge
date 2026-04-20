@@ -11,7 +11,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
  * An interface for Entities that need extra information to be communicated
  * between the server and client when they are spawned.
  */
-public interface IEntityWithComplexSpawn {
+public interface IEntityWithComplexSpawn extends io.github.fabricators_of_create.porting_lib.entity.IEntityWithComplexSpawn {
     /**
      * Called by the server when constructing the spawn packet.
      * Data should be added to the provided stream.

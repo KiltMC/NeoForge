@@ -10,6 +10,17 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import io.github.fabricators_of_create.porting_lib.entity.injects.EntityInjection;
+import net.neoforged.neoforge.attachment.AttachmentInternals;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
+import net.neoforged.neoforge.common.SoundAction;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
+import net.neoforged.neoforge.entity.PartEntity;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.network.payload.AdvancedAddEntityPayload;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -26,16 +37,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.attachment.AttachmentInternals;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.attachment.IAttachmentHolder;
-import net.neoforged.neoforge.common.SoundAction;
-import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
-import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.network.payload.AdvancedAddEntityPayload;
-import org.jetbrains.annotations.Nullable;
 
 public interface IEntityExtension extends INBTSerializable<CompoundTag>, EntityInjection {
     private Entity self() {
@@ -398,6 +399,9 @@ public interface IEntityExtension extends INBTSerializable<CompoundTag>, EntityI
     default void sendPairingData(ServerPlayer serverPlayer, Consumer<CustomPacketPayload> bundleBuilder) {
         if (this instanceof IEntityWithComplexSpawn) {
             bundleBuilder.accept(new AdvancedAddEntityPayload(self()));
+        } else {
+            // Kilt: make sure to call Porting Lib's
+            EntityInjection.super.sendPairingData(serverPlayer, bundleBuilder);
         }
     }
 
