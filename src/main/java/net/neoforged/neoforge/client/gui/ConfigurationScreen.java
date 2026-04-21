@@ -7,13 +7,6 @@ package net.neoforged.neoforge.client.gui;
 
 import static net.neoforged.neoforge.common.NeoForgeConfig.CLIENT;
 
-import com.electronwill.nightconfig.core.ConfigSpec;
-import com.electronwill.nightconfig.core.UnmodifiableConfig;
-import com.electronwill.nightconfig.core.UnmodifiableConfig.Entry;
-import com.google.common.collect.ImmutableList;
-import com.mojang.realmsclient.RealmsMainScreen;
-import com.mojang.serialization.Codec;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +23,35 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import com.electronwill.nightconfig.core.ConfigSpec;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
+import com.electronwill.nightconfig.core.UnmodifiableConfig.Entry;
+import com.google.common.collect.ImmutableList;
+import com.mojang.realmsclient.RealmsMainScreen;
+import com.mojang.serialization.Codec;
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfig.Type;
+import net.neoforged.fml.config.ModConfigs;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen.ConfigurationSectionScreen.Filter;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec.ListValueSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.Range;
+import net.neoforged.neoforge.common.ModConfigSpec.RestartType;
+import net.neoforged.neoforge.common.ModConfigSpec.ValueSpec;
+import net.neoforged.neoforge.common.TranslatableEnum;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.loader.mod.fabric.WrappedFabricModContainer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -59,25 +81,8 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.config.ModConfig.Type;
-import net.neoforged.fml.config.ModConfigs;
-import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.fml.loading.FMLLoader;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen.ConfigurationSectionScreen.Filter;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
-import net.neoforged.neoforge.common.ModConfigSpec.ListValueSpec;
-import net.neoforged.neoforge.common.ModConfigSpec.Range;
-import net.neoforged.neoforge.common.ModConfigSpec.RestartType;
-import net.neoforged.neoforge.common.ModConfigSpec.ValueSpec;
-import net.neoforged.neoforge.common.TranslatableEnum;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Strings;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+
+import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * A generic configuration UI.<p>
@@ -266,6 +271,20 @@ public final class ConfigurationScreen extends OptionsSubScreen {
     // If there is only one config type (and it can be edited, we show that instantly on the way "down" and want to close on the way "up".
     // But when returning from the restart/reload confirmation screens, we need to stay open.
     private boolean autoClose = false;
+
+    // Kilt: because Forge Config API Port sucks
+    public ConfigurationScreen(final String modId, final Screen parent) {
+        this(new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent);
+    }
+
+    public ConfigurationScreen(final String modId, final Screen parent, ConfigurationSectionScreen.Filter filter) {
+        this(new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent, filter);
+    }
+
+    public ConfigurationScreen(final String modId, final Screen parent, QuadFunction<ConfigurationScreen, ModConfig.Type, ModConfig, Component, Screen> sectionScreen) {
+        this(new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent, sectionScreen);
+    }
+    // Kilt end
 
     public ConfigurationScreen(final ModContainer mod, final Screen parent) {
         this(mod, parent, ConfigurationSectionScreen::new);
