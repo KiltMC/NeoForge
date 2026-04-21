@@ -5,13 +5,6 @@
 
 package net.neoforged.neoforge.common.conditions;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.MapCodec;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +12,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -27,10 +30,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public interface ICondition {
-    Codec<ICondition> CODEC = NeoForgeRegistries.CONDITION_SERIALIZERS.byNameCodec()
+    Codec<ICondition> CODEC = Codec.withAlternative(NeoForgeRegistries.CONDITION_SERIALIZERS.byNameCodec(), Codec.unit(TrueCondition.CODEC)) // Kilt: Allow fallbacks, in case something fails
             .dispatch(ICondition::codec, Function.identity());
     Codec<List<ICondition>> LIST_CODEC = CODEC.listOf();
 
