@@ -32,8 +32,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 
 public interface ICondition {
-    Codec<ICondition> CODEC = Codec.withAlternative(NeoForgeRegistries.CONDITION_SERIALIZERS.byNameCodec(), Codec.unit(TrueCondition.CODEC)) // Kilt: Allow fallbacks, in case something fails
-            .dispatch(ICondition::codec, Function.identity());
+    Codec<ICondition> CODEC = NeoForgeRegistries.CONDITION_SERIALIZERS.byNameCodec()
+            .dispatch(ICondition::codec, Function.identity())
+            .orElse(TrueCondition.INSTANCE); // Kilt: Allow fallbacks, in case something fails. We're using true so it resolves correctly for Fabric mods using both.
     Codec<List<ICondition>> LIST_CODEC = CODEC.listOf();
 
     static <V, T> Optional<T> getConditionally(Codec<T> codec, DynamicOps<V> ops, V element) {
