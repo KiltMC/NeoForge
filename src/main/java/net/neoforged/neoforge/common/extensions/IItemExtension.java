@@ -13,6 +13,15 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import io.github.fabricators_of_create.porting_lib.item.injects.ItemInjection;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.registries.datamaps.builtin.FurnaceFuel;
+import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.util.KiltHelper;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.RegistryLookup;
@@ -56,16 +65,11 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.ItemAbilities;
-import net.neoforged.neoforge.common.ItemAbility;
-import net.neoforged.neoforge.registries.datamaps.builtin.FurnaceFuel;
-import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+
+import net.fabricmc.fabric.api.item.v1.FabricItem;
 
 // TODO systemic review of all extension functions. lots of unused -C
-public interface IItemExtension extends ItemInjection, io.github.fabricators_of_create.porting_lib.entity.injects.ItemInjection {
+public interface IItemExtension extends ItemInjection, io.github.fabricators_of_create.porting_lib.entity.injects.ItemInjection, FabricItem {
     private Item self() {
         return (Item) this;
     }
@@ -193,10 +197,25 @@ public interface IItemExtension extends ItemInjection, io.github.fabricators_of_
      */
     @SuppressWarnings("deprecation")
     default ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+        // Kilt: Compare against Fabric API
+        if (KiltHelper.INSTANCE.hasMethodOverrideWithReturnType(self().getClass(), IItemExtension.class, "getRecipeRemainder", ItemStack.class, ItemStack.class)) {
+            return self().getRecipeRemainder(itemStack);
+        }
+
         if (!hasCraftingRemainingItem(itemStack)) {
             return ItemStack.EMPTY;
         }
         return new ItemStack(self().getCraftingRemainingItem());
+    }
+
+    // Kilt: Add support to Fabric API
+    @Override
+    default ItemStack getRecipeRemainder(ItemStack stack) {
+        if (KiltHelper.INSTANCE.hasMethodOverrideWithReturnType(self().getClass(), IItemExtension.class, "getCraftingRemainingItem", ItemStack.class, ItemStack.class)) {
+            return self().getCraftingRemainingItem(stack);
+        }
+
+        return FabricItem.super.getRecipeRemainder(stack);
     }
 
     /**
@@ -207,6 +226,14 @@ public interface IItemExtension extends ItemInjection, io.github.fabricators_of_
      */
     @SuppressWarnings("deprecation")
     default boolean hasCraftingRemainingItem(ItemStack stack) {
+        // Kilt: Compare against Fabric API
+        if (KiltHelper.INSTANCE.hasMethodOverrideWithReturnType(self().getClass(), IItemExtension.class, "getRecipeRemainder", ItemStack.class, ItemStack.class)) {
+            var remainder = self().getRecipeRemainder(stack);
+
+            if (remainder != null && !remainder.isEmpty())
+                return true;
+        }
+
         return self().hasCraftingRemainingItem();
     }
 

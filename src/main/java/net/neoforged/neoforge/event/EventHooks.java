@@ -369,6 +369,20 @@ public class EventHooks {
         return event;
     }
 
+    // Kilt: Mod compatible variant
+    public static SpawnGroupData kilt$finalizeMobSpawnSpawner(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData, IOwnedSpawner spawner, boolean def, Operation<SpawnGroupData> original) {
+        var event = new FinalizeSpawnEvent(mob, level, mob.getX(), mob.getY(), mob.getZ(), difficulty, spawnType, spawnData, spawner.getOwner());
+        NeoForge.EVENT_BUS.post(event);
+
+        if (!event.isCanceled() && def) {
+            // Spawners only call finalizeSpawn under certain conditions, which are passed through as def.
+            // Spawners also do not propagate the SpawnGroupData between spawns, so we ignore the result of Mob#finalizeSpawn
+            return original.call(mob, level, event.getDifficulty(), event.getSpawnType(), event.getSpawnData());
+        }
+
+        return event.getSpawnData();
+    }
+
     /**
      * Called from {@link PhantomSpawner#tick} just before the spawn conditions for phantoms are evaluated.
      * Fires the {@link PlayerSpawnPhantomsEvent} and returns the event.
