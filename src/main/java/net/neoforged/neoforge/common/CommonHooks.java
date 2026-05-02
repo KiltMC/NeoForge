@@ -1376,6 +1376,7 @@ public class CommonHooks {
      * @param registryKey key of the registry
      * @return path of the registry key. Prefixed with the namespace if it is not "minecraft"
      */
+    @Deprecated(forRemoval = true, since = "kilt") // Kilt: DO NOT BY ANY MEANS USE THIS, IT WILL CAUSE PROBLEMS.
     public static String prefixNamespace(ResourceLocation registryKey) {
         return registryKey.getNamespace().equals("minecraft") ? registryKey.getPath() : registryKey.getNamespace() + "/" + registryKey.getPath();
     }
