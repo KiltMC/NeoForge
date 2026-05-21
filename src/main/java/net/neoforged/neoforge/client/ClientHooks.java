@@ -94,6 +94,7 @@ import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.forge.snapshots.ForgeSnapshotsModClient;
 import net.neoforged.neoforge.gametest.GameTestHooks;
 import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
+import net.neoforged.neoforge.network.configuration.CheckExtensibleEnums;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -104,7 +105,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import xyz.bluspring.kilt.injections.client.gui.screens.MenuScreensInjection;
 import xyz.bluspring.kilt.injections.client.renderer.ShaderInstanceInjection;
-import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 
 import net.minecraft.FileUtil;
 import net.minecraft.client.Camera;
@@ -1128,7 +1128,7 @@ public class ClientHooks {
         return event.getTooltip();
     }
 
-    private static final ExtensionInfo RECIPE_BOOK_TYPE_EXTENSION_INFO = RecipeBookTypeInjection.getExtensionInfo();
+    private static final ExtensionInfo RECIPE_BOOK_TYPE_EXTENSION_INFO = CheckExtensibleEnums.getEnumExtensionInfo(RecipeBookType.class);
     private static final RecipeBookType[] RECIPE_BOOK_TYPES = RecipeBookType.values();
     private static RecipeBookType @Nullable [] cachedFilteredTypes = null;
 

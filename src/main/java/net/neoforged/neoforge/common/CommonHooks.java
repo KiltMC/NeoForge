@@ -96,6 +96,7 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.NoteBlockEvent;
 import net.neoforged.neoforge.event.level.block.CropGrowEvent;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.network.configuration.CheckExtensibleEnums;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.resource.ResourcePackLoader;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -111,7 +112,6 @@ import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.nbt.CompoundTagInjection;
 import xyz.bluspring.kilt.injections.nbt.ListTagInjection;
 import xyz.bluspring.kilt.injections.world.entity.ai.attributes.AttributeSupplierBuilderInjection;
-import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.ResourceLocationException;
@@ -1660,7 +1660,7 @@ public class CommonHooks {
     }
 
     public static Map<RecipeBookType, Pair<String, String>> buildRecipeBookTypeTagFields(Map<RecipeBookType, Pair<String, String>> vanillaMap) {
-        ExtensionInfo extInfo = RecipeBookTypeInjection.getExtensionInfo();
+        ExtensionInfo extInfo = CheckExtensibleEnums.getEnumExtensionInfo(RecipeBookType.class);
         if (extInfo.extended()) {
             vanillaMap = new HashMap<>(vanillaMap);
             for (RecipeBookType type : RecipeBookType.values()) {
