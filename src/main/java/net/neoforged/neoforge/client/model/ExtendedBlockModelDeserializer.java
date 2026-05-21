@@ -5,6 +5,12 @@
 
 package net.neoforged.neoforge.client.model;
 
+import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -12,10 +18,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.math.Transformation;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import net.neoforged.neoforge.client.model.geometry.GeometryLoaderManager;
+import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
+import net.neoforged.neoforge.common.util.TransformationHelper;
+import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.Kilt;
+
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
@@ -25,10 +33,6 @@ import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.neoforged.neoforge.client.model.geometry.GeometryLoaderManager;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
-import net.neoforged.neoforge.common.util.TransformationHelper;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A version of {@link BlockModel.Deserializer} capable of deserializing models with custom loaders, as well as other
@@ -46,6 +50,9 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer {
             .registerTypeAdapter(ItemOverride.class, new ItemOverride.Deserializer())
             .registerTypeAdapter(Transformation.class, new TransformationHelper.Deserializer())
             .create();
+
+    // Kilt: Avoid spamming the log about missing loaders.
+    private static final Set<String> kilt$alreadyWarnedLoaders = new HashSet<>();
 
     @Override
     public BlockModel deserialize(JsonElement element, Type targetType, JsonDeserializationContext deserializationContext) throws JsonParseException {
@@ -105,7 +112,13 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer {
             if (optional) {
                 return null;
             }
+            // Kilt: Avoid throwing exception so other mods still work
+            /*
             throw new JsonParseException(String.format(Locale.ENGLISH, "Model loader '%s' not found. Registered loaders: %s", name, GeometryLoaderManager.getLoaderList()));
+             */
+            if (kilt$alreadyWarnedLoaders.add(name.toString()))
+                Kilt.Companion.getLogger().error("Could not find model loader '{}', attempting to load under alternative loaders. Registered loaders: {}", name, GeometryLoaderManager.getLoaderList());
+            return null;
         }
 
         return loader.read(object, deserializationContext);
