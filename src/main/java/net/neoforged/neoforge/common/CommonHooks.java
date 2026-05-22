@@ -1669,6 +1669,7 @@ public class CommonHooks {
                 }
                 //Kilt: Fabric mods might already have added themselves here.
                 if (vanillaMap.containsKey(type)) {
+                    LOGGER.warn("Existing tag fields found for non-vanilla RecipeBookType enum {} {}. These will be used instead of the NeoForge (Kilt) defaults.", type, vanillaMap.get(type));
                     continue;
                 }
                 String name = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, type.name());
