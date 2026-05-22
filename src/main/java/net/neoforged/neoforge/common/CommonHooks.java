@@ -1667,6 +1667,10 @@ public class CommonHooks {
                 if (type.ordinal() < extInfo.vanillaCount()) {
                     continue;
                 }
+                //Kilt: Fabric mods might already have added themselves here.
+                if (vanillaMap.containsKey(type)) {
+                    continue;
+                }
                 String name = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, type.name());
                 vanillaMap.put(type, Pair.of("is" + name + "GuiOpen", "is" + name + "FilteringCraftable"));
             }
