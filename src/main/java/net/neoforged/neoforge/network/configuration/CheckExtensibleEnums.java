@@ -193,7 +193,7 @@ public record CheckExtensibleEnums(ServerConfigurationPacketListener listener) i
         return enumEntries;
     }
 
-    private static ExtensionInfo getEnumExtensionInfo(Class<? extends Enum<?>> enumClass) {
+    public static ExtensionInfo getEnumExtensionInfo(Class<? extends Enum<?>> enumClass) {
         try {
             Method mth = enumClass.getDeclaredMethod("getExtensionInfo");
             return (ExtensionInfo) mth.invoke(null);
