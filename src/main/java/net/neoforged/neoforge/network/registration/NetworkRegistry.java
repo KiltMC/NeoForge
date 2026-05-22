@@ -5,11 +5,6 @@
 
 package net.neoforged.neoforge.network.registration;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.mojang.logging.LogUtils;
-import io.netty.channel.ChannelHandlerContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,34 +19,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.impl.networking.RegistrationPayload;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.Connection;
-import net.minecraft.network.ConnectionProtocol;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.PacketListener;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.network.protocol.common.ClientCommonPacketListener;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.ServerCommonPacketListener;
-import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.custom.BrandPayload;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.common.custom.DiscardedPayload;
-import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
-import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.mojang.logging.LogUtils;
+import io.netty.channel.ChannelHandlerContext;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.config.ConfigTracker;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
@@ -72,8 +44,6 @@ import net.neoforged.neoforge.network.negotiation.NegotiationResult;
 import net.neoforged.neoforge.network.negotiation.NetworkComponentNegotiator;
 import net.neoforged.neoforge.network.payload.CommonRegisterPayload;
 import net.neoforged.neoforge.network.payload.CommonVersionPayload;
-import net.neoforged.neoforge.network.payload.MinecraftRegisterPayload;
-import net.neoforged.neoforge.network.payload.MinecraftUnregisterPayload;
 import net.neoforged.neoforge.network.payload.ModdedNetworkPayload;
 import net.neoforged.neoforge.network.payload.ModdedNetworkQueryComponent;
 import net.neoforged.neoforge.network.payload.ModdedNetworkQueryPayload;
@@ -83,6 +53,36 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Unique;
+
+import net.minecraft.network.Connection;
+import net.minecraft.network.ConnectionProtocol;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.ServerCommonPacketListener;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.common.custom.DiscardedPayload;
+import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
+import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.impl.networking.RegistrationPayload;
+import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Core registry for all modded networking.
@@ -667,6 +667,10 @@ public class NetworkRegistry {
      * @return True if the connection has a connection setup that can transmit the given payload id, false otherwise.
      */
     public static boolean hasChannel(Connection connection, @Nullable ConnectionProtocol protocol, ResourceLocation payloadId) {
+        // Kilt: Otherwise Flashback has problems.
+        if (connection.channel() == null)
+            return false;
+
         NetworkPayloadSetup payloadSetup = ChannelAttributes.getPayloadSetup(connection);
         if (payloadSetup != null) {
             // If a protocol is specified, only check against channels for that protocol
