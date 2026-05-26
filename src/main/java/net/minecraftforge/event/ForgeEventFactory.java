@@ -184,6 +184,19 @@ public class ForgeEventFactory
         return event.getResult() == Result.ALLOW;
     }
 
+    // We insert this into onFinalizeSpawn with a mixin for best compatibility.
+    private static final ThreadLocal<Operation<SpawnGroupData>> kilt$fabricOriginal = ThreadLocal.withInitial(() -> null);
+
+    // Ideally, I would have wanted to turn onFinalizeSpawn into a stub calling this.
+    // Unfortunately: https://github.com/The-Aether-Team/The-Aether/blob/1.20.1-develop/src/main/java/com/aetherteam/aether/mixin/mixins/common/ForgeEventFactoryMixin.java#L24-L29
+    public static SpawnGroupData kilt$onFinalizeSpawn(
+            Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
+            @Nullable SpawnGroupData spawnData, @Nullable CompoundTag spawnTag, Operation<SpawnGroupData> original
+    ) {
+        kilt$fabricOriginal.set(original);
+        return onFinalizeSpawn(mob, level, difficulty, spawnType, spawnData, spawnTag);
+    } // Removing would likely just cause unnecessary lag.
+
     /**
      * Vanilla calls to {@link Mob#finalizeSpawn} are replaced with calls to this method via coremod.<br>
      * Mods should call this method in place of calling {@link Mob#finalizeSpawn}. Super calls (from within overrides) should not be wrapped.
