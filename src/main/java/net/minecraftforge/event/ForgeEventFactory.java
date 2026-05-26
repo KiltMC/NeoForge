@@ -196,8 +196,12 @@ public class ForgeEventFactory
             Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
             @Nullable SpawnGroupData spawnData, @Nullable CompoundTag spawnTag, Operation<SpawnGroupData> original
     ) {
-        kilt$fabricOriginal.set(original);
-        return onFinalizeSpawn(mob, level, difficulty, spawnType, spawnData, spawnTag);
+        try {
+            kilt$fabricOriginal.set(original);
+            return onFinalizeSpawn(mob, level, difficulty, spawnType, spawnData, spawnTag);
+        } finally {
+            kilt$fabricOriginal.set(null);
+        }
     } // Removing would likely just cause unnecessary lag.
 
     /**
