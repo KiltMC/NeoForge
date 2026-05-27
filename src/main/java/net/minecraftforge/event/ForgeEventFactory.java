@@ -28,7 +28,6 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.Unit;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.*;
@@ -83,9 +82,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -188,6 +185,8 @@ public class ForgeEventFactory
     // We insert this into onFinalizeSpawn with a mixin for best compatibility.
     private static final ThreadLocal<Operation<SpawnGroupData>> kilt$fabricOriginal = ThreadLocal.withInitial(() -> null);
 
+    public static final ThreadLocal<Set<Mob>> kilt$hasFiredInitializeEvent = ThreadLocal.withInitial(HashSet::new);
+
     // Ideally, I would have wanted to turn onFinalizeSpawn into a stub calling this.
     // Unfortunately: https://github.com/The-Aether-Team/The-Aether/blob/1.20.1-develop/src/main/java/com/aetherteam/aether/mixin/mixins/common/ForgeEventFactoryMixin.java#L24-L29
     public static SpawnGroupData kilt$onFinalizeSpawn(
@@ -236,15 +235,20 @@ public class ForgeEventFactory
     @SuppressWarnings("deprecation") // Call to deprecated Mob#finalizeSpawn is expected.
     public static SpawnGroupData onFinalizeSpawn(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag spawnTag)
     {
-        var event = new MobSpawnEvent.FinalizeSpawn(mob, level, mob.getX(), mob.getY(), mob.getZ(), difficulty, spawnType, spawnData, spawnTag, null);
-        boolean cancel = MinecraftForge.EVENT_BUS.post(event);
+        try {
+            var event = new MobSpawnEvent.FinalizeSpawn(mob, level, mob.getX(), mob.getY(), mob.getZ(), difficulty, spawnType, spawnData, spawnTag, null);
+            boolean cancel = MinecraftForge.EVENT_BUS.post(event);
+            kilt$hasFiredInitializeEvent.get().add(mob);
 
-        if (!cancel)
-        {
-            return mob.finalizeSpawn(level, event.getDifficulty(), event.getSpawnType(), event.getSpawnData(), event.getSpawnTag());
+            if (!cancel)
+            {
+                return mob.finalizeSpawn(level, event.getDifficulty(), event.getSpawnType(), event.getSpawnData(), event.getSpawnTag());
+            }
+
+            return null;
+        } finally {
+            kilt$hasFiredInitializeEvent.get().remove(mob);
         }
-
-        return null;
     }
 
     /**
