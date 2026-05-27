@@ -133,7 +133,8 @@ public sealed class ChunkRenderTypeSet implements Iterable<RenderType> {
 
         @Override
         public boolean hasNext() {
-            return index >= 0;
+            return index >= 0
+                && index < CHUNK_RENDER_TYPES.length; // Kilt: Weird crash otherwise, see https://github.com/KiltMC/Kilt/issues/786
         }
 
         @Override
