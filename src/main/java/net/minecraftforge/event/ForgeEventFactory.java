@@ -188,8 +188,6 @@ public class ForgeEventFactory
     // We insert this into onFinalizeSpawn with a mixin for best compatibility.
     private static final ThreadLocal<Operation<SpawnGroupData>> kilt$fabricOriginal = ThreadLocal.withInitial(() -> null);
 
-    public static final ThreadLocal<Unit> kilt$didRunEvent = ThreadLocal.withInitial(() -> null);
-
     // Ideally, I would have wanted to turn onFinalizeSpawn into a stub calling this.
     // Unfortunately: https://github.com/The-Aether-Team/The-Aether/blob/1.20.1-develop/src/main/java/com/aetherteam/aether/mixin/mixins/common/ForgeEventFactoryMixin.java#L24-L29
     public static SpawnGroupData kilt$onFinalizeSpawn(
@@ -238,20 +236,15 @@ public class ForgeEventFactory
     @SuppressWarnings("deprecation") // Call to deprecated Mob#finalizeSpawn is expected.
     public static SpawnGroupData onFinalizeSpawn(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag spawnTag)
     {
-        try {
-            kilt$didRunEvent.set(Unit.INSTANCE);
-            var event = new MobSpawnEvent.FinalizeSpawn(mob, level, mob.getX(), mob.getY(), mob.getZ(), difficulty, spawnType, spawnData, spawnTag, null);
-            boolean cancel = MinecraftForge.EVENT_BUS.post(event);
+        var event = new MobSpawnEvent.FinalizeSpawn(mob, level, mob.getX(), mob.getY(), mob.getZ(), difficulty, spawnType, spawnData, spawnTag, null);
+        boolean cancel = MinecraftForge.EVENT_BUS.post(event);
 
-            if (!cancel)
-            {
-                return mob.finalizeSpawn(level, event.getDifficulty(), event.getSpawnType(), event.getSpawnData(), event.getSpawnTag());
-            }
-
-            return null;
-        } finally {
-            kilt$didRunEvent.set(null); // Do we want to run remove here? Might reduce performance.
+        if (!cancel)
+        {
+            return mob.finalizeSpawn(level, event.getDifficulty(), event.getSpawnType(), event.getSpawnData(), event.getSpawnTag());
         }
+
+        return null;
     }
 
     /**
