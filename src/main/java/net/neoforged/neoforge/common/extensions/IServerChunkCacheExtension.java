@@ -18,7 +18,7 @@ import net.minecraft.world.entity.Entity;
  */
 @SuppressWarnings("resource")
 public interface IServerChunkCacheExtension {
-    default ServerChunkCache self() {
+    private ServerChunkCache self() { // Kilt: make private cuz otherwise things panic
         return (ServerChunkCache) this;
     }
 

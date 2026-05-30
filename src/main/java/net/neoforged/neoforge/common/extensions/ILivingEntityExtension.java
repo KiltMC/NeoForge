@@ -5,16 +5,17 @@
 
 package net.neoforged.neoforge.common.extensions;
 
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.fluids.FluidType;
 
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
+
 public interface ILivingEntityExtension extends IEntityExtension {
-    default LivingEntity self() {
+    private LivingEntity self() { // Kilt: make private cuz otherwise things panic
         return (LivingEntity) this;
     }
 

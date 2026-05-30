@@ -22,7 +22,7 @@ public interface IPlayerListExtension {
     /**
      * {@return the PlayerList instance that this extension is attached to}
      */
-    default PlayerList self() {
+    private PlayerList self() { // Kilt: make private cuz otherwise things panic
         return (PlayerList) this;
     }
 

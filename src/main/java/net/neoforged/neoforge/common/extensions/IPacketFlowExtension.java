@@ -5,8 +5,9 @@
 
 package net.neoforged.neoforge.common.extensions;
 
-import net.minecraft.network.protocol.PacketFlow;
 import net.neoforged.fml.LogicalSide;
+
+import net.minecraft.network.protocol.PacketFlow;
 
 /**
  * Extension for {@link PacketFlow} to add some utility methods.
@@ -15,7 +16,7 @@ public interface IPacketFlowExtension {
     /**
      * {@return the {@link PacketFlow} this extension is applied to}
      */
-    default PacketFlow self() {
+    private PacketFlow self() { // Kilt: make private cuz otherwise things panic
         return (PacketFlow) this;
     }
 
