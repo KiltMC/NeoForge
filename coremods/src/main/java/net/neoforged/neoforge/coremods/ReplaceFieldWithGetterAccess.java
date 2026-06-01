@@ -5,14 +5,15 @@
 
 package net.neoforged.neoforge.coremods;
 
-import cpw.mods.modlauncher.api.ITransformer;
-import cpw.mods.modlauncher.api.ITransformerVotingContext;
-import cpw.mods.modlauncher.api.TargetType;
-import cpw.mods.modlauncher.api.TransformerVoteResult;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import cpw.mods.modlauncher.api.ITransformer;
+import cpw.mods.modlauncher.api.ITransformerVotingContext;
+import cpw.mods.modlauncher.api.TargetType;
+import cpw.mods.modlauncher.api.TransformerVoteResult;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
@@ -63,8 +64,9 @@ public class ReplaceFieldWithGetterAccess implements ITransformer<ClassNode> {
     private static void redirectFieldToMethod(ClassNode classNode, String fieldName, @Nullable String methodName) {
         var foundField = CoremodUtils.getFieldByName(classNode, fieldName);
 
-        if (!Modifier.isPrivate(foundField.access) || Modifier.isStatic(foundField.access)) {
-            throw new IllegalStateException("Field " + fieldName + " in " + classNode.name + " is not private and an instance field");
+        // Kilt: Not dealing with access issues
+        if (/*!Modifier.isPrivate(foundField.access) ||*/ Modifier.isStatic(foundField.access)) {
+            throw new IllegalStateException("Field " + fieldName + " in " + classNode.name + " is not an instance field");
         }
 
         String methodDescriptor = "()" + foundField.desc;
