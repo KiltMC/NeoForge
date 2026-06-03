@@ -20,8 +20,9 @@ public class NeoForgeCoreMod implements ICoreMod {
                 "specialEffects", "getModifiedSpecialEffects")));
         transformers.add(new ReplaceFieldWithGetterAccess("net.minecraft.world.level.levelgen.structure.Structure", Map.of(
                 "settings", "getModifiedStructureSettings")));
-        transformers.add(new ReplaceFieldWithGetterAccess("net.minecraft.world.level.block.FlowerPotBlock", Map.of(
-                "potted", "getPotted")));
+        // Disabled due to stack overflow caused by FlowerPotInject::kilt$deferredContentGet
+        //transformers.add(new ReplaceFieldWithGetterAccess("net.minecraft.world.level.block.FlowerPotBlock", Map.of(
+        //        "potted", "getPotted")));
 
         transformers.add(new MethodRedirector());
 
