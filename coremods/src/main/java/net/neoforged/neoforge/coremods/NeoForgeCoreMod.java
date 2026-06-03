@@ -20,7 +20,7 @@ public class NeoForgeCoreMod implements ICoreMod {
                 "specialEffects", "getModifiedSpecialEffects")));
         transformers.add(new ReplaceFieldWithGetterAccess("net.minecraft.world.level.levelgen.structure.Structure", Map.of(
                 "settings", "getModifiedStructureSettings")));
-        // Disabled due to stack overflow caused by FlowerPotInject::kilt$deferredContentGet
+        // Kilt: Disabled due to stack overflow caused by FlowerPotInject::kilt$deferredContentGet
         //transformers.add(new ReplaceFieldWithGetterAccess("net.minecraft.world.level.block.FlowerPotBlock", Map.of(
         //        "potted", "getPotted")));
 
