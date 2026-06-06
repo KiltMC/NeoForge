@@ -59,6 +59,7 @@ class NeoForgeRegistryCallbacks {
             addedBlocks.clear();
 
             // Update block state ID map after each bake in case of registry changes.
+            BLOCKSTATE_TO_ID_MAP.clear();
             for (Block block : registry) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
                     BLOCKSTATE_TO_ID_MAP.add(state);
