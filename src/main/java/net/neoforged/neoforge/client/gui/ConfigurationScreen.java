@@ -274,15 +274,15 @@ public final class ConfigurationScreen extends OptionsSubScreen {
 
     // Kilt: because Forge Config API Port sucks
     public ConfigurationScreen(final String modId, final Screen parent) {
-        this(new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent);
+        this(WrappedFabricModContainer.get(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent);
     }
 
     public ConfigurationScreen(final String modId, final Screen parent, ConfigurationSectionScreen.Filter filter) {
-        this(new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent, filter);
+        this(WrappedFabricModContainer.get(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent, filter);
     }
 
     public ConfigurationScreen(final String modId, final Screen parent, QuadFunction<ConfigurationScreen, ModConfig.Type, ModConfig, Component, Screen> sectionScreen) {
-        this(new WrappedFabricModContainer(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent, sectionScreen);
+        this(WrappedFabricModContainer.get(FabricLoader.getInstance().getModContainer(modId).orElseThrow()), parent, sectionScreen);
     }
     // Kilt end
 
