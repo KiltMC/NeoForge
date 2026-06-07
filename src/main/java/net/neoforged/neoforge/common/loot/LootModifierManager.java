@@ -5,14 +5,6 @@
 
 package net.neoforged.neoforge.common.loot;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.serialization.DynamicOps;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -22,16 +14,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.mojang.serialization.JsonOps;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.mojang.serialization.DynamicOps;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.workarounds.ContextAwareReloadListenerWorkaround;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import xyz.bluspring.kilt.workarounds.ContextAwareReloadListenerWorkaround;
 
 public class LootModifierManager extends SimpleJsonResourceReloadListener implements ContextAwareReloadListenerWorkaround {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -69,7 +69,11 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener implem
         Map<ResourceLocation, JsonElement> finalMap = new HashMap<>();
         //use layered config to fetch modifier data files (modifiers missing from config are disabled)
         for (ResourceLocation location : finalLocations) {
-            finalMap.put(location, map.get(location));
+            // Kilt: Otherwise Tempad causes problems, we have to make sure the elements actually exist.
+            JsonElement element = map.get(location);
+            if (element == null) continue;
+
+            finalMap.put(location, element);
         }
         return finalMap;
     }
