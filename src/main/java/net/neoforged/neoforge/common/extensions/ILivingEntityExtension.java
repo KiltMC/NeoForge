@@ -19,6 +19,11 @@ public interface ILivingEntityExtension extends IEntityExtension {
         return (LivingEntity) this;
     }
 
+    // Kilt: unfortunately, people actually use this shit! :D
+    default LivingEntity neoforge$self() {
+        return self();
+    }
+
     @Override
     default boolean canSwimInFluidType(FluidType type) {
         if (type == NeoForgeMod.WATER_TYPE.value()) return !self().isSensitiveToWater();

@@ -26,6 +26,11 @@ public interface IPlayerListExtension {
         return (PlayerList) this;
     }
 
+    // Kilt: unfortunately, people actually use this shit! :D
+    default PlayerList neoforge$self() {
+        return self();
+    }
+
     /**
      * Sends a payload to all players on the server
      *

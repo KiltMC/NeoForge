@@ -22,6 +22,11 @@ public interface IServerChunkCacheExtension {
         return (ServerChunkCache) this;
     }
 
+    // Kilt: unfortunately, people actually use this shit! :D
+    default ServerChunkCache neoforge$self() {
+        return self();
+    }
+
     /**
      * Sends a payload to all players watching the given entity.
      * <p>

@@ -20,6 +20,11 @@ public interface IPacketFlowExtension {
         return (PacketFlow) this;
     }
 
+    // Kilt: unfortunately, people actually use this shit! :D
+    default PacketFlow neoforge$self() {
+        return self();
+    }
+
     /**
      * {@return an indication of whether this {@link PacketFlow} is clientbound}
      */
