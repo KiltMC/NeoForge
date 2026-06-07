@@ -58,6 +58,9 @@ class NeoForgeRegistryCallbacks {
             }
             addedBlocks.clear();
 
+            // Kilt: Clear BLOCKSTATE_TO_ID_MAP because it might already be filled from Fabric API.
+            BLOCKSTATE_TO_ID_MAP.clear();
+
             // Update block state ID map after each bake in case of registry changes.
             for (Block block : registry) {
                 for (BlockState state : block.getStateDefinition().getPossibleStates()) {
