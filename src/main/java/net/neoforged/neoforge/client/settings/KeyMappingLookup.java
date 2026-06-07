@@ -128,4 +128,8 @@ public class KeyMappingLookup {
             bindings.clear();
         }
     }
+
+    public boolean kilt$isEmpty() {
+        return map.values().stream().allMatch(Map::isEmpty);
+    }
 }
