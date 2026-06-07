@@ -7,12 +7,13 @@ package net.neoforged.neoforge.client.extensions;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.extensions.client.PoseStackExtension;
 import org.joml.Vector3f;
 
 /**
  * Extension interface for {@link com.mojang.blaze3d.vertex.PoseStack}.
  */
-public interface IPoseStackExtension {
+public interface IPoseStackExtension extends PoseStackExtension {
     private PoseStack self() {
         return (PoseStack) this;
     }
