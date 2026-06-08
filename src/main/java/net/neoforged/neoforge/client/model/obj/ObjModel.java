@@ -5,11 +5,6 @@
 
 package net.neoforged.neoforge.client.model.obj;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.Sets;
-import com.mojang.math.Transformation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,18 +17,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Sets;
+import com.mojang.math.Transformation;
 import joptsimple.internal.Strings;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec2;
 import net.neoforged.neoforge.client.model.IModelBuilder;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.SimpleUnbakedGeometry;
@@ -45,6 +35,19 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import xyz.bluspring.kilt.util.KiltHelper;
+
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
 
 /**
  * A model loaded from an OBJ file.
@@ -137,7 +140,7 @@ public class ObjModel extends SimpleUnbakedGeometry<ObjModel> {
 
                 case "usemtl": // Sets the current material (starts new mesh)
                 {
-                    String mat = Strings.join(Arrays.copyOfRange(line, 1, line.length), " ");
+                    String mat = KiltHelper.INSTANCE.joinToString(Arrays.copyOfRange(line, 1, line.length), " "); // Kilt:
                     ObjMaterialLibrary.Material newMat = mtllib.getMaterial(mat);
                     if (!Objects.equals(newMat, currentMat)) {
                         currentMat = newMat;

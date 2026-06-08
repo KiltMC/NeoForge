@@ -5,13 +5,14 @@
 
 package net.neoforged.neoforge.client.model.obj;
 
-import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import joptsimple.internal.Strings;
+
+import com.google.common.collect.Maps;
 import org.joml.Vector4f;
+import xyz.bluspring.kilt.util.KiltHelper;
 
 /**
  * An OBJ material library (MTL), composed of named {@link Material materials}.
@@ -29,7 +30,7 @@ public class ObjMaterialLibrary {
         while ((line = reader.readAndSplitLine(true)) != null) {
             switch (line[0]) {
                 case "newmtl": {
-                    String name = Strings.join(Arrays.copyOfRange(line, 1, line.length), " ");
+                    String name = KiltHelper.INSTANCE.joinToString(Arrays.copyOfRange(line, 1, line.length), " "); // Kilt: too many issues
                     currentMaterial = new Material(name);
                     materials.put(name, currentMaterial);
                     break;
