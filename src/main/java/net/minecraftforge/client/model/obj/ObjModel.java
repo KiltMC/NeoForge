@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import xyz.bluspring.kilt.util.KiltHelper;
 
 import java.io.IOException;
 import java.util.*;
@@ -137,7 +138,7 @@ public class ObjModel extends SimpleUnbakedGeometry<ObjModel>
 
                 case "usemtl": // Sets the current material (starts new mesh)
                 {
-                    String mat = Strings.join(Arrays.stream(Arrays.copyOfRange(line, 1, line.length)).iterator(), ' ');
+                    String mat = KiltHelper.INSTANCE.joinToString(Arrays.copyOfRange(line, 1, line.length), " "); // Kilt: otherwise, problems
                     ObjMaterialLibrary.Material newMat = mtllib.getMaterial(mat);
                     if (!Objects.equals(newMat, currentMat))
                     {

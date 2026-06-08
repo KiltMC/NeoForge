@@ -6,7 +6,7 @@
 package net.minecraftforge.client.model.obj;
 
 import com.google.common.base.Charsets;
-import joptsimple.internal.Strings;
+import kotlin.text.StringsKt;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -55,7 +55,7 @@ public class ObjTokenizer implements AutoCloseable
                     hasContinuation = currentLine.endsWith("\\");
                     String tmp = hasContinuation ? currentLine.substring(0, currentLine.length() - 1) : currentLine;
 
-                    Arrays.stream(tmp.split("[\t ]+")).filter(s -> !Strings.isNullOrEmpty(s)).forEach(lineParts::add);
+                    Arrays.stream(tmp.split("[\t ]+")).filter(s -> s != null && !StringsKt.isBlank(s)).forEach(lineParts::add); // Kilt: otherwise, crash
 
                     if (hasContinuation)
                     {

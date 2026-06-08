@@ -8,6 +8,7 @@ package net.minecraftforge.client.model.obj;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.util.Strings;
 import org.joml.Vector4f;
+import xyz.bluspring.kilt.util.KiltHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -37,7 +38,7 @@ public class ObjMaterialLibrary
             {
                 case "newmtl":
                 {
-                    String name = Strings.join(Arrays.stream(Arrays.copyOfRange(line, 1, line.length)).iterator(), ' ');
+                    String name = KiltHelper.INSTANCE.joinToString(Arrays.copyOfRange(line, 1, line.length), " "); // Kilt: Otherwise, problems
                     currentMaterial = new Material(name);
                     materials.put(name, currentMaterial);
                     break;
