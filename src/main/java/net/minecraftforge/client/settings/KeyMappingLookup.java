@@ -100,4 +100,8 @@ public class KeyMappingLookup {
     public void clear() {
         map.values().forEach(Map::clear);
     }
+
+    public boolean kilt$isEmpty() {
+        return map.values().stream().allMatch(Map::isEmpty);
+    }
 }
