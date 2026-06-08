@@ -23,7 +23,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Sets;
 import com.mojang.math.Transformation;
-import joptsimple.internal.Strings;
+import kotlin.text.StringsKt;
 import net.neoforged.neoforge.client.model.IModelBuilder;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.SimpleUnbakedGeometry;
@@ -186,7 +186,7 @@ public class ObjModel extends SimpleUnbakedGeometry<ObjModel> {
                     for (int i = 0; i < vertices.length; i++) {
                         String vertexData = line[i + 1];
                         String[] vertexParts = vertexData.split("/");
-                        int[] vertex = Arrays.stream(vertexParts).mapToInt(num -> Strings.isNullOrEmpty(num) ? 0 : Integer.parseInt(num)).toArray();
+                        int[] vertex = Arrays.stream(vertexParts).mapToInt(num -> num == null || StringsKt.isBlank(num) ? 0 : Integer.parseInt(num)).toArray(); // Kilt: Avoid Strings crash
                         if (vertex[0] < 0) vertex[0] = model.positions.size() + vertex[0];
                         else vertex[0]--;
                         if (vertex.length > 1) {
