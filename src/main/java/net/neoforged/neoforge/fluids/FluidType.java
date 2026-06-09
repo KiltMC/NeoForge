@@ -135,6 +135,7 @@ public class FluidType {
 
     // Kilt: Add flag to know that a fluid type is wrapped.
     public boolean kilt$isWrapped = false;
+    public @Nullable io.github.fabricators_of_create.porting_lib.fluids.FluidType kilt$wrapped;
     public FluidType(final Properties properties, boolean isWrapped)
     {
         this(properties);
@@ -161,7 +162,7 @@ public class FluidType {
     }
 
     public static FluidType kilt$tryGetWrappingFluidType(io.github.fabricators_of_create.porting_lib.fluids.FluidType wrapped) {
-        return new FluidType(Properties.create()
+        var type = new FluidType(Properties.create()
             .descriptionId(wrapped.getDescriptionId())
             .motionScale(((FluidTypeAccessor) wrapped).getMotionScale())
             .canPushEntity(((FluidTypeAccessor) wrapped).isCanPushEntity())
@@ -179,6 +180,8 @@ public class FluidType {
             .temperature(((FluidTypeAccessor) wrapped).getTemperature())
             .viscosity(((FluidTypeAccessor) wrapped).getViscosity())
             .rarity(((FluidTypeAccessor) wrapped).getRarity()), true);
+        type.kilt$wrapped = wrapped;
+        return type;
     }
 
     /* Default Accessors */
