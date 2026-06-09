@@ -232,6 +232,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+
 /**
  * Class for various common (i.e. client and server-side) hooks.
  */
@@ -906,6 +909,10 @@ public class CommonHooks {
      * @throws RuntimeException if the fluid is not a vanilla one
      */
     public static FluidType getVanillaFluidType(Fluid fluid) {
+        return kilt$getVanillaFluidType(fluid, true);
+    }
+
+    public static FluidType kilt$getVanillaFluidType(Fluid fluid, boolean includeFabricCheck) {
         if (fluid == Fluids.EMPTY)
             return NeoForgeMod.EMPTY_TYPE.value();
         if (fluid == Fluids.WATER || fluid == Fluids.FLOWING_WATER)
@@ -914,6 +921,20 @@ public class CommonHooks {
             return NeoForgeMod.LAVA_TYPE.value();
         if (NeoForgeMod.MILK.asOptional().filter(milk -> milk == fluid).isPresent() || NeoForgeMod.FLOWING_MILK.asOptional().filter(milk -> milk == fluid).isPresent())
             return NeoForgeMod.MILK_TYPE.value();
+
+        // Kilt: I hate FluidType
+        if (includeFabricCheck) {
+            var fabricFluidType = fluid.getFluidType();
+            if (fabricFluidType != null) {
+                return FluidType.kilt$tryGetWrappingFluidType(fabricFluidType);
+            }
+        }
+
+        var handler = FluidVariantAttributes.getHandlerOrDefault(fluid);
+        if (handler != null) {
+            return FluidType.kilt$tryGetWrappingFluidType(FluidVariant.of(fluid), handler);
+        }
+
         throw new RuntimeException("Mod fluids must override getFluidType.");
     }
 

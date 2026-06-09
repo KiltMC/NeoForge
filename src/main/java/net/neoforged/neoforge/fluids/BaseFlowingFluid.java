@@ -5,6 +5,13 @@
 
 package net.neoforged.neoforge.fluids;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.SoundActions;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
@@ -23,11 +30,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.common.SoundActions;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Base implementation of a {@link FlowingFluid} for mods to use.
@@ -60,8 +62,24 @@ public abstract class BaseFlowingFluid extends FlowingFluid {
         this.tickRate = properties.tickRate;
     }
 
+    // Kilt: Fabric fluid types.
+    private FluidType kilt$backupFluidType;
+
     @Override
     public FluidType neo$getFluidType() {
+        // Kilt: Fabric fluid types.
+        if (this.fluidType == null) {
+            if (kilt$backupFluidType == null) {
+                var ft = super.getFluidType();
+                if (ft == null) {
+                    kilt$backupFluidType = CommonHooks.kilt$getVanillaFluidType(this, false);
+                } else {
+                    kilt$backupFluidType = FluidType.kilt$tryGetWrappingFluidType(ft);
+                }
+            }
+            return kilt$backupFluidType;
+        }
+
         return this.fluidType.get();
     }
 

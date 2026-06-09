@@ -5,15 +5,27 @@
 
 package net.neoforged.neoforge.fluids;
 
-import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+
+import com.google.common.collect.ImmutableMap;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.common.SoundAction;
+import net.neoforged.neoforge.common.SoundActions;
+import net.neoforged.neoforge.common.util.Lazy;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.mixin.FluidTypeAccessor;
+
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -42,13 +54,9 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.common.SoundAction;
-import net.neoforged.neoforge.common.SoundActions;
-import net.neoforged.neoforge.common.util.Lazy;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.jetbrains.annotations.Nullable;
+
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributeHandler;
 
 /**
  * A definition of common attributes, properties, and methods that is applied
@@ -123,6 +131,54 @@ public class FluidType {
         this.viscosity = properties.viscosity;
         this.rarity = properties.rarity;
         this.dripInfo = properties.dripInfo;
+    }
+
+    // Kilt: Add flag to know that a fluid type is wrapped.
+    public boolean kilt$isWrapped = false;
+    public FluidType(final Properties properties, boolean isWrapped)
+    {
+        this(properties);
+        this.kilt$isWrapped = isWrapped;
+    }
+
+    // Kilt: Try to replicate fluid types for Fabric
+    private static final Map<FluidVariantAttributeHandler, FluidType> kilt$fluidTypes = new ConcurrentHashMap<>();
+    public static FluidType kilt$tryGetWrappingFluidType(FluidVariant fluidVariant, FluidVariantAttributeHandler handler) {
+        return kilt$fluidTypes.computeIfAbsent(handler, $ -> {
+            var name = handler.getName(fluidVariant);
+            var properties = Properties.create()
+                .descriptionId(name.getContents() instanceof TranslatableContents translatable ? translatable.getKey() : name.getString())
+                .lightLevel(handler.getLuminance(fluidVariant))
+                .temperature(handler.getTemperature(fluidVariant))
+                .viscosity(handler.getViscosity(fluidVariant, null))
+                .density(handler.isLighterThanAir(fluidVariant) ? 0 : 100);
+
+            handler.getFillSound(fluidVariant).ifPresent(sound -> properties.sound(SoundActions.BUCKET_FILL, sound));
+            handler.getEmptySound(fluidVariant).ifPresent(sound -> properties.sound(SoundActions.BUCKET_EMPTY, sound));
+
+            return new FluidType(properties, true);
+        });
+    }
+
+    public static FluidType kilt$tryGetWrappingFluidType(io.github.fabricators_of_create.porting_lib.fluids.FluidType wrapped) {
+        return new FluidType(Properties.create()
+            .descriptionId(wrapped.getDescriptionId())
+            .motionScale(((FluidTypeAccessor) wrapped).getMotionScale())
+            .canPushEntity(((FluidTypeAccessor) wrapped).isCanPushEntity())
+            .canSwim(((FluidTypeAccessor) wrapped).isCanSwim())
+            .canDrown(((FluidTypeAccessor) wrapped).isCanDrown())
+            .fallDistanceModifier(((FluidTypeAccessor) wrapped).getFallDistanceModifier())
+            .canExtinguish(((FluidTypeAccessor) wrapped).isCanExtinguish())
+            .canConvertToSource(((FluidTypeAccessor) wrapped).isCanConvertToSource())
+            .supportsBoating(((FluidTypeAccessor) wrapped).isSupportsBoating())
+            .pathType(((FluidTypeAccessor) wrapped).getPathType())
+            .adjacentPathType(((FluidTypeAccessor) wrapped).getAdjacentPathType())
+            .canHydrate(((FluidTypeAccessor) wrapped).isCanHydrate())
+            .lightLevel(((FluidTypeAccessor) wrapped).getLightLevel())
+            .density(((FluidTypeAccessor) wrapped).getDensity())
+            .temperature(((FluidTypeAccessor) wrapped).getTemperature())
+            .viscosity(((FluidTypeAccessor) wrapped).getViscosity())
+            .rarity(((FluidTypeAccessor) wrapped).getRarity()), true);
     }
 
     /* Default Accessors */
