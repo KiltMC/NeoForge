@@ -5,38 +5,45 @@
 
 package net.neoforged.neoforge.common.crafting;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
-import java.util.stream.Stream;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.bluspring.kilt.injections.world.item.crafting.IngredientInjection;
 
+import net.minecraft.world.item.crafting.Ingredient;
+
 @ApiStatus.Internal
 public class CraftingHelper {
     public static Codec<Ingredient> makeIngredientCodec(boolean allowEmpty) {
         var listCodec = Codec.lazyInitialized(() -> allowEmpty ? Ingredient.LIST_CODEC : Ingredient.LIST_CODEC_NONEMPTY);
-        return Codec.either(listCodec, makeIngredientMapCodec().codec())
-                .xmap(either -> either.map(list -> {
-                    // Use CompoundIngredient.of(...) to convert empty ingredients to Ingredient.EMPTY
-                    return CompoundIngredient.of(list.toArray(Ingredient[]::new));
-                }, i -> i), ingredient -> {
-                    if (ingredient.isCustom()) {
-                        if (ingredient.neoforge$getCustomIngredient() instanceof CompoundIngredient compound) {
-                            // Use [] syntax for CompoundIngredients.
-                            return Either.left(compound.children());
-                        }
-                    } else if (ingredient.getValues().length != 1) {
-                        // Use [] syntax for vanilla ingredients that either 0 or 2+ values.
-                        return Either.left(Stream.of(ingredient.getValues()).map(v -> Ingredient.fromValues(Stream.of(v))).toList());
+        return kilt$makeIngredientCodec(listCodec);
+    }
+
+    public static Codec<Ingredient> kilt$makeIngredientCodec(Codec<List<Ingredient>> original) {
+        return Codec.either(original, makeIngredientMapCodec().codec())
+            .xmap(either -> either.map(list -> {
+                // Use CompoundIngredient.of(...) to convert empty ingredients to Ingredient.EMPTY
+                return CompoundIngredient.of(list.toArray(Ingredient[]::new));
+            }, i -> i), ingredient -> {
+                if (ingredient.isCustom()) {
+                    if (ingredient.neoforge$getCustomIngredient() instanceof CompoundIngredient compound) {
+                        // Use [] syntax for CompoundIngredients.
+                        return Either.left(compound.children());
                     }
-                    // Else use {} syntax.
-                    return Either.right(ingredient);
-                });
+                } else if (ingredient.getValues().length != 1) {
+                    // Use [] syntax for vanilla ingredients that either 0 or 2+ values.
+                    return Either.left(Stream.of(ingredient.getValues()).map(v -> Ingredient.fromValues(Stream.of(v))).toList());
+                }
+                // Else use {} syntax.
+                return Either.right(ingredient);
+            });
     }
 
     public static MapCodec<Ingredient> makeIngredientMapCodec() {
