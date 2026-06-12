@@ -5,14 +5,17 @@
 
 package net.neoforged.neoforge.registries.datamaps;
 
+import java.util.Objects;
+import java.util.function.Function;
+
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
-import java.util.Objects;
+import net.neoforged.neoforge.common.conditions.ConditionalOps;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.common.conditions.ConditionalOps;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A registry data map contains data-driven object that can be attached to a registry object. <p>
@@ -62,6 +65,8 @@ public sealed class DataMapType<R, T> permits AdvancedDataMapType {
     private final Codec<T> codec;
     private final @Nullable Codec<T> networkCodec;
     private final boolean mandatorySync;
+
+    private @Nullable Function<R, T> kilt$fallback;
 
     DataMapType(ResourceKey<Registry<R>> registryKey, ResourceLocation id, Codec<T> codec, @Nullable Codec<T> networkCodec, boolean mandatorySync) {
         Preconditions.checkArgument(networkCodec != null || !mandatorySync, "Mandatory sync cannot be enabled when the attachment isn't synchronized");
@@ -121,6 +126,15 @@ public sealed class DataMapType<R, T> permits AdvancedDataMapType {
         return mandatorySync;
     }
 
+    // Kilt: Allow getting fallback values when a datamap value does not exist.
+    public @Nullable T kilt$getFallbackFor(R value) {
+        if (this.kilt$fallback != null) {
+            return this.kilt$fallback.apply(value);
+        }
+
+        return null;
+    }
+
     /**
      * A builder for {@link DataMapType data map types}.
      *
@@ -155,11 +169,20 @@ public sealed class DataMapType<R, T> permits AdvancedDataMapType {
             return this;
         }
 
+        // Kilt: Register custom fallback for Kilt to defer to if no datamap exists.
+        protected @Nullable Function<R, T> kilt$fallback = null;
+        public Builder<T, R> kilt$setFallback(Function<R, T> fallback) {
+            this.kilt$fallback = fallback;
+            return this;
+        }
+
         /**
          * {@return a built data map type}
          */
         public DataMapType<R, T> build() {
-            return new DataMapType<>(registryKey, id, codec, networkCodec, mandatorySync);
+            var type = new DataMapType<>(registryKey, id, codec, networkCodec, mandatorySync);
+            type.kilt$fallback = kilt$fallback;
+            return type;
         }
     }
 }

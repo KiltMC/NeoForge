@@ -5,6 +5,13 @@
 
 package net.neoforged.neoforge.registries.datamaps.builtin;
 
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.DataMapHooks;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
+import net.neoforged.neoforge.registries.datamaps.DataMapType;
+import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -24,12 +31,9 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.vibrations.VibrationSystem;
 import net.minecraft.world.level.levelgen.feature.MonsterRoomFeature;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.common.DataMapHooks;
-import net.neoforged.neoforge.common.ItemAbilities;
-import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
-import net.neoforged.neoforge.registries.datamaps.DataMapType;
-import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
+
+import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 
 /**
  * Holds all {@link DataMapType data maps} provided by NeoForge.
@@ -49,7 +53,16 @@ public class NeoForgeDataMaps {
      * The use of a float as the value is also possible, though discouraged in case more options are added in the future.
      */
     public static final DataMapType<Item, Compostable> COMPOSTABLES = DataMapType.builder(
-            id("compostables"), Registries.ITEM, Compostable.CODEC).synced(Compostable.CHANCE_CODEC, false).build();
+            id("compostables"), Registries.ITEM, Compostable.CODEC).synced(Compostable.CHANCE_CODEC, false)
+            .kilt$setFallback(item -> { // Kilt: Add fallback
+                var chance = CompostingChanceRegistry.INSTANCE.get(item);
+                if (chance != null) {
+                    return new Compostable(chance);
+                }
+
+                return null;
+            })
+            .build();
 
     /**
      * The {@linkplain Item} data map that replaces {@link AbstractFurnaceBlockEntity#getFuel()}.
@@ -65,7 +78,16 @@ public class NeoForgeDataMaps {
      * @implNote This data map will be empty when connected to a Vanilla server.
      */
     public static final DataMapType<Item, FurnaceFuel> FURNACE_FUELS = DataMapType.builder(
-            id("furnace_fuels"), Registries.ITEM, FurnaceFuel.CODEC).synced(FurnaceFuel.BURN_TIME_CODEC, false).build();
+            id("furnace_fuels"), Registries.ITEM, FurnaceFuel.CODEC).synced(FurnaceFuel.BURN_TIME_CODEC, false)
+            .kilt$setFallback(item -> { // Kilt: Add fallback
+                var fuel = FuelRegistry.INSTANCE.get(item);
+                if (fuel != null) {
+                    return new FurnaceFuel(fuel);
+                }
+
+                return null;
+            })
+            .build();
 
     /**
      * The {@linkplain EntityType} data map that replaces {@link MonsterRoomFeature#MOBS}.
@@ -91,7 +113,16 @@ public class NeoForgeDataMaps {
      * The inverted map of this can be found at {@link DataMapHooks#getInverseOxidizablesMap()}
      */
     public static final DataMapType<Block, Oxidizable> OXIDIZABLES = DataMapType.builder(
-            id("oxidizables"), Registries.BLOCK, Oxidizable.CODEC).synced(Oxidizable.OXIDIZABLE_CODEC, false).build();
+            id("oxidizables"), Registries.BLOCK, Oxidizable.CODEC).synced(Oxidizable.OXIDIZABLE_CODEC, false)
+            .kilt$setFallback(block -> { // Kilt: Add fallback
+                var next = WeatheringCopper.NEXT_BY_BLOCK.get().get(block);
+                if (next != null) {
+                    return new Oxidizable(next);
+                }
+
+                return null;
+            })
+            .build();
 
     /**
      * The {@linkplain EntityType} data map that replaces {@link Parrot#MOB_SOUND_MAP}.
