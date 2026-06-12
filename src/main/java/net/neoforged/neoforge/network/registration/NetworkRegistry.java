@@ -132,6 +132,16 @@ public class NetworkRegistry {
 
     private NetworkRegistry() {}
 
+    // Kilt: Allow checking if a payload exists here somehow
+    public static boolean kilt$payloadExists(ConnectionProtocol protocol, ResourceLocation id) {
+        var payloads = PAYLOAD_REGISTRATIONS.get(protocol);
+
+        if (payloads == null)
+            return false;
+
+        return payloads.containsKey(id);
+    }
+
     /**
      * Sets up the network registry by firing {@link RegisterPayloadHandlersEvent}, storing the resulting payload registrations in {@link #PAYLOAD_REGISTRATIONS}.
      */
