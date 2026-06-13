@@ -29,6 +29,7 @@ import net.minecraftforge.entity.PartEntity;
 import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.Nullable;
 import xyz.bluspring.kilt.injections.world.entity.EntityInjection;
+import xyz.bluspring.kilt.util.KiltHelper;
 
 import java.util.Collection;
 import java.util.function.BiPredicate;
@@ -233,9 +234,19 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag>, Enti
         return this.kilt$getStepHeight(() -> self().maxUpStep());
     }
 
+    ThreadLocal<Boolean> KILT$IS_CHECKING_HEIGHT = ThreadLocal.withInitial(() -> false);
+
     // Kilt: Custom provider to allow compat with other mods :D
     default float kilt$getStepHeight(Supplier<Float> vanillaStepProvider)
     {
+        if (KiltHelper.INSTANCE.hasMethodOverride(this.getClass(), IForgeEntity.class, "getStepHeight") && !KILT$IS_CHECKING_HEIGHT.get()) {
+            try {
+                KILT$IS_CHECKING_HEIGHT.set(true);
+                return getStepHeight();
+            } finally {
+                KILT$IS_CHECKING_HEIGHT.set(false);
+            }
+        }
         float vanillaStep = vanillaStepProvider.get();
         if (self() instanceof LivingEntity living)
         {
