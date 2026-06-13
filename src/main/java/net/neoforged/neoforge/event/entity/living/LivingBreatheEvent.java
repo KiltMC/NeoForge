@@ -5,9 +5,10 @@
 
 package net.neoforged.neoforge.event.entity.living;
 
-import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.NeoForge;
+
+import net.minecraft.world.entity.LivingEntity;
 
 /**
  * LivingBreatheEvent is fired whenever a living entity ticks.<br>
@@ -24,6 +25,11 @@ public class LivingBreatheEvent extends LivingEvent {
     private boolean canBreathe;
     private int consumeAirAmount;
     private int refillAirAmount;
+
+    // Kilt: Special handling to watch over what we should modify and what should be deferred.
+    public boolean kilt$isConsumeModified = false;
+    public boolean kilt$canBreatheModified = false;
+    public boolean kilt$isRefillModified = false;
 
     public LivingBreatheEvent(LivingEntity entity, boolean canBreathe, int consumeAirAmount, int refillAirAmount) {
         super(entity);
@@ -49,6 +55,7 @@ public class LivingBreatheEvent extends LivingEvent {
      */
     public void setCanBreathe(boolean canBreathe) {
         this.canBreathe = canBreathe;
+        this.kilt$canBreatheModified = true;
     }
 
     /**
@@ -66,6 +73,7 @@ public class LivingBreatheEvent extends LivingEvent {
      */
     public void setConsumeAirAmount(int consumeAirAmount) {
         this.consumeAirAmount = Math.max(consumeAirAmount, 0);
+        this.kilt$isConsumeModified = true;
     }
 
     /**
@@ -83,5 +91,6 @@ public class LivingBreatheEvent extends LivingEvent {
      */
     public void setRefillAirAmount(int refillAirAmount) {
         this.refillAirAmount = Math.max(refillAirAmount, 0);
+        this.kilt$isRefillModified = true;
     }
 }

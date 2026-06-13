@@ -5,13 +5,14 @@
 
 package net.neoforged.neoforge.event.entity.living;
 
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.NeoForge;
+
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.ICancellableEvent;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.NeoForge;
 
 /**
  * LivingDrownEvent is fired whenever a living entity can't breathe and its air supply is less than or equal to zero.
@@ -27,6 +28,9 @@ public class LivingDrownEvent extends LivingEvent implements ICancellableEvent {
     private boolean isDrowning;
     private float damageAmount;
     private int bubbleCount;
+
+    // Kilt: Keeping track of values that were modified.
+    public boolean kilt$bubbleCountModified = false;
 
     /**
      * Constructs a new LivingDrownEvent.
@@ -115,6 +119,7 @@ public class LivingDrownEvent extends LivingEvent implements ICancellableEvent {
      */
     public void setBubbleCount(int bubbleCount) {
         this.bubbleCount = bubbleCount;
+        this.kilt$bubbleCountModified = true;
     }
 
     /**
