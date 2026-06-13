@@ -6,6 +6,10 @@
 package net.neoforged.neoforge.client.textures;
 
 import java.util.Map;
+
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.LiquidBlockRenderer;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
@@ -15,8 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Helper class for safely accessing fluid textures on a render worker (such as in {@link LiquidBlockRenderer})
@@ -32,6 +34,18 @@ public final class FluidSpriteCache {
      */
     public static TextureAtlasSprite[] getFluidSprites(BlockAndTintGetter level, BlockPos pos, FluidState fluid) {
         IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluid);
+
+        // Kilt: Some mods rely on this data really early, let's do an early return.
+        if (level == null || pos == null || fluid == null) {
+            ResourceLocation overlay = props.getOverlayTexture();
+            Map<ResourceLocation, TextureAtlasSprite> textures = textureLookup;
+            return new TextureAtlasSprite[] {
+                textures.getOrDefault(props.getStillTexture(), missingSprite),
+                textures.getOrDefault(props.getFlowingTexture(), missingSprite),
+                overlay == null ? null : textures.getOrDefault(overlay, missingSprite)
+            };
+        }
+
         ResourceLocation overlay = props.getOverlayTexture(fluid, level, pos);
         Map<ResourceLocation, TextureAtlasSprite> textures = textureLookup;
 
