@@ -6,19 +6,23 @@
 package net.neoforged.neoforge.client.gui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
-import net.minecraft.resources.ResourceLocation;
+
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Adaptation of {@link LayeredDraw} that is used for {@link Gui} rendering specifically,
@@ -40,14 +44,15 @@ public class GuiLayerManager {
         public NamedLayer(ResourceLocation name, LayeredDraw.Layer layer) {
             this(name, layer, false);
         }
-
-        public boolean kilt$isEmptyLayer() {
-            return this.layer() == KILT_EMPTY_LAYER;
-        }
     }
 
     public GuiLayerManager add(ResourceLocation name, LayeredDraw.Layer layer) {
         this.layers.add(new NamedLayer(name, layer));
+        return this;
+    }
+
+    public GuiLayerManager add(ResourceLocation name, LayeredDraw.Layer layer, boolean isVanilla) {
+        this.layers.add(new NamedLayer(name, layer, isVanilla));
         return this;
     }
 
@@ -68,7 +73,7 @@ public class GuiLayerManager {
                 if (shouldRender.getAsBoolean()) {
                     entry.layer().render(guiGraphics, partialTick);
                 }
-            });
+            }, entry.isVanilla());
         }
         return this;
     }
@@ -110,82 +115,17 @@ public class GuiLayerManager {
         return this.layers.size();
     }
 
-    // Kilt: custom compatibility GUI rendering stuff :D (yes I stole this from Porting Lib, I wrote the damn code lmao)
-    /**
-     * Renders layers starting from one render layer until the next Vanilla layer is reached.
-     * @param start The ID of the rendering layer to start from
-     */
-    public void kilt$renderFrom(ResourceLocation start, GuiGraphics guiGraphics, DeltaTracker partialTick) {
-        NamedLayer startingLayer = kilt$getLayer(start);
-        if (startingLayer == null) {
-            throw new IllegalArgumentException("Layer " + start + " does not exist!");
-        }
-
-        kilt$renderFrom(startingLayer, guiGraphics, partialTick);
-    }
-
-    public void kilt$renderFrom(NamedLayer startingLayer, GuiGraphics guiGraphics, DeltaTracker partialTick) {
-        guiGraphics.pose().pushPose();
-        boolean hasStartedRendering = false;
-
-        for (NamedLayer layer : layers) {
-            if (layer == startingLayer || startingLayer == null) {
-                hasStartedRendering = true;
-            }
-
-            if (!hasStartedRendering) {
-                continue;
-            }
-
-            // Stop rendering entirely if this layer is a Vanilla layer that isn't the starting layer.
-            if (layer.isVanilla() && layer != startingLayer) {
-                break;
-            }
-
-            // Render only non-Vanilla layers - we may end up double-rendering otherwise.
-            if (!layer.isVanilla()) {
-                kilt$renderLayer(guiGraphics, partialTick, layer);
-            }
-        }
-        guiGraphics.pose().popPose();
-    }
-
-    public boolean kilt$callPreRenderEvent(ResourceLocation id, GuiGraphics guiGraphics, DeltaTracker partialTick) {
-        NamedLayer layer = kilt$getLayer(id);
-
-        if (layer == null) {
-            throw new IllegalArgumentException("Layer " + id + " does not exist!");
-        }
-
-        return NeoForge.EVENT_BUS.post(new RenderGuiLayerEvent.Pre(guiGraphics, partialTick, layer.name(), layer.layer())).isCanceled();
-    }
-
-    public void kilt$callPostRenderEvent(ResourceLocation id, GuiGraphics guiGraphics, DeltaTracker partialTick) {
-        NamedLayer layer = kilt$getLayer(id);
-
-        if (layer == null) {
-            throw new IllegalArgumentException("Layer " + id + " does not exist!");
-        }
-
-        NeoForge.EVENT_BUS.post(new RenderGuiLayerEvent.Post(guiGraphics, partialTick, layer.name(), layer.layer()));
-    }
-
-    private void kilt$renderLayer(GuiGraphics guiGraphics, DeltaTracker partialTick, NamedLayer layer) {
-        if (!NeoForge.EVENT_BUS.post(new RenderGuiLayerEvent.Pre(guiGraphics, partialTick, layer.name(), layer.layer())).isCanceled()) {
-            layer.layer().render(guiGraphics, partialTick);
-            NeoForge.EVENT_BUS.post(new RenderGuiLayerEvent.Post(guiGraphics, partialTick, layer.name(), layer.layer()));
-        }
-
-        guiGraphics.pose().translate(0.0F, 0.0F, Z_SEPARATION);
-    }
-
-    public NamedLayer kilt$getLayer(ResourceLocation id) {
-        for (NamedLayer layer : layers) {
-            if (layer.name().equals(id)) {
-                return layer;
+    public @Nullable NamedLayer kilt$findNamedLayer(LayeredDraw.Layer layer) {
+        for (NamedLayer named : layers) {
+            if (named.layer() == layer) {
+                return named;
             }
         }
 
         return null;
+    }
+
+    public Collection<NamedLayer> kilt$getLayers() {
+        return this.layers;
     }
 }
