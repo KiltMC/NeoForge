@@ -33,7 +33,7 @@ import net.minecraft.resources.ResourceLocation;
 @ApiStatus.Internal
 public class GuiLayerManager {
     // Kilt: Add empty layer
-    private static final LayeredDraw.Layer KILT_EMPTY_LAYER = (guiGraphics, deltaTracker) -> {};
+    public static final LayeredDraw.Layer KILT_EMPTY_LAYER = (guiGraphics, deltaTracker) -> {};
 
     public static final float Z_SEPARATION = LayeredDraw.Z_SEPARATION;
     private final List<NamedLayer> layers = new ArrayList<>();
