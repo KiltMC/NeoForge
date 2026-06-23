@@ -5,10 +5,14 @@
 
 package net.neoforged.neoforge.client.model.geometry;
 
-import com.mojang.math.Transformation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import com.mojang.math.Transformation;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -18,8 +22,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A {@linkplain IGeometryBakingContext geometry baking context} that is bound to a {@link BlockModel}.
@@ -155,6 +157,10 @@ public class BlockGeometryBakingContext implements IGeometryBakingContext {
         public void copyFrom(VisibilityData visibilityData) {
             data.clear();
             data.putAll(visibilityData.data);
+        }
+
+        public boolean kilt$hasAnyData() {
+            return !data.isEmpty();
         }
     }
 }
