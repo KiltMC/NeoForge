@@ -399,23 +399,24 @@ public class NeoForgeMod {
 
     private static final DeferredRegister<FluidType> VANILLA_FLUID_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.FLUID_TYPES, "minecraft");
 
-    public static final Holder<FluidType> EMPTY_TYPE = VANILLA_FLUID_TYPES.register("empty", () -> new FluidType(FluidType.Properties.create()
-            .descriptionId("block.minecraft.air")
-            .motionScale(1D)
-            .canPushEntity(false)
-            .canSwim(false)
-            .canDrown(false)
-            .fallDistanceModifier(1F)
-            .pathType(null)
-            .adjacentPathType(null)
-            .density(0)
-            .temperature(0)
-            .viscosity(0)) {
+    public static final FluidType KILT_EMPTY_TYPE_DIRECT = new FluidType(FluidType.Properties.create()
+        .descriptionId("block.minecraft.air")
+        .motionScale(1D)
+        .canPushEntity(false)
+        .canSwim(false)
+        .canDrown(false)
+        .fallDistanceModifier(1F)
+        .pathType(null)
+        .adjacentPathType(null)
+        .density(0)
+        .temperature(0)
+        .viscosity(0)) {
         @Override
         public void setItemMovement(ItemEntity entity) {
             if (!entity.isNoGravity()) entity.setDeltaMovement(entity.getDeltaMovement().add(0.0D, -0.04D, 0.0D));
         }
-    });
+    };
+    public static final Holder<FluidType> EMPTY_TYPE = VANILLA_FLUID_TYPES.register("empty", () -> KILT_EMPTY_TYPE_DIRECT);
     public static final Holder<FluidType> WATER_TYPE = VANILLA_FLUID_TYPES.register("water", () -> new FluidType(FluidType.Properties.create()
             .descriptionId("block.minecraft.water")
             .fallDistanceModifier(0F)
