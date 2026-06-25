@@ -11,6 +11,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -49,11 +56,6 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.ItemAbilities;
-import net.neoforged.neoforge.common.ItemAbility;
-import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
 
 public interface IItemExtension {
     private Item self() {
@@ -537,8 +539,8 @@ public interface IItemExtension {
      * Called every tick when this item is equipped {@linkplain DataComponents#EQUIPPABLE as an armor item} by an animal.
      *
      * @param stack The armor stack
-     * @param level The level the horse is in
-     * @param horse The horse wearing this item
+     * @param level The level the equine is in
+     * @param horse The equine wearing this item
      * @apiNote Call from {@link IItemStackExtension#onAnimalArmorTick(Level, Mob)}.
      */
     @ApiStatus.OverrideOnly

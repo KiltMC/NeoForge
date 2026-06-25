@@ -10,9 +10,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
+
 import net.neoforged.neoforge.registries.callback.AddCallback;
 import net.neoforged.neoforge.registries.callback.BakeCallback;
 import net.neoforged.neoforge.registries.callback.ClearCallback;
@@ -21,11 +19,15 @@ import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+
 @ApiStatus.Internal
 public abstract class BaseMappedRegistry<T> implements Registry<T> {
     protected final List<AddCallback<T>> addCallbacks = new ArrayList<>();
-    protected final List<BakeCallback<T>> bakeCallbacks = new ArrayList<>();
-    protected final List<ClearCallback<T>> clearCallbacks = new ArrayList<>();
+    public final List<BakeCallback<T>> bakeCallbacks = new ArrayList<>();
+    public final List<ClearCallback<T>> clearCallbacks = new ArrayList<>();
     final Map<Identifier, Identifier> aliases = new HashMap<>();
     final Map<DataMapType<T, ?>, Map<ResourceKey<T>, ?>> dataMaps = new IdentityHashMap<>();
 

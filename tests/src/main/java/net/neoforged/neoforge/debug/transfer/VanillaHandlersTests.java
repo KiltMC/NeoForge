@@ -616,11 +616,11 @@ public class VanillaHandlersTests {
                 try (var tx = Transaction.openRoot()) {
                     // Check that non-armor items can't be inserted
                     if (wrapper.insert(ItemResource.of(Items.DIAMOND_PICKAXE), 1, tx) != 0) {
-                        helper.fail("Should have rejected diamond pickaxe as horse armor");
+                        helper.fail("Should have rejected diamond pickaxe as equine armor");
                     }
 
                     if (wrapper.insert(ItemResource.of(Items.DIAMOND_HORSE_ARMOR), 1, tx) != 1) {
-                        helper.fail("Should have inserted 1 diamond horse armor");
+                        helper.fail("Should have inserted 1 diamond equine armor");
                     }
                     // No events yet - in case the insertion is rolled back
                     helper.assertValueEqual(0, equipEvents.getPlain(), "equip event count");
@@ -634,7 +634,7 @@ public class VanillaHandlersTests {
 
                 try (var tx = Transaction.openRoot()) {
                     if (wrapper.extract(ItemResource.of(Items.DIAMOND_HORSE_ARMOR), 1, tx) != 1) {
-                        helper.fail("Should have extracted 1 diamond horse armor");
+                        helper.fail("Should have extracted 1 diamond equine armor");
                     }
                     // No additional events yet - in case the extraction is rolled back
                     helper.assertValueEqual(1, equipEvents.getPlain(), "equip event count");

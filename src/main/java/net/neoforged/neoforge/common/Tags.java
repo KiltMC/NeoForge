@@ -1034,7 +1034,7 @@ public class Tags {
         /**
          * A tag containing armor that can fit on a Horse.
          */
-        public static final TagKey<Item> ARMORS_HORSE = tag("armors/horse");
+        public static final TagKey<Item> ARMORS_HORSE = tag("armors/equine");
         /**
          * A tag containing armor that can fit on a Nautilus.
          */

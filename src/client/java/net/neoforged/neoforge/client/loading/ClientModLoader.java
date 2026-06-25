@@ -8,13 +8,7 @@ package net.neoforged.neoforge.client.loading;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-import net.minecraft.CrashReport;
-import net.minecraft.CrashReportCategory;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.util.NativeModuleLister;
-import net.minecraft.world.level.DataPackConfig;
+
 import net.neoforged.fml.Logging;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoader;
@@ -22,7 +16,6 @@ import net.neoforged.fml.ModLoadingException;
 import net.neoforged.fml.ModLoadingIssue;
 import net.neoforged.fml.ModWorkManager;
 import net.neoforged.fml.VersionChecker;
-import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.loading.EarlyLoadingScreenController;
 import net.neoforged.fml.startup.FatalErrorReporting;
 import net.neoforged.neoforge.client.config.NeoForgeClientConfig;
@@ -35,6 +28,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
+
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.util.NativeModuleLister;
+import net.minecraft.world.level.DataPackConfig;
 
 @ApiStatus.Internal
 public class ClientModLoader extends CommonModLoader {
@@ -74,9 +75,11 @@ public class ClientModLoader extends CommonModLoader {
             Minecraft.saveReport(gameDir, report);
             reportFatalError(e, gameDir.toPath(), report);
         }
+        /* // Kilt: no
         if (earlyLoadingScreen instanceof DisplayWindow displayWindow) {
             displayWindow.close();
         }
+         */
     }
 
     public static VersionChecker.Status checkForUpdates() {

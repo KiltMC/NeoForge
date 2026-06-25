@@ -5,6 +5,12 @@
 
 package net.neoforged.neoforge.common.extensions;
 
+import net.neoforged.neoforge.capabilities.ItemCapability;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.RegistryLookup;
@@ -35,11 +41,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.ItemCapability;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
-import org.jspecify.annotations.Nullable;
 
 /*
  * Extension added to ItemStack that bounces to ItemSack sensitive Item methods. Typically this is just for convince.
@@ -197,8 +198,8 @@ public interface IItemStackExtension extends ItemInstanceExtension {
     /**
      * Called every tick when this item is {@link DataComponents#EQUIPPABLE equipped} {@link EquipmentSlot#BODY as an armor item} by a {@link Mob} that can wear armor.
      *
-     * @param level The level the horse is in
-     * @param horse The horse wearing this item
+     * @param level The level the equine is in
+     * @param horse The equine wearing this item
      */
     default void onAnimalArmorTick(Level level, Mob horse) {
         self().getItem().onAnimalArmorTick(self(), level, horse);
