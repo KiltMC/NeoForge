@@ -29,13 +29,14 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'de.undercouch.download' version '5.4.0'
-    id 'net.minecraftforge.gradle.patcher' version '[6.0.11,6.2)' apply false
-    id 'net.minecraftforge.gradle.mcp' version '[6.0.11,6.2)' apply false
+    id 'net.minecraftforge.gradle.patcher' version '[6.0.52,6.2)' apply false
+    id 'net.minecraftforge.gradle.mcp' version '[6.0.52,6.2)' apply false
 }
 
 Util.init() //Init all our extension methods!
 
 ext {
+    HAS_CLEAN = findProject(':clean') != null
     JAR_SIGNER = null
     if (project.hasProperty('keystore')) {
         JAR_SIGNER = [
@@ -55,11 +56,11 @@ ext {
     MERGETOOL_VERSION = '1.1.5'
     ACCESSTRANSFORMERS_VERSION = '8.0.4'
     COREMODS_VERSION = '5.2.4'
-    EVENTBUS_VERSION = '6.0.5'
+    EVENTBUS_VERSION = '6.2.33'
     MODLAUNCHER_VERSION = '10.0.9'
     SECUREJARHANDLER_VERSION = '2.1.10'
     BOOTSTRAPLAUNCHER_VERSION = '1.1.2'
-    ASM_VERSION = '9.7.1'
+    ASM_VERSION = '9.9.1'
     INSTALLER_VERSION = '2.2.+'
     MIXIN_VERSION = '0.8.5'
     TERMINALCONSOLEAPPENDER_VERSION = '1.2.0'
@@ -227,7 +228,7 @@ project(':mcp') {
     }
 }
 
-if (!System.env.TEAMCITY_VERSION) {
+if (HAS_CLEAN) {
     project(':clean') {
         evaluationDependsOn(':mcp')
         apply plugin: 'net.minecraftforge.gradle.patcher'
@@ -890,7 +891,7 @@ project(':fmlonly') {
 }
 
 project(':forge') {
-    evaluationDependsOn(System.env.TEAMCITY_VERSION ? ':mcp' : ':clean')
+    evaluationDependsOn(HAS_CLEAN ? ':clean' : ':mcp')
     apply plugin: 'java-library'
     apply plugin: 'net.minecraftforge.gradle.patcher'
     apply plugin: 'org.cadixdev.licenser'
@@ -970,18 +971,14 @@ project(':forge') {
 
     patcher {
         excs.from file("$rootDir/src/main/resources/forge.exc")
-        parent = project(System.env.TEAMCITY_VERSION ? ':mcp' : ':clean')
+        parent = project(HAS_CLEAN ? ':clean' : ':mcp')
         patches = file("$rootDir/patches/minecraft")
         patchedSrc = file('src/main/java')
         srgPatches = true
         accessTransformers.from file("$rootDir/src/main/resources/META-INF/accesstransformer.cfg")
         sideAnnotationStrippers.from file("$rootDir/src/main/resources/forge.sas")
-
-        // the clean project provides these. if we're not using it, we need to provide them ourselves
-        if (System.env.TEAMCITY_VERSION) {
-            mappings channel: MAPPING_CHANNEL, version: MAPPING_VERSION
-            mcVersion = MC_VERSION
-        }
+        mappings channel: MAPPING_CHANNEL, version: MAPPING_VERSION
+        mcVersion = MC_VERSION
 
         runs {
             forge_client {
@@ -1803,7 +1800,7 @@ project(':forge') {
 
 //evaluationDependsOnChildren()
 task setup() {  //These must be strings so that we can do lazy resolution. Else we need evaluationDependsOnChildren above
-    if (!System.env.TEAMCITY_VERSION)
+    if (HAS_CLEAN)
         dependsOn ':clean:extractMapped'
     if (symlinkValid)
         dependsOn ':fmlonly:extractMapped'
@@ -1818,20 +1815,8 @@ task doChecks {
 if (symlinkValid)
     project.gradle.startParameter.excludedTaskNames.add(':fmlonly:genPatches')
 
-if (!System.env.TEAMCITY_VERSION)
+if (HAS_CLEAN)
     project.gradle.startParameter.excludedTaskNames.add(':clean:genPatches')
-
-//Also output FMLOnly when building a version.
-if (System.env.TEAMCITY_VERSION) {
-    //Only setup the CI environment if and only if the environment variables are set.
-    tasks.configureTeamCity {
-        doLast {
-            println "##teamcity[buildNumber '${project(':forge').version}']"
-            println "##teamcity[setParameter name='env.PUBLISHED_JAVA_ARTIFACT_VERSION' value='${project(':forge').version}']"
-            println "##teamcity[setParameter name='env.PUBLISHED_JAVA_FML_ARTIFACT_VERSION' value='${project(':fmlonly').version}']"
-        }
-    }
-}
 
 idea {
     module {

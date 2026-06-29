@@ -37,7 +37,7 @@ project(":mcp").projectDir = file("projects/mcp")
 project(":fmlonly").projectDir = file("projects/fmlonly")
 project(":forge").projectDir = file("projects/forge")
 
-if (!System.env.TEAMCITY_VERSION) {
+if (false && !'true'.equals(System.env.CI)) {
     include ':clean'
     project(":clean").projectDir = file("projects/clean")
 }
