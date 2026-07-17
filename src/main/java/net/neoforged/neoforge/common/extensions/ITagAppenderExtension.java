@@ -11,7 +11,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
-public interface ITagAppenderExtension<T> extends TagAppenderExtension<T> {
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricProvidedTagBuilder;
+
+public interface ITagAppenderExtension<T> extends TagAppenderExtension<T>, FabricProvidedTagBuilder<T> {
     private TagsProvider.TagAppender<T> self() {
         return (TagsProvider.TagAppender<T>) this;
     }
