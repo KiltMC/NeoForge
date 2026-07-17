@@ -5,18 +5,20 @@
 
 package net.neoforged.neoforge.common.util;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Optional;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.util.ExtraCodecs;
-import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public record InsertingContents(int index) implements ComponentContents {
@@ -41,6 +43,18 @@ public record InsertingContents(int index) implements ComponentContents {
     @ApiStatus.Internal
     public static void popTranslation() {
         TRANSLATION_STACK.get().pop();
+    }
+
+    // Kilt: make sure it actually exists in here first.
+    @ApiStatus.Internal
+    public static boolean kilt$hasTranslationInStack(TranslatableContents contents) {
+        for (TranslatableContents other : TRANSLATION_STACK.get()) {
+            if (contents == other) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

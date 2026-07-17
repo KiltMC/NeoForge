@@ -10,12 +10,12 @@ import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.renderer.ScreenEffectRendererInjection;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.resources.Identifier;
@@ -69,7 +69,7 @@ public interface IClientFluidTypeExtensions {
     default void renderOverlay(Minecraft mc, PoseStack poseStack, MultiBufferSource buffers) {
         Identifier texture = this.getRenderOverlayTexture(mc);
         if (texture != null)
-            ScreenEffectRenderer.renderFluid(mc, poseStack, buffers, texture);
+            ScreenEffectRendererInjection.renderFluid(mc, poseStack, buffers, texture);
     }
 
     /**
