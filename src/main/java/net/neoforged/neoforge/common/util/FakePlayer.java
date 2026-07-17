@@ -5,13 +5,18 @@
 
 package net.neoforged.neoforge.common.util;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.datafixers.DataFixer;
 import java.nio.file.Path;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Consumer;
+
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.mojang.authlib.GameProfile;
+import com.mojang.datafixers.DataFixer;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.network.Connection;
@@ -88,8 +93,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A basic fake server player implementation that can be used to simulate player actions.
@@ -155,7 +158,7 @@ public class FakePlayer extends ServerPlayer {
         }
 
         @Override
-        protected void load(ServerAdvancementManager manager) {}
+        public void load(ServerAdvancementManager manager) {}
 
         @Override
         public void setPlayer(ServerPlayer player) {}
