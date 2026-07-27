@@ -79,7 +79,6 @@ public class RegisterSpawnPlacementsEvent extends Event implements IModBusEvent 
             }
             map.put(entityType, new MergedSpawnPredicate<>(predicate, placementType, heightmap));
         } else {
-            // Kilt: patch by @ItsBlackGear to fix Vanilla Backport (Fabric) + NML + Kilt, may be upstreamed.
             ((MergedSpawnPredicate<T>) map.get(entityType)).merge(operation, predicate, placementType, heightmap);
         }
     }
