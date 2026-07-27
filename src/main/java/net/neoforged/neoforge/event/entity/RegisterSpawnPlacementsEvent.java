@@ -70,14 +70,6 @@ public class RegisterSpawnPlacementsEvent extends Event implements IModBusEvent 
      */
     @SuppressWarnings("unchecked")
     public <T extends Entity> void register(EntityType<T> entityType, @Nullable SpawnPlacementType placementType, @Nullable Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> predicate, Operation operation) {
-        // Kilt: patch by @ItsBlackGear to fix Vanilla Backport (Fabric) + NML + Kilt, may be upstreamed.
-        if (this.map.containsKey(entityType) && operation != Operation.REPLACE) {
-            if (placementType != null || heightmap != null) {
-                ((MergedSpawnPredicate<T>) this.map.get(entityType)).merge(operation, predicate, null, null);
-                return;
-            }
-        }
-
         if (!map.containsKey(entityType)) {
             if (placementType == null) {
                 throw new NullPointerException("Registering a new Spawn Predicate requires a nonnull placement type! Entity Type: " + BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
@@ -87,9 +79,7 @@ public class RegisterSpawnPlacementsEvent extends Event implements IModBusEvent 
             }
             map.put(entityType, new MergedSpawnPredicate<>(predicate, placementType, heightmap));
         } else {
-            if (operation != Operation.REPLACE && (heightmap != null || placementType != null)) {
-                throw new IllegalStateException("Nonnull heightmap types or spawn placement types may only be used with the REPLACE operation. Entity Type: " + BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
-            }
+            // Kilt: patch by @ItsBlackGear to fix Vanilla Backport (Fabric) + NML + Kilt, may be upstreamed.
             ((MergedSpawnPredicate<T>) map.get(entityType)).merge(operation, predicate, placementType, heightmap);
         }
     }
