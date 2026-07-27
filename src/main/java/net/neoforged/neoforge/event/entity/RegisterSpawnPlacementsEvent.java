@@ -8,18 +8,20 @@ package net.neoforged.neoforge.event.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.SpawnPlacementType;
-import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.level.levelgen.Heightmap;
+
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SpawnPlacementType;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
  * This event allows each {@link EntityType} to have a {@link SpawnPlacements.SpawnPredicate} registered or modified.
@@ -68,6 +70,14 @@ public class RegisterSpawnPlacementsEvent extends Event implements IModBusEvent 
      */
     @SuppressWarnings("unchecked")
     public <T extends Entity> void register(EntityType<T> entityType, @Nullable SpawnPlacementType placementType, @Nullable Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> predicate, Operation operation) {
+        // Kilt: patch by @ItsBlackGear to fix Vanilla Backport (Fabric) + NML + Kilt, may be upstreamed.
+        if (this.map.containsKey(entityType) && operation != Operation.REPLACE) {
+            if (placementType != null || heightmap != null) {
+                ((MergedSpawnPredicate<T>) this.map.get(entityType)).merge(operation, predicate, null, null);
+                return;
+            }
+        }
+
         if (!map.containsKey(entityType)) {
             if (placementType == null) {
                 throw new NullPointerException("Registering a new Spawn Predicate requires a nonnull placement type! Entity Type: " + BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
