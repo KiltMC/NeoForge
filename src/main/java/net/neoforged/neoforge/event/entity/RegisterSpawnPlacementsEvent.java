@@ -79,6 +79,10 @@ public class RegisterSpawnPlacementsEvent extends Event implements IModBusEvent 
             }
             map.put(entityType, new MergedSpawnPredicate<>(predicate, placementType, heightmap));
         } else {
+//            commented out as it's both punishing and redundant, merge already handles the operations without need of a throw
+//            if (operation != Operation.REPLACE && (heightmap != null || placementType != null)) {
+//                throw new IllegalStateException("Nonnull heightmap types or spawn placement types may only be used with the REPLACE operation. Entity Type: " + BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
+//            }
             ((MergedSpawnPredicate<T>) map.get(entityType)).merge(operation, predicate, placementType, heightmap);
         }
     }
