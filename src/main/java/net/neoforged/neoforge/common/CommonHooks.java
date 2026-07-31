@@ -1074,7 +1074,12 @@ public class CommonHooks {
 
     @Nullable
     public static EntityDataSerializer<?> getSerializer(int id, CrudeIncrementalIntIdentityHashBiMap<EntityDataSerializer<?>> vanilla) {
-        EntityDataSerializer<?> serializer = vanilla.byId(id);
+        return kilt$getSerializer(id, () -> vanilla.byId(id));
+    }
+
+    @Nullable
+    public static EntityDataSerializer<?> kilt$getSerializer(int id, Supplier<EntityDataSerializer<?>> original) {
+        EntityDataSerializer<?> serializer = original.get();
         if (serializer == null) {
             return NeoForgeRegistries.ENTITY_DATA_SERIALIZERS.byId(id - VANILLA_SERIALIZER_LIMIT);
         }
@@ -1082,12 +1087,19 @@ public class CommonHooks {
     }
 
     public static int getSerializerId(EntityDataSerializer<?> serializer, CrudeIncrementalIntIdentityHashBiMap<EntityDataSerializer<?>> vanilla) {
-        int id = vanilla.getId(serializer);
+        return kilt$getSerializerId(serializer, () -> vanilla.getId(serializer));
+    }
+
+    public static int kilt$getSerializerId(EntityDataSerializer<?> serializer, Supplier<Integer> original) {
+        int id = original.get();
+        final int originalId = id;
         if (id < 0) {
             id = NeoForgeRegistries.ENTITY_DATA_SERIALIZERS.getId(serializer);
             if (id >= 0) {
                 return id + VANILLA_SERIALIZER_LIMIT;
             }
+
+            return originalId; // Kilt: don't return -1 on accident!
         }
         return id;
     }
