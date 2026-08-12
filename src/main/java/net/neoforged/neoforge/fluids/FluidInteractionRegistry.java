@@ -5,6 +5,16 @@
 
 package net.neoforged.neoforge.fluids;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.event.EventHooks;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -12,11 +22,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.event.EventHooks;
-
-import java.util.*;
-import java.util.function.Function;
 
 /**
  * A registry which defines the interactions a source fluid can have with its
@@ -51,12 +56,17 @@ public final class FluidInteractionRegistry {
      * @return {@code true} if an interaction took place, {@code false} otherwise
      */
     public static boolean canInteract(Level level, BlockPos pos) {
+        return kilt$canInteract(level, pos, true);
+    }
+
+    // Kilt: For wrapping and Fabric mods, check Vanilla handling
+    public static boolean kilt$canInteract(Level level, BlockPos pos, boolean handlesVanilla) {
         FluidState state = level.getFluidState(pos);
         for (Direction direction : LiquidBlock.POSSIBLE_FLOW_DIRECTIONS) {
             BlockPos relativePos = pos.relative(direction.getOpposite());
             List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(state.neo$getFluidType(), Collections.emptyList());
             for (InteractionInformation interaction : interactions) {
-                if (interaction.predicate().test(level, pos, relativePos, state)) {
+                if ((!handlesVanilla || interaction.kilt$isVanilla()) && interaction.predicate().test(level, pos, relativePos, state)) {
                     interaction.interaction().interact(level, pos, relativePos, state);
                     return true;
                 }
@@ -70,12 +80,12 @@ public final class FluidInteractionRegistry {
         // Lava + Water = Obsidian (Source Lava) / Cobblestone (Flowing Lava)
         addInteraction(NeoForgeMod.LAVA_TYPE.value(), new InteractionInformation(
                 NeoForgeMod.WATER_TYPE.value(),
-                fluidState -> fluidState.isSource() ? Blocks.OBSIDIAN.defaultBlockState() : Blocks.COBBLESTONE.defaultBlockState()));
+                fluidState -> fluidState.isSource() ? Blocks.OBSIDIAN.defaultBlockState() : Blocks.COBBLESTONE.defaultBlockState(), true));
 
         // Lava + Soul Soil (Below) + Blue Ice = Basalt
         addInteraction(NeoForgeMod.LAVA_TYPE.value(), new InteractionInformation(
                 (level, currentPos, relativePos, currentState) -> level.getBlockState(currentPos.below()).is(Blocks.SOUL_SOIL) && level.getBlockState(relativePos).is(Blocks.BLUE_ICE),
-                Blocks.BASALT.defaultBlockState()));
+                Blocks.BASALT.defaultBlockState(), true));
     }
 
     /**
@@ -85,7 +95,11 @@ public final class FluidInteractionRegistry {
      * @param predicate   a test to see whether an interaction can occur
      * @param interaction the interaction to perform
      */
-    public record InteractionInformation(HasFluidInteraction predicate, FluidInteraction interaction) {
+    public record InteractionInformation(HasFluidInteraction predicate, FluidInteraction interaction, boolean kilt$isVanilla) { // Kilt: handle Vanilla interactions
+        public InteractionInformation(HasFluidInteraction predicate, FluidInteraction interaction) {
+            this(predicate, interaction, false);
+        }
+
         /**
          * Constructor which checks the surroundings fluids for a specific type
          * and then transforms the source state into a block.
@@ -94,7 +108,11 @@ public final class FluidInteractionRegistry {
          * @param state the state of the block replacing the source
          */
         public InteractionInformation(FluidType type, BlockState state) {
-            this(type, fluidState -> state);
+            this(type, state, false);
+        }
+
+        public InteractionInformation(FluidType type, BlockState state, boolean kilt$isVanilla) {
+            this(type, fluidState -> state, kilt$isVanilla);
         }
 
         /**
@@ -104,7 +122,11 @@ public final class FluidInteractionRegistry {
          * @param state     the state of the block replacing the source
          */
         public InteractionInformation(HasFluidInteraction predicate, BlockState state) {
-            this(predicate, fluidState -> state);
+            this(predicate, state, false);
+        }
+
+        public InteractionInformation(HasFluidInteraction predicate, BlockState state, boolean kilt$isVanilla) {
+            this(predicate, fluidState -> state, kilt$isVanilla);
         }
 
         /**
@@ -115,7 +137,11 @@ public final class FluidInteractionRegistry {
          * @param getState a function to transform the source fluid into a block state
          */
         public InteractionInformation(FluidType type, Function<FluidState, BlockState> getState) {
-            this((level, currentPos, relativePos, currentState) -> level.getFluidState(relativePos).neo$getFluidType() == type, getState);
+            this(type, getState, false);
+        }
+
+        public InteractionInformation(FluidType type, Function<FluidState, BlockState> getState, boolean kilt$isVanilla) {
+            this((level, currentPos, relativePos, currentState) -> level.getFluidState(relativePos).neo$getFluidType() == type, getState, kilt$isVanilla);
         }
 
         /**
@@ -125,10 +151,14 @@ public final class FluidInteractionRegistry {
          * @param getState  a function to transform the source fluid into a block state
          */
         public InteractionInformation(HasFluidInteraction predicate, Function<FluidState, BlockState> getState) {
+            this(predicate, getState, false);
+        }
+
+        public InteractionInformation(HasFluidInteraction predicate, Function<FluidState, BlockState> getState, boolean kilt$isVanilla) {
             this(predicate, (level, currentPos, relativePos, currentState) -> {
                 level.setBlockAndUpdate(currentPos, EventHooks.fireFluidPlaceBlockEvent(level, currentPos, currentPos, getState.apply(currentState)));
                 level.levelEvent(1501, currentPos, 0);
-            });
+            }, kilt$isVanilla);
         }
     }
 
