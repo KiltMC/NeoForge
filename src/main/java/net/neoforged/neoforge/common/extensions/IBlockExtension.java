@@ -7,19 +7,6 @@ package net.neoforged.neoforge.common.extensions;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
-
-import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
-import net.neoforged.neoforge.common.DataMapHooks;
-import net.neoforged.neoforge.common.ItemAbilities;
-import net.neoforged.neoforge.common.ItemAbility;
-import net.neoforged.neoforge.common.enums.BubbleColumnDirection;
-import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.model.data.ModelData;
-import org.jspecify.annotations.Nullable;
-import xyz.bluspring.kilt.injections.world.item.AxeItemInjection;
-import xyz.bluspring.kilt.injections.world.item.ShovelItemInjection;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -39,8 +26,10 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.hurtingprojectile.WitherSkull;
+import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.level.BlockAndLightGetter;
@@ -86,11 +75,20 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.phys.Vec3;
-
-import net.fabricmc.fabric.api.block.v1.FabricBlock;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.common.DataMapHooks;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.enums.BubbleColumnDirection;
+import net.neoforged.neoforge.common.util.BlockRelocability;
+import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.model.data.ModelData;
+import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
-public interface IBlockExtension extends FabricBlock {
+public interface IBlockExtension {
     private Block self() {
         return (Block) this;
     }
@@ -821,14 +819,14 @@ public interface IBlockExtension extends FabricBlock {
             return null;
 
         if (ItemAbilities.AXE_STRIP == itemAbility) {
-            return AxeItemInjection.getAxeStrippingState(state);
+            return AxeItem.getAxeStrippingState(state);
         } else if (ItemAbilities.AXE_SCRAPE == itemAbility) {
             return WeatheringCopper.getPrevious(state).orElse(null);
         } else if (ItemAbilities.AXE_WAX_OFF == itemAbility) {
             Block waxOffBlock = DataMapHooks.getBlockUnwaxed(state.getBlock());
             return Optional.ofNullable(waxOffBlock).map(block -> block.withPropertiesOf(state)).orElse(null);
         } else if (ItemAbilities.SHOVEL_FLATTEN == itemAbility) {
-            return ShovelItemInjection.getShovelPathingState(state);
+            return ShovelItem.getShovelPathingState(state);
         } else if (ItemAbilities.HOE_TILL == itemAbility) {
             // Logic copied from HoeItem#TILLABLES; needs to be kept in sync during updating
             Block block = state.getBlock();
@@ -1080,5 +1078,26 @@ public interface IBlockExtension extends FabricBlock {
      */
     default boolean shouldHideAdjacentFluidFace(BlockState state, Direction selfFace, FluidState adjacentFluid) {
         return state.getFluidState().getType().isSame(adjacentFluid.getType());
+    }
+
+    /// Declares whether a block may be relocated and under what circumstances.
+    /// "Relocation" here means a region of blocks being cut or copied,
+    /// and pasted somewhere else, with a translation and possibly a rotation or mirror,
+    /// also copying any blockentity data to the new position(s).
+    ///
+    /// A multiblock which is relocatable if and only if the entire multiblock is being relocated
+    /// (e.g. a bed, a door, a 3x3 machine) may override this method to define such behavior.
+    ///
+    /// Blocks which may never be relocated should be added to
+    /// {@link Tags.Blocks#RELOCATION_NOT_SUPPORTED}, in which case this method does not need to be overridden.
+    ///
+    /// @param level LevelReader which the block is being relocated from
+    /// @param pos BlockPos which the block is being relocated from
+    /// @param state BlockState of the block being relocated
+    /// @return BlockRelocability declaring whether the block may be relocated
+    default BlockRelocability getRelocability(LevelReader level, BlockPos pos, BlockState state) {
+        return state.is(Tags.Blocks.RELOCATION_NOT_SUPPORTED)
+                ? BlockRelocability.No.INSTANCE
+                : BlockRelocability.Yes.INSTANCE;
     }
 }
