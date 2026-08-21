@@ -5,25 +5,28 @@
 
 package net.neoforged.neoforge.attachment;
 
-import com.mojang.logging.LogUtils;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+
+import com.mojang.logging.LogUtils;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
+import xyz.bluspring.kilt.workarounds.AttachmentHolderWorkaround;
+
+import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * Implementation class for objects that can hold data attachments.
  * For the user-facing methods, see {@link IAttachmentHolder}.
  */
-public abstract class AttachmentHolder implements IAttachmentHolder {
+public abstract class AttachmentHolder implements IAttachmentHolder, AttachmentHolderWorkaround {
     public static final String ATTACHMENTS_NBT_KEY = "neoforge:attachments";
     private static final boolean IN_DEV = !FMLEnvironment.isProduction();
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -141,7 +144,7 @@ public abstract class AttachmentHolder implements IAttachmentHolder {
      *
      * <p>This does not trigger {@link IAttachmentHolder#syncData syncing} of the deserialized attachments.
      */
-    protected final void deserializeAttachments(ValueInput input) {
+    public void deserializeAttachments(ValueInput input) {
         for (var key : input.keySet()) {
             // Use tryParse to not discard valid attachment type keys, even if there is a malformed key.
             Identifier keyLocation = Identifier.tryParse(key);
