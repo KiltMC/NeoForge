@@ -5,6 +5,8 @@
 
 package net.neoforged.neoforge.event.entity.player;
 
+import xyz.bluspring.kilt.injections.neoforge.event.KiltModifiedEventCheckInjection;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
@@ -19,7 +21,7 @@ import net.minecraft.world.level.levelgen.PhantomSpawner;
  * <p>
  * This event is only fired on the logical server.
  */
-public class PlayerSpawnPhantomsEvent extends PlayerEvent {
+public class PlayerSpawnPhantomsEvent extends PlayerEvent implements KiltModifiedEventCheckInjection {
     private int phantomsToSpawn;
     private Result result = Result.DEFAULT;
 
