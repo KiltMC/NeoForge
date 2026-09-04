@@ -1249,6 +1249,13 @@ public class ForgeHooks
         return e;
     }
 
+    public static LivingSwapItemsEvent.Hands kilt$onLivingSwapHandItems(LivingEntity livingEntity, ItemStack toMainHand, ItemStack toOffHand)
+    {
+        LivingSwapItemsEvent.Hands event = new LivingSwapItemsEvent.Hands(livingEntity, toMainHand, toOffHand);
+        MinecraftForge.EVENT_BUS.post(event);
+        return event;
+    }
+
     public static LivingSwapItemsEvent.Hands onLivingSwapHandItems(LivingEntity livingEntity)
     {
         LivingSwapItemsEvent.Hands event = new LivingSwapItemsEvent.Hands(livingEntity);
