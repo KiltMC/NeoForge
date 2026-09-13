@@ -116,8 +116,11 @@ public class ExtendedBlockModelDeserializer extends BlockModel.Deserializer {
             /*
             throw new JsonParseException(String.format(Locale.ENGLISH, "Model loader '%s' not found. Registered loaders: %s", name, GeometryLoaderManager.getLoaderList()));
              */
-            if (kilt$alreadyWarnedLoaders.add(name.toString()))
-                Kilt.Companion.getLogger().error("Could not find model loader '{}', attempting to load under alternative loaders. Registered loaders: {}", name, GeometryLoaderManager.getLoaderList());
+            if (kilt$alreadyWarnedLoaders.add(name.toString())) {
+                if (io.github.fabricators_of_create.porting_lib.models.geometry.GeometryLoaderManager.get(name) == null) { // Don't warn if Porting Lib has it
+                    Kilt.Companion.getLogger().error("Kilt: Could not find model loader '{}', attempting to load under alternative loaders. Registered loaders: {}", name, GeometryLoaderManager.getLoaderList());
+                }
+            }
             return null;
         }
 
