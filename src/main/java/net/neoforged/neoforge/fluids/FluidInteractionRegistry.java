@@ -66,7 +66,7 @@ public final class FluidInteractionRegistry {
             BlockPos relativePos = pos.relative(direction.getOpposite());
             List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(state.neo$getFluidType(), Collections.emptyList());
             for (InteractionInformation interaction : interactions) {
-                if ((!handlesVanilla || interaction.kilt$isVanilla()) && interaction.predicate().test(level, pos, relativePos, state)) {
+                if ((handlesVanilla || !interaction.kilt$isVanilla()) && interaction.predicate().test(level, pos, relativePos, state)) {
                     interaction.interaction().interact(level, pos, relativePos, state);
                     return true;
                 }
