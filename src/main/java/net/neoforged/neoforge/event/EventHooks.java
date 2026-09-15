@@ -201,6 +201,88 @@ import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableConditio
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceWithEnchantedBonusCondition;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.fml.ModLoader;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.extensions.IFluidStateExtension;
+import net.neoforged.neoforge.common.extensions.IOwnedSpawner;
+import net.neoforged.neoforge.common.util.BlockSnapshot;
+import net.neoforged.neoforge.common.util.ClockAdjustment;
+import net.neoforged.neoforge.common.util.InsertableLinkedOpenCustomHashSet;
+import net.neoforged.neoforge.event.brewing.PlayerBrewedPotionEvent;
+import net.neoforged.neoforge.event.brewing.PotionBrewEvent;
+import net.neoforged.neoforge.event.enchanting.EnchantedBlockLootEvent;
+import net.neoforged.neoforge.event.enchanting.EnchantedEntityLootEvent;
+import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
+import net.neoforged.neoforge.event.enchanting.GetEnchantmentLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityEvent;
+import net.neoforged.neoforge.event.entity.EntityMobGriefingEvent;
+import net.neoforged.neoforge.event.entity.EntityMountEvent;
+import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
+import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
+import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
+import net.neoforged.neoforge.event.entity.item.ItemExpireEvent;
+import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
+import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
+import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
+import net.neoforged.neoforge.event.entity.living.MobDespawnEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.entity.living.MobSpawnEvent.PositionCheck;
+import net.neoforged.neoforge.event.entity.living.MobSpawnEvent.SpawnPlacementCheck;
+import net.neoforged.neoforge.event.entity.living.MobSplitEvent;
+import net.neoforged.neoforge.event.entity.living.SpawnClusterSizeEvent;
+import net.neoforged.neoforge.event.entity.player.AdvancementEvent.AdvancementEarnEvent;
+import net.neoforged.neoforge.event.entity.player.AdvancementEvent.AdvancementProgressEvent;
+import net.neoforged.neoforge.event.entity.player.AdvancementEvent.AdvancementProgressEvent.ProgressType;
+import net.neoforged.neoforge.event.entity.player.ArrowLooseEvent;
+import net.neoforged.neoforge.event.entity.player.ArrowNockEvent;
+import net.neoforged.neoforge.event.entity.player.BonemealEvent;
+import net.neoforged.neoforge.event.entity.player.CanContinueSleepingEvent;
+import net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent;
+import net.neoforged.neoforge.event.entity.player.FluidTooltipEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.event.entity.player.PermissionsChangedEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerDestroyItemEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerFlyableFallEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerRespawnPositionEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerSetSpawnEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerSpawnPhantomsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
+import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
+import net.neoforged.neoforge.event.level.AlterGroundEvent;
+import net.neoforged.neoforge.event.level.AlterGroundEvent.StateProvider;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.BlockEvent.BlockToolModificationEvent;
+import net.neoforged.neoforge.event.level.BlockEvent.EntityMultiPlaceEvent;
+import net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent;
+import net.neoforged.neoforge.event.level.BlockEvent.NeighborNotifyEvent;
+import net.neoforged.neoforge.event.level.BlockGrowFeatureEvent;
+import net.neoforged.neoforge.event.level.ChunkTicketLevelUpdatedEvent;
+import net.neoforged.neoforge.event.level.ChunkWatchEvent;
+import net.neoforged.neoforge.event.level.ExplosionEvent;
+import net.neoforged.neoforge.event.level.ExplosionKnockbackEvent;
+import net.neoforged.neoforge.event.level.GameRuleChangedEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.level.ModifyCustomSpawnersEvent;
+import net.neoforged.neoforge.event.level.PistonEvent;
+import net.neoforged.neoforge.event.level.SleepFinishedTimeEvent;
+import net.neoforged.neoforge.event.level.block.CreateFluidSourceEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.resource.ListenerKey;
+import net.neoforged.neoforge.resource.ReloadListenerSort;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 
 public class EventHooks {
     public static boolean onMultiBlockPlace(@Nullable Entity entity, List<BlockSnapshot> blockSnapshots, Direction direction) {
@@ -1121,11 +1203,14 @@ public class EventHooks {
         final var searchEntries = new InsertableLinkedOpenCustomHashSet<ItemStack>(ItemStackLinkedSet.TYPE_AND_TAG);
 
         originalGenerator.accept(params, (stack, vis) -> {
+            // This should mirror the checks in CreativeModeTab.ItemDisplayBuilder#accept
             if (stack.getCount() != 1)
                 throw new IllegalArgumentException("The stack count must be 1");
 
             if (BuildCreativeModeTabContentsEvent.isParentTab(vis)) {
-                parentEntries.add(stack);
+                // TODO 26.3: Remove the dev-only check, so this runs in production as well
+                if (!parentEntries.add(stack) && !FMLEnvironment.isProduction())
+                    throw new IllegalArgumentException("Stack " + stack.getDisplayName().getString() + "has already been added to the tab " + tab.getDisplayName().getString() + " previously");
             }
 
             if (BuildCreativeModeTabContentsEvent.isSearchTab(vis)) {

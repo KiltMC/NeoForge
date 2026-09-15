@@ -8,6 +8,7 @@ package net.neoforged.neoforge.debug.fluid;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.core.BlockPos;
@@ -57,6 +58,7 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.testframework.DynamicTest;
 import net.neoforged.testframework.TestFramework;
 import net.neoforged.testframework.annotation.ForEachTest;
 import net.neoforged.testframework.annotation.OnInit;
@@ -65,6 +67,7 @@ import net.neoforged.testframework.gametest.EmptyTemplate;
 import net.neoforged.testframework.gametest.ExtendedGameTestHelper;
 import net.neoforged.testframework.gametest.GameTest;
 import net.neoforged.testframework.gametest.GameTestPlayer;
+import net.neoforged.testframework.gametest.StructureTemplateBuilder;
 import net.neoforged.testframework.registration.RegistrationHelper;
 
 @ForEachTest(groups = EntityFluidInteractionTests.GROUP)
@@ -88,7 +91,8 @@ public class EntityFluidInteractionTests {
      * Seed oil is a custom non-water fluid that does not override movement.
      */
     private static final FluidFixture<FluidType> SEED_OIL = new FluidFixture<>("seed_oil", () -> new FluidType(FluidType.Properties.create()
-            .descriptionId("fluid_type.neotests_entity_fluid_interaction.seed_oil")));
+            .descriptionId("fluid_type.neotests_entity_fluid_interaction.seed_oil")
+            .fallDistanceModifier(.75F)));
 
     /**
      * Named milk so the tests read like a concrete mod fluid.
@@ -101,6 +105,11 @@ public class EntityFluidInteractionTests {
             .canSwim(true)
             .canExtinguish(true)
             .supportsBoating(true)
+            .isWaterLike(true)));
+
+    /// Steam is a water-like fluid which only pushes zombies.
+    private static final FluidFixture<FluidType> STEAM = new FluidFixture<>("steam", () -> new SteamFluidType(FluidType.Properties.create()
+            .descriptionId("fluid_type.neotests_entity_fluid_interactions.steam")
             .isWaterLike(true)));
 
     private static final Supplier<EntityType<UndrownableZombie>> UNDROWNABLE_ZOMBIE = REG_HELPER.entityTypes()
@@ -351,25 +360,33 @@ public class EntityFluidInteractionTests {
     }
 
     @GameTest(timeoutTicks = 200)
-    @EmptyTemplate(value = "7x6x3", floor = true)
+    @EmptyTemplate(value = "11x6x3", floor = true)
     @TestHolder(description = "Tests vanilla fluid fall distance against a dry control")
     static void vanillaFluidFallDistance(final TestHelper helper) {
         helper.requireDifficulty(Difficulty.NORMAL);
         final BlockPos waterPos = new BlockPos(1, 2, 1);
         final BlockPos lavaPos = new BlockPos(3, 2, 1);
         final BlockPos dryPos = new BlockPos(5, 2, 1);
+        final BlockPos milkPos = new BlockPos(7, 2, 1);
+        final BlockPos seedOilPos = new BlockPos(9, 2, 1);
         helper.fillFluidColumn(WATER, waterPos);
         helper.fillFluidColumn(LAVA, lavaPos);
+        helper.fillFluidColumn(MILK, milkPos);
+        helper.fillFluidColumn(SEED_OIL, seedOilPos);
 
         final Zombie waterZombie = helper.spawnZombieWithNoFreeWill(waterPos);
         final Zombie lavaZombie = helper.spawnZombieWithNoFreeWill(lavaPos);
         final Zombie dryZombie = helper.spawnZombieWithNoFreeWill(dryPos);
+        final Zombie milkZombie = helper.spawnZombieWithNoFreeWill(milkPos);
+        final Zombie seedOilZombie = helper.spawnZombieWithNoFreeWill(seedOilPos);
 
         helper.startSequence()
                 .thenExecuteAfter(2, () -> {
                     helper.assertFallDistanceAfterBaseTick(waterZombie, 12.0D, 0.0D, "Water should reset fall distance during base tick");
                     helper.assertFallDistanceAfterBaseTick(lavaZombie, 12.0D, 6.0D, "Lava should reduce fall distance by its fluid modifier");
                     helper.assertFallDistanceAfterBaseTick(dryZombie, 12.0D, 12.0D, "Dry entity should keep fall distance during base tick");
+                    helper.assertFallDistanceAfterBaseTick(milkZombie, 12.0D, 0.0D, "Water-like fluid should reset fall distance during base tick");
+                    helper.assertFallDistanceAfterBaseTick(seedOilZombie, 12.0D, 9.0D, "Non-water-like fluid should reduce fall distance by its fluid modifier");
                 })
                 .thenSucceed();
     }
@@ -985,6 +1002,44 @@ public class EntityFluidInteractionTests {
                 .thenSucceed();
     }
 
+    @GameTest(timeoutTicks = 200)
+    @TestHolder(description = "Tests submerged mining speed in water-like custom fluid against water and lava controls")
+    static void conditionalFluidPushing(final DynamicTest test) {
+        test.registerGameTestTemplate(() -> StructureTemplateBuilder.withSize(7, 4, 5)
+                .fill(0, 0, 0, 6, 0, 4, Blocks.STONE)
+                .fill(0, 1, 0, 0, 1, 4, Blocks.STONE)
+                .fill(6, 1, 0, 6, 1, 4, Blocks.STONE)
+                .fill(0, 1, 0, 6, 1, 0, Blocks.STONE)
+                .fill(0, 1, 4, 6, 1, 4, Blocks.STONE));
+
+        test.onGameTest(TestHelper.class, helper -> {
+            final BlockPos pushablePos = new BlockPos(1, 1, 1);
+            final BlockPos centerPos = new BlockPos(1, 1, 2);
+            final BlockPos nonPushablePos = new BlockPos(1, 1, 3);
+            final BlockPos pushableEntityPos = pushablePos.east();
+            final BlockPos nonPushableEntityPos = nonPushablePos.east();
+
+            final AtomicReference<Zombie> pushableEntity = new AtomicReference<>();
+            final AtomicReference<Pig> nonPushableEntity = new AtomicReference<>();
+
+            helper.startSequence()
+                    .thenExecute(() -> {
+                        helper.setBlock(pushablePos, STEAM.blockState());
+                        helper.setBlock(centerPos, STEAM.blockState());
+                        helper.setBlock(nonPushablePos, STEAM.blockState());
+                    })
+                    .thenExecuteAfter(20, () -> {
+                        pushableEntity.set(helper.spawnZombieWithNoFreeWill(pushableEntityPos));
+                        nonPushableEntity.set(helper.spawnWithNoFreeWill(EntityType.PIG, nonPushableEntityPos));
+                    })
+                    .thenExecuteAfter(40, () -> {
+                        helper.assertEntityPosition(pushableEntity.get(), pushableEntityPos, (p1, p2) -> !p1.equals(p2), "Expected Zombie to be pushed by Steam");
+                        helper.assertEntityPosition(nonPushableEntity.get(), nonPushableEntityPos, BlockPos::equals, "Expected Pig to not be pushed by Steam");
+                    })
+                    .thenSucceed();
+        });
+    }
+
     private static boolean isBoatEyeInBoatableFluid(Boat boat) {
         return boat.getFluidInteraction().isEyeInFluidMatching(boat, (entity, type, _) -> entity.canBoatInFluid(type));
     }
@@ -1073,7 +1128,7 @@ public class EntityFluidInteractionTests {
         void assertFallDistanceAfterBaseTick(Entity entity, double initialFallDistance, double expectedFallDistance, String message) {
             entity.fallDistance = initialFallDistance;
             entity.baseTick();
-            this.assertValueEqual(expectedFallDistance, entity.fallDistance, message);
+            this.assertValueEqual(entity.fallDistance, expectedFallDistance, message);
         }
 
         void assertNormalSkeletonHorse(CalciumAbsorbingSkeletonHorse horse, float normalWidth, float normalHeight, String fluidName) {
@@ -1086,6 +1141,11 @@ public class EntityFluidInteractionTests {
             this.assertTrue(horse.isGiant(), "Skeleton horse in " + fluidName + " should become giant");
             this.assertTrue(horse.getBbWidth() > normalWidth, "Skeleton horse in " + fluidName + " should grow wider");
             this.assertTrue(horse.getBbHeight() > normalHeight, "Skeleton horse in " + fluidName + " should grow taller");
+        }
+
+        void assertEntityPosition(Entity entity, BlockPos comparePos, BiPredicate<BlockPos, BlockPos> predicate, String message) {
+            // Converting absolute to relative positions is broken, so we do it the stupid way
+            this.assertEntityProperty(entity, e -> predicate.test(this.absolutePos(comparePos), e.blockPosition()), message);
         }
 
         void fillFluidColumn(FluidFixture<?> fluid, BlockPos pos) {
@@ -1273,6 +1333,17 @@ public class EntityFluidInteractionTests {
         public boolean canHydrate(Entity entity) {
             this.hydrationChecks.incrementAndGet();
             return entity instanceof CalciumAbsorbingSkeletonHorse;
+        }
+    }
+
+    private static final class SteamFluidType extends FluidType {
+        private SteamFluidType(Properties properties) {
+            super(properties);
+        }
+
+        @Override
+        public boolean canPushEntity(Entity entity) {
+            return entity.getType() == EntityType.ZOMBIE;
         }
     }
 
