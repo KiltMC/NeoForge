@@ -5,10 +5,6 @@
 
 package net.neoforged.neoforge.resource;
 
-import com.google.common.collect.Sets;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +19,25 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.collect.Sets;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoader;
+import net.neoforged.fml.ModLoadingIssue;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforgespi.language.IModFileInfo;
+import net.neoforged.neoforgespi.language.IModInfo;
+import net.neoforged.neoforgespi.locating.IModFile;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.server.packs.metadata.pack.PackMetadataSectionInjection;
+import xyz.bluspring.kilt.injections.server.packs.repository.PackMetadataInjection;
+
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -43,19 +58,6 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.util.InclusiveRange;
 import net.minecraft.world.flag.FeatureFlagSet;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.ModLoader;
-import net.neoforged.fml.ModLoadingIssue;
-import net.neoforged.neoforge.event.AddPackFindersEvent;
-import net.neoforged.neoforgespi.language.IModFileInfo;
-import net.neoforged.neoforgespi.language.IModInfo;
-import net.neoforged.neoforgespi.locating.IModFile;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.jetbrains.annotations.ApiStatus;
-import xyz.bluspring.kilt.injections.server.packs.metadata.pack.PackMetadataSectionInjection;
-import xyz.bluspring.kilt.injections.server.packs.repository.PackMetadataInjection;
 
 public class ResourcePackLoader {
     public static final String MOD_DATA_ID = "mod_data";
@@ -71,7 +73,7 @@ public class ResourcePackLoader {
     public static void populatePackRepository(PackRepository resourcePacks, PackType packType, boolean trusted) {
         // First add the mod's builtin packs
         // Kilt: Handled by Fabric
-//        findResourcePacks();
+        findResourcePacks();
 //        resourcePacks.addPackFinder(buildPackFinder(modResourcePacks, packType));
         // Then fire the event to add more packs
         ModLoader.postEvent(new AddPackFindersEvent(packType, resourcePacks::addPackFinder, trusted));
