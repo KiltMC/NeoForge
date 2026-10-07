@@ -5,9 +5,14 @@
 
 package net.neoforged.neoforge.attachment;
 
+import java.util.Objects;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import java.util.Objects;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -16,13 +21,10 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
-import net.neoforged.neoforge.common.NeoForgeMod;
-import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
 
 @ApiStatus.Internal
 public class LevelAttachmentsSavedData extends SavedData {
-    public static final SavedDataType<LevelAttachmentsSavedData> TYPE = new SavedDataType<>(
+    public static final SavedDataType<LevelAttachmentsSavedData> TYPE = SavedDataTypeInjection.create(
             Identifier.fromNamespaceAndPath(NeoForgeMod.MOD_ID, "data_attachments"),
             LevelAttachmentsSavedData::new,
             LevelAttachmentsSavedData::makeCodec);

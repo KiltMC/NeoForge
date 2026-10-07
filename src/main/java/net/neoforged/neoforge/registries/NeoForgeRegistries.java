@@ -6,12 +6,6 @@
 package net.neoforged.neoforge.registries;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.conditions.ICondition;
@@ -22,6 +16,14 @@ import net.neoforged.neoforge.common.world.StructureModifier;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredientType;
 import net.neoforged.neoforge.registries.holdersets.HolderSetType;
+import xyz.bluspring.kilt.mixin.fabric.FabricEntityDataRegistryImplAccessor;
+
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 /**
  * A class that exposes static references to NeoForge registries.
@@ -31,7 +33,9 @@ import net.neoforged.neoforge.registries.holdersets.HolderSetType;
  */
 public class NeoForgeRegistries {
     // Custom NeoForge registries
-    public static final Registry<EntityDataSerializer<?>> ENTITY_DATA_SERIALIZERS = new RegistryBuilder<>(Keys.ENTITY_DATA_SERIALIZERS).sync(true).create();
+    // Kilt: Use Fabric API's entity data serializer registry
+    public static final Registry<EntityDataSerializer<?>> ENTITY_DATA_SERIALIZERS = FabricEntityDataRegistryImplAccessor.kilt$getHandlerRegistry();
+    //public static final Registry<EntityDataSerializer<?>> ENTITY_DATA_SERIALIZERS = new RegistryBuilder<>(Keys.ENTITY_DATA_SERIALIZERS).sync(true).create();
     public static final Registry<MapCodec<? extends IGlobalLootModifier>> GLOBAL_LOOT_MODIFIER_SERIALIZERS = new RegistryBuilder<>(Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS).create();
     public static final Registry<MapCodec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = new RegistryBuilder<>(Keys.BIOME_MODIFIER_SERIALIZERS).create();
     public static final Registry<MapCodec<? extends StructureModifier>> STRUCTURE_MODIFIER_SERIALIZERS = new RegistryBuilder<>(Keys.STRUCTURE_MODIFIER_SERIALIZERS).create();
@@ -41,6 +45,11 @@ public class NeoForgeRegistries {
     public static final Registry<FluidIngredientType<?>> FLUID_INGREDIENT_TYPES = new RegistryBuilder<>(Keys.FLUID_INGREDIENT_TYPES).sync(true).create();
     public static final Registry<MapCodec<? extends ICondition>> CONDITION_SERIALIZERS = new RegistryBuilder<>(Keys.CONDITION_CODECS).create();
     public static final Registry<AttachmentType<?>> ATTACHMENT_TYPES = new RegistryBuilder<>(Keys.ATTACHMENT_TYPES).create();
+
+    static {
+        // Kilt: Remap NeoForge's registry to Fabric's, so mods always know where to look.
+        BuiltInRegistries.REGISTRY.addAlias(Keys.ENTITY_DATA_SERIALIZERS.identifier(), FabricEntityDataRegistryImplAccessor.kilt$getHandlerRegistryId());
+    }
 
     // Reminder: If you add a registry to NeoForge itself, remember to add it to NeoForgeRegistriesSetup#registerRegistries.
 

@@ -5,6 +5,9 @@
 
 package net.neoforged.neoforge.common.conditions;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -12,11 +15,10 @@ import com.mojang.serialization.Decoder;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Encoder;
 import com.mojang.serialization.MapCodec;
-import java.util.List;
-import java.util.Optional;
+import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
+
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.ExtraCodecs;
-import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
 
 /**
  * Extension of {@link RegistryOps} that also encapsulates a {@link ICondition.IContext}.
@@ -26,7 +28,7 @@ public class ConditionalOps<T> extends RegistryOps<T> {
     private final ICondition.IContext context;
 
     public ConditionalOps(RegistryOps<T> ops, ICondition.IContext context) {
-        super(ops);
+        super(ops, ops.lookupProvider);
         this.context = context;
     }
 

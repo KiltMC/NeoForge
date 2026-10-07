@@ -6,8 +6,7 @@
 package net.neoforged.neoforge.attachment;
 
 import java.util.function.Predicate;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.world.entity.Entity;
+
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForgeMod;
@@ -15,6 +14,9 @@ import net.neoforged.neoforge.common.extensions.IEntityExtension;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.jetbrains.annotations.ApiStatus;
+
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.entity.Entity;
 
 @ApiStatus.Internal
 @EventBusSubscriber(modid = NeoForgeMod.MOD_ID)
@@ -50,7 +52,7 @@ public final class AttachmentInternals {
      * Do not call directly, use {@link IEntityExtension#copyAttachmentsFrom(Entity, boolean)}.
      */
     public static void copyEntityAttachments(Entity from, Entity to, boolean isDeath) {
-        copyAttachments(from.registryAccess(), from, to, isDeath ? type -> type.copyOnDeath : type -> true);
+        copyAttachments(from.registryAccess(), (AttachmentHolder) (Object) from, (AttachmentHolder) (Object) to, isDeath ? type -> type.copyOnDeath : type -> true);
     }
 
     @SubscribeEvent
