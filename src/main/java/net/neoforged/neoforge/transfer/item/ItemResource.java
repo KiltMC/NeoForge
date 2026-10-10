@@ -5,13 +5,20 @@
 
 package net.neoforged.neoforge.transfer.item;
 
-import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.resource.DataComponentHolderResource;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import xyz.bluspring.kilt.injections.world.item.ItemStackInjection;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
@@ -27,10 +34,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.transfer.TransferPreconditions;
-import net.neoforged.neoforge.transfer.resource.DataComponentHolderResource;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
 
 /**
  * Immutable combination of an {@link Item} and data components.
@@ -209,7 +212,7 @@ public final class ItemResource implements DataComponentHolderResource<Item> {
      * @param template the item stack template to check
      */
     public boolean matches(@Nullable ItemStackTemplate template) {
-        return ItemStack.isSameItemSameComponents(innerStack, template);
+        return ItemStackInjection.isSameItemSameComponents(innerStack, template);
     }
 
     /**

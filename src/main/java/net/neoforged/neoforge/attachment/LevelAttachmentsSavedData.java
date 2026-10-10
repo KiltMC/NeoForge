@@ -12,6 +12,8 @@ import com.mojang.serialization.DataResult;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.level.saveddata.SavedDataTypeInjection;
+import xyz.bluspring.kilt.workarounds.AttachmentHolderWorkaround;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -40,14 +42,14 @@ public class LevelAttachmentsSavedData extends SavedData {
             var data = new LevelAttachmentsSavedData(level);
             ProblemReporter.Collector reporter = new ProblemReporter.Collector();
             // Note: Side effect here, keep an eye on this
-            data.level.deserializeAttachments(TagValueInput.create(reporter, data.level.registryAccess(), tag));
+            ((AttachmentHolderWorkaround) data.level).deserializeAttachments(TagValueInput.create(reporter, data.level.registryAccess(), tag));
             return !reporter.isEmpty()
                     ? DataResult.error(() -> "Deserialisation error in level attachments: " + reporter.getReport())
                     : DataResult.success(data);
         }, data -> {
             ProblemReporter.Collector reporter = new ProblemReporter.Collector();
             var tag = TagValueOutput.createWithContext(reporter, data.level.registryAccess());
-            data.level.serializeAttachments(tag);
+            ((AttachmentHolderWorkaround) data.level).serializeAttachments(tag);
             return !reporter.isEmpty()
                     ? DataResult.error(() -> "Serialisation error in level attachments: " + reporter.getReport())
                     : DataResult.success(tag.buildResult());

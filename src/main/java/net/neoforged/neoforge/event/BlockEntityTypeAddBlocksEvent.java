@@ -10,6 +10,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+
+import net.neoforged.bus.api.Event;
+import net.neoforged.fml.event.IModBusEvent;
+import net.neoforged.neoforge.mixins.BlockEntityTypeAccessor;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Util;
@@ -18,10 +24,6 @@ import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.bus.api.Event;
-import net.neoforged.fml.event.IModBusEvent;
-import net.neoforged.neoforge.mixins.BlockEntityTypeAccessor;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Allows injecting new blocks into a block entity's {@link BlockEntityType#validBlocks} field in a safe manner.
@@ -37,7 +39,8 @@ import org.jspecify.annotations.Nullable;
  * }
  */
 public class BlockEntityTypeAddBlocksEvent extends Event implements IModBusEvent {
-    private final Function<BlockEntityType<?>, ? extends Class<?>> memoizedCommonSuperClass = Util.memoize((BlockEntityType<?> blockEntityType) -> getCommonSuperClassForExistingValidBlocks(blockEntityType.getValidBlocks()));
+    // Kilt: wtf?
+    private final Function<BlockEntityType<?>, ? extends Class<?>> memoizedCommonSuperClass = (Function<BlockEntityType<?>, ? extends Class<?>>) Util.memoize((BlockEntityType<?> blockEntityType) -> getCommonSuperClassForExistingValidBlocks(blockEntityType.getValidBlocks()));
 
     public BlockEntityTypeAddBlocksEvent() {}
 

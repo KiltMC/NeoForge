@@ -7,6 +7,13 @@ package net.neoforged.neoforge.capabilities;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Set;
+
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.fml.event.IModBusEvent;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -17,10 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.bus.api.Event;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.fml.event.IModBusEvent;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Fired to register capability providers at an appropriate time.
@@ -66,7 +69,8 @@ public class RegisterCapabilitiesEvent extends Event implements IModBusEvent {
             return provider.getCapability((BE) blockEntity, context);
         };
 
-        for (Block block : blockEntityType.getValidBlocks()) {
+        Set<Block> blocks = blockEntityType.getValidBlocks(); // Kilt: ???????
+        for (Block block : blocks) {
             Objects.requireNonNull(block);
             capability.providers.computeIfAbsent(block, b -> new ArrayList<>()).add(adaptedProvider);
         }

@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 
 public abstract class ItemTagsProvider extends IntrinsicHolderTagsProvider<Item> {
     public ItemTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId) {
-        super(output, Registries.ITEM, lookupProvider, item -> item.builtInRegistryHolder().key(), modId);
+        super(output, Registries.ITEM, lookupProvider, item -> item.builtInRegistryHolder().key());
+        this.kilt$setModId(modId);
     }
 }
