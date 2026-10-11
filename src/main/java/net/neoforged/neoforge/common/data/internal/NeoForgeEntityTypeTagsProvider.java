@@ -6,16 +6,19 @@
 package net.neoforged.neoforge.common.data.internal;
 
 import java.util.concurrent.CompletableFuture;
+
+import net.neoforged.neoforge.common.Tags;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.EntityType;
-import net.neoforged.neoforge.common.Tags;
 
 public class NeoForgeEntityTypeTagsProvider extends EntityTypeTagsProvider {
     public NeoForgeEntityTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider, "neoforge");
+        super(output, lookupProvider);
+        this.kilt$setModId("neoforge");
     }
 
     @Override

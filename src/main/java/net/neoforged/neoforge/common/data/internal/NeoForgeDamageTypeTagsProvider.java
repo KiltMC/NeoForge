@@ -5,11 +5,15 @@
 
 package net.neoforged.neoforge.common.data.internal;
 
-import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+
+import com.google.common.collect.Maps;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.common.Tags;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
@@ -22,12 +26,11 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.common.Tags;
 
 public final class NeoForgeDamageTypeTagsProvider extends DamageTypeTagsProvider {
     public NeoForgeDamageTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider, "neoforge");
+        super(output, lookupProvider);
+        this.kilt$setModId("neoforge");
     }
 
     private final Map<Identifier, TagBuilder> vanillaBuilders = Maps.newLinkedHashMap();

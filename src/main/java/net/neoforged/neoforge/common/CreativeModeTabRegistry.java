@@ -5,6 +5,16 @@
 
 package net.neoforged.neoforge.common;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.graph.ElementOrder;
@@ -17,15 +27,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import net.neoforged.fml.loading.toposort.TopologicalSort;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -38,11 +45,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.neoforged.fml.loading.toposort.TopologicalSort;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
 
 public final class CreativeModeTabRegistry {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -188,7 +190,7 @@ public final class CreativeModeTabRegistry {
             final CreativeModeTab tab = value.value();
             final Identifier name = value.unwrapKey().orElseThrow().identifier();
 
-            if (!tab.tabsBefore.isEmpty() || !tab.tabsAfter.isEmpty())
+            if (!tab.kilt$getTabsBefore().isEmpty() || !tab.kilt$getTabsAfter().isEmpty())
                 addTabOrder(tab, name);
             else {
                 // If there is no order specified ensure vanilla ordering by specifying the previous and next indexed tab as edges
@@ -205,7 +207,7 @@ public final class CreativeModeTabRegistry {
             final CreativeModeTab tab = value.value();
             final Identifier name = value.unwrapKey().orElseThrow().identifier();
 
-            if (!tab.tabsBefore.isEmpty() || !tab.tabsAfter.isEmpty())
+            if (!tab.kilt$getTabsBefore().isEmpty() || !tab.kilt$getTabsAfter().isEmpty())
                 addTabOrder(tab, name);
             else // if there is no order specified ensure the tab comes after the last vanilla tab
                 edges.put(lastVanilla, name);
@@ -215,11 +217,11 @@ public final class CreativeModeTabRegistry {
     }
 
     private static void addTabOrder(CreativeModeTab tab, Identifier name) {
-        for (final Identifier after : tab.tabsAfter) {
+        for (final Identifier after : tab.kilt$getTabsAfter()) {
             edges.put(name, after);
         }
 
-        for (final Identifier before : tab.tabsBefore) {
+        for (final Identifier before : tab.kilt$getTabsBefore()) {
             edges.put(before, name);
         }
     }

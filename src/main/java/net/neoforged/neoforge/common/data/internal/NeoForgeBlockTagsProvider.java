@@ -8,6 +8,11 @@ package net.neoforged.neoforge.common.data.internal;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import xyz.bluspring.kilt.injections.tags.BlockTagsInjection;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -17,8 +22,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.data.BlockTagsProvider;
 
 public final class NeoForgeBlockTagsProvider extends BlockTagsProvider {
     public NeoForgeBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
@@ -70,7 +73,7 @@ public final class NeoForgeBlockTagsProvider extends BlockTagsProvider {
         tag(Tags.Blocks.FENCES_NETHER_BRICK).add(Blocks.NETHER_BRICK_FENCE);
         tag(Tags.Blocks.FENCES_WOODEN).addTag(BlockTags.WOODEN_FENCES);
         tag(Tags.Blocks.FLOWERS_SMALL).add(Blocks.DANDELION, Blocks.POPPY, Blocks.BLUE_ORCHID, Blocks.ALLIUM, Blocks.AZURE_BLUET, Blocks.RED_TULIP, Blocks.ORANGE_TULIP, Blocks.WHITE_TULIP, Blocks.PINK_TULIP, Blocks.OXEYE_DAISY, Blocks.CORNFLOWER, Blocks.LILY_OF_THE_VALLEY, Blocks.WITHER_ROSE, Blocks.TORCHFLOWER, Blocks.OPEN_EYEBLOSSOM, Blocks.CLOSED_EYEBLOSSOM).addOptionalTag(BlockTags.SMALL_FLOWERS);
-        tag(Tags.Blocks.FLOWERS_TALL).add(Blocks.SUNFLOWER, Blocks.LILAC, Blocks.PEONY, Blocks.ROSE_BUSH, Blocks.PITCHER_PLANT).addOptionalTag(BlockTags.create(Identifier.withDefaultNamespace("tall_flowers")));
+        tag(Tags.Blocks.FLOWERS_TALL).add(Blocks.SUNFLOWER, Blocks.LILAC, Blocks.PEONY, Blocks.ROSE_BUSH, Blocks.PITCHER_PLANT).addOptionalTag(BlockTagsInjection.create(Identifier.withDefaultNamespace("tall_flowers")));
         tag(Tags.Blocks.FLOWERS).add(Blocks.CHERRY_LEAVES, Blocks.FLOWERING_AZALEA_LEAVES, Blocks.FLOWERING_AZALEA, Blocks.MANGROVE_PROPAGULE, Blocks.PINK_PETALS, Blocks.WILDFLOWERS, Blocks.CHORUS_FLOWER, Blocks.SPORE_BLOSSOM, Blocks.CACTUS_FLOWER).addTags(Tags.Blocks.FLOWERS_SMALL, Tags.Blocks.FLOWERS_TALL).addOptionalTag(BlockTags.FLOWERS);
         tag(Tags.Blocks.FROGLIGHTS).add(Blocks.OCHRE_FROGLIGHT, Blocks.PEARLESCENT_FROGLIGHT, Blocks.VERDANT_FROGLIGHT);
         tag(Tags.Blocks.GLASS_BLOCKS).addTags(Tags.Blocks.GLASS_BLOCKS_COLORLESS, Tags.Blocks.GLASS_BLOCKS_CHEAP, Tags.Blocks.GLASS_BLOCKS_TINTED);

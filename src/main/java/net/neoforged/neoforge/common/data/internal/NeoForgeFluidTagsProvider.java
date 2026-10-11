@@ -6,6 +6,10 @@
 package net.neoforged.neoforge.common.data.internal;
 
 import java.util.concurrent.CompletableFuture;
+
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.common.Tags.Fluids;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
@@ -14,12 +18,11 @@ import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.common.Tags.Fluids;
 
 public final class NeoForgeFluidTagsProvider extends FluidTagsProvider {
     public NeoForgeFluidTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider, "neoforge");
+        super(output, lookupProvider);
+        this.kilt$setModId("neoforge");
     }
 
     @Override

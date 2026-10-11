@@ -6,6 +6,9 @@
 package net.neoforged.neoforge.common.data.internal;
 
 import java.util.concurrent.CompletableFuture;
+
+import net.neoforged.neoforge.common.Tags;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.BiomeTagsProvider;
@@ -14,11 +17,11 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
-import net.neoforged.neoforge.common.Tags;
 
 public final class NeoForgeBiomeTagsProvider extends BiomeTagsProvider {
     public NeoForgeBiomeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider, "neoforge");
+        super(output, lookupProvider);
+        this.kilt$setModId("neoforge");
     }
 
     @Override

@@ -5,12 +5,19 @@
 
 package net.neoforged.neoforge.network.configuration;
 
-import com.google.common.collect.Sets;
-import com.mojang.logging.LogUtils;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.Sets;
+import com.mojang.logging.LogUtils;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.payload.FeatureFlagAcknowledgePayload;
+import net.neoforged.neoforge.network.payload.FeatureFlagDataPayload;
+import org.jetbrains.annotations.ApiStatus;
+import org.slf4j.Logger;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
@@ -18,15 +25,10 @@ import net.minecraft.network.protocol.configuration.ServerConfigurationPacketLis
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.world.flag.FeatureFlags;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.payload.FeatureFlagAcknowledgePayload;
-import net.neoforged.neoforge.network.payload.FeatureFlagDataPayload;
-import org.jetbrains.annotations.ApiStatus;
-import org.slf4j.Logger;
 
 @ApiStatus.Internal
 public record CheckFeatureFlags(ServerConfigurationPacketListener listener) implements ConfigurationTask {
-    public static final Type TYPE = new Type(Identifier.fromNamespaceAndPath("neoforge", "check_feature_flags"));
+    public static final Type TYPE = new Type(Identifier.fromNamespaceAndPath("neoforge", "check_feature_flags").toString());
     private static final Logger LOGGER = LogUtils.getLogger();
     private static Set<Identifier> moddedFlags = null;
 

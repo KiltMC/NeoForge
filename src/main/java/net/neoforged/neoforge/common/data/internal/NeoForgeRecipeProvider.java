@@ -12,6 +12,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+
+import net.neoforged.fml.util.ObfuscationReflectionHelper;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.ICondition;
+import net.neoforged.neoforge.common.crafting.DifferenceIngredient;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.HolderGetter;
@@ -34,11 +41,6 @@ import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.fml.util.ObfuscationReflectionHelper;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.common.crafting.DifferenceIngredient;
-import org.jspecify.annotations.Nullable;
 
 public final class NeoForgeRecipeProvider extends VanillaRecipeProvider {
     private final InterceptingRecipeOutput output;
@@ -61,7 +63,7 @@ public final class NeoForgeRecipeProvider extends VanillaRecipeProvider {
     }
 
     @Override
-    protected void buildRecipes() {
+    public void buildRecipes() {
         replace(Items.STICK, Tags.Items.RODS_WOODEN);
         replace(Items.GOLD_INGOT, Tags.Items.INGOTS_GOLD);
         replace(Items.GOLD_NUGGET, Tags.Items.NUGGETS_GOLD);

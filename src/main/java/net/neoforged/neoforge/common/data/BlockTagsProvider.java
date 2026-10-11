@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 
 public abstract class BlockTagsProvider extends IntrinsicHolderTagsProvider<Block> {
     public BlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId) {
-        super(output, Registries.BLOCK, lookupProvider, block -> block.builtInRegistryHolder().key(), modId);
+        super(output, Registries.BLOCK, lookupProvider, block -> block.builtInRegistryHolder().key());
+        this.kilt$setModId(modId);
     }
 }

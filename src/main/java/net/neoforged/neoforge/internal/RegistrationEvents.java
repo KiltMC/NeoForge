@@ -5,17 +5,17 @@
 
 package net.neoforged.neoforge.internal;
 
-import net.minecraft.core.cauldron.CauldronInteractions;
 import net.neoforged.neoforge.capabilities.CapabilityHooks;
 import net.neoforged.neoforge.common.world.chunk.ForcedChunkManager;
 import net.neoforged.neoforge.common.world.poi.PoiTypeExtender;
 import net.neoforged.neoforge.fluids.CauldronFluidContent;
 import net.neoforged.neoforge.registries.RegistryManager;
+import xyz.bluspring.kilt.injections.core.cauldron.CauldronInteractionsInjection;
 
 public class RegistrationEvents {
     static void init() {
         CauldronFluidContent.init(); // must be before capability event
-        CauldronInteractions.registerCustomInteractions();
+        CauldronInteractionsInjection.registerCustomInteractions();
         CapabilityHooks.init(); // must be after cauldron event
         ForcedChunkManager.init();
         RegistryManager.initDataMaps();

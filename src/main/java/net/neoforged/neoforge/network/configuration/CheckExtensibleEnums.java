@@ -5,10 +5,6 @@
 
 package net.neoforged.neoforge.network.configuration;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
-import com.mojang.logging.LogUtils;
-import io.netty.buffer.ByteBuf;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,14 +15,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
-import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.network.ConfigurationTask;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+import com.mojang.logging.LogUtils;
+import io.netty.buffer.ByteBuf;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.asm.enumextension.ExtensionInfo;
 import net.neoforged.fml.common.asm.enumextension.IExtensibleEnum;
@@ -38,9 +31,18 @@ import net.neoforged.neoforgespi.language.ModFileScanData;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
+import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.network.ConfigurationTask;
+
 @ApiStatus.Internal
 public record CheckExtensibleEnums(ServerConfigurationPacketListener listener) implements ConfigurationTask {
-    public static final Type TYPE = new Type(Identifier.fromNamespaceAndPath("neoforge", "check_extensible_enum"));
+    public static final Type TYPE = new Type(Identifier.fromNamespaceAndPath("neoforge", "check_extensible_enum").toString());
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final org.objectweb.asm.Type NETWORKED_ENUM = org.objectweb.asm.Type.getType(NetworkedEnum.class);
     private static final List<? extends Class<? extends Enum<?>>> NETWORKED_EXTENSIBLE_ENUM_CLASSES = collectNetworkedEnumClasses();
