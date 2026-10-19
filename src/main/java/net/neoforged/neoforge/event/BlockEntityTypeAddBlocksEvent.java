@@ -40,7 +40,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
  */
 public class BlockEntityTypeAddBlocksEvent extends Event implements IModBusEvent {
     // Kilt: wtf?
-    private final Function<BlockEntityType<?>, ? extends Class<?>> memoizedCommonSuperClass = (Function<BlockEntityType<?>, ? extends Class<?>>) Util.memoize((BlockEntityType<?> blockEntityType) -> getCommonSuperClassForExistingValidBlocks(blockEntityType.getValidBlocks()));
+    private final Function<BlockEntityType<?>, ? extends Class<?>> memoizedCommonSuperClass = (Function<BlockEntityType<?>, ? extends Class<?>>) (Object) Util.memoize((BlockEntityType<?> blockEntityType) -> getCommonSuperClassForExistingValidBlocks(blockEntityType.getValidBlocks()));
 
     public BlockEntityTypeAddBlocksEvent() {}
 

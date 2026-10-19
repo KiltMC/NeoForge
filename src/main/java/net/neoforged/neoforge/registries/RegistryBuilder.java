@@ -5,20 +5,22 @@
 
 package net.neoforged.neoforge.registries;
 
-import com.mojang.serialization.Lifecycle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.core.DefaultedMappedRegistry;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
+
+import com.mojang.serialization.Lifecycle;
 import net.neoforged.neoforge.registries.callback.AddCallback;
 import net.neoforged.neoforge.registries.callback.BakeCallback;
 import net.neoforged.neoforge.registries.callback.ClearCallback;
 import net.neoforged.neoforge.registries.callback.RegistryCallback;
 import org.jspecify.annotations.Nullable;
+
+import net.minecraft.core.DefaultedMappedRegistry;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 public class RegistryBuilder<T> {
     private final ResourceKey<? extends Registry<T>> registryKey;
@@ -114,8 +116,8 @@ public class RegistryBuilder<T> {
      */
     public Registry<T> create() {
         BaseMappedRegistry<T> registry = this.defaultKey != null
-                ? new DefaultedMappedRegistry<>(this.defaultKey.toString(), this.registryKey, Lifecycle.stable(), intrusiveHolders)
-                : new MappedRegistry<>(this.registryKey, Lifecycle.stable(), intrusiveHolders);
+                ? (BaseMappedRegistry<T>) (Object) new DefaultedMappedRegistry<>(this.defaultKey.toString(), this.registryKey, Lifecycle.stable(), intrusiveHolders)
+                : (BaseMappedRegistry<T>) (Object) new MappedRegistry<>(this.registryKey, Lifecycle.stable(), intrusiveHolders);
         this.callbacks.forEach(registry::addCallback);
         if (this.maxId != -1)
             registry.setMaxId(this.maxId);

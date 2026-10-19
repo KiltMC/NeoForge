@@ -18,6 +18,7 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.crafting.DifferenceIngredient;
 import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.workarounds.KiltConditionHandledRecipeOutput;
 
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
@@ -122,7 +123,7 @@ public final class NeoForgeRecipeProvider extends VanillaRecipeProvider {
         super.buildRecipes();
     }
 
-    private static class InterceptingRecipeOutput implements RecipeOutput {
+    private static class InterceptingRecipeOutput implements KiltConditionHandledRecipeOutput {
         private final HolderGetter<Item> items;
         private final RecipeOutput output;
         private final Map<Item, TagKey<Item>> replacements = new HashMap<>();

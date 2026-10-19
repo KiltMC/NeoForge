@@ -5,13 +5,14 @@
 
 package net.neoforged.neoforge.common.extensions;
 
+import net.neoforged.neoforge.common.conditions.ICondition;
+import net.neoforged.neoforge.common.crafting.ConditionalRecipeOutput;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Recipe;
-import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.common.crafting.ConditionalRecipeOutput;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Extra methods for {@link RecipeOutput}.
@@ -24,7 +25,10 @@ public interface IRecipeOutputExtension {
     /**
      * Generates a recipe with the given conditions.
      */
-    void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions);
+    default void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+        // Kilt: Go through Vanilla's handling instead, just in case.
+        self().accept(key, recipe, advancement);
+    }
 
     /**
      * Builds a wrapper around this recipe output that adds conditions to all received recipes.

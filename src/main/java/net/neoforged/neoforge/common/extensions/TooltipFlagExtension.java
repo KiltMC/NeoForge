@@ -5,8 +5,10 @@
 
 package net.neoforged.neoforge.common.extensions;
 
+import net.fabricmc.fabric.api.item.v1.FabricTooltipFlag;
+
 /// Extension methods for [net.minecraft.world.item.TooltipFlag]
-public interface TooltipFlagExtension {
+public interface TooltipFlagExtension extends FabricTooltipFlag {
     /// {@return the state of the Control key (as reported by Screen) on the client, or `false` on the server}
     default boolean hasControlDown() {
         return false;

@@ -129,6 +129,10 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.transformer.meta.MixinMerged;
+import xyz.bluspring.kilt.injections.nbt.CompoundTagInjection;
+import xyz.bluspring.kilt.injections.nbt.ListTagInjection;
+import xyz.bluspring.kilt.injections.world.entity.ai.attributes.AttributeSupplierBuilderInjection;
+import xyz.bluspring.kilt.injections.world.inventory.RecipeBookTypeInjection;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.IdentifierException;
@@ -1200,7 +1204,7 @@ public class CommonHooks {
 
         finalMap.forEach((k, v) -> {
             AttributeSupplier supplier = DefaultAttributes.getSupplier(k);
-            AttributeSupplier.Builder newBuilder = supplier != null ? new AttributeSupplier.Builder(supplier) : new AttributeSupplier.Builder();
+            AttributeSupplier.Builder newBuilder = supplier != null ? AttributeSupplierBuilderInjection.create(supplier) : new AttributeSupplier.Builder();
             newBuilder.combine(v);
             FORGE_ATTRIBUTES.put(k, newBuilder.build());
         });
@@ -1241,9 +1245,9 @@ public class CommonHooks {
     public static void writeAdditionalLevelSaveData(WorldData worldData, CompoundTag levelTag) {
         if (CommonHooks.modList == null) {
             var mods = ModList.get().getMods();
-            var modListTag = new ListTag(mods.size());
+            var modListTag = ListTagInjection.create(mods.size());
             mods.forEach(mi -> {
-                final CompoundTag mod = new CompoundTag(2);
+                final CompoundTag mod = CompoundTagInjection.create(2);
                 mod.putString("ModId", mi.getModId());
                 mod.putString("ModVersion", MavenVersionTranslator.artifactVersionToString(mi.getVersion()));
                 modListTag.add(mod);

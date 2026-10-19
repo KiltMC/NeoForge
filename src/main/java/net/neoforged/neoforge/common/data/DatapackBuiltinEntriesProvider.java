@@ -13,13 +13,15 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import net.neoforged.neoforge.common.conditions.ICondition;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
 import net.minecraft.data.registries.RegistryPatchGenerator;
 import net.minecraft.resources.ResourceKey;
-import net.neoforged.neoforge.common.conditions.ICondition;
 
 /**
  * An extension of the {@link RegistriesDatapackGenerator} which properly handles
@@ -64,7 +66,8 @@ public class DatapackBuiltinEntriesProvider extends RegistriesDatapackGenerator 
      * @param conditions a map containing conditions to append to registry objects
      */
     public DatapackBuiltinEntriesProvider(PackOutput output, CompletableFuture<RegistrySetBuilder.PatchedRegistries> registries, Map<ResourceKey<?>, List<ICondition>> conditions, Set<String> modIds) {
-        super(output, registries.thenApply(RegistrySetBuilder.PatchedRegistries::patches), modIds, conditions);
+        super(output, registries.thenApply(RegistrySetBuilder.PatchedRegistries::patches));
+        // Kilt TODO: do we need to specify conditions and modIds?
         this.fullRegistries = registries.thenApply(RegistrySetBuilder.PatchedRegistries::full);
     }
 

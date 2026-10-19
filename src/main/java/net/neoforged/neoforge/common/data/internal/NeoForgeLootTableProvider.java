@@ -5,7 +5,6 @@
 
 package net.neoforged.neoforge.common.data.internal;
 
-import com.mojang.datafixers.util.Either;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +13,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.mojang.datafixers.util.Either;
+import net.neoforged.fml.util.ObfuscationReflectionHelper;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.loot.CanItemPerformAbility;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.loot.LootTableSubProvider;
@@ -25,12 +30,10 @@ import net.minecraft.data.loot.packs.VanillaLootTableProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.ValidationContextSource;
 import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
 import net.minecraft.world.level.storage.loot.entries.CompositeEntryBase;
 import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
@@ -49,10 +52,6 @@ import net.minecraft.world.level.storage.loot.predicates.CompositeLootItemCondit
 import net.minecraft.world.level.storage.loot.predicates.InvertedLootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
-import net.neoforged.fml.util.ObfuscationReflectionHelper;
-import net.neoforged.neoforge.common.ItemAbilities;
-import net.neoforged.neoforge.common.loot.CanItemPerformAbility;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Currently used only for replacing shears item to shears_dig item ability
@@ -64,10 +63,12 @@ public final class NeoForgeLootTableProvider extends LootTableProvider {
         super(packOutput, Set.of(), VanillaLootTableProvider.create(packOutput, provider).getTables(), provider);
     }
 
+    /* // Kilt: huh?
     @Override
     protected void validate(WritableRegistry<LootTable> tables, ValidationContextSource validationContext, ProblemReporter.Collector problems) {
         // Do not validate against all registered loot tables
     }
+    */
 
     @Override
     public List<LootTableProvider.SubProviderEntry> getTables() {

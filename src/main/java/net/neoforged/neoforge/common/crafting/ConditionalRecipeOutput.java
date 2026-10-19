@@ -5,22 +5,24 @@
 
 package net.neoforged.neoforge.common.crafting;
 
+import net.neoforged.neoforge.common.conditions.ICondition;
+import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.workarounds.KiltConditionHandledRecipeOutput;
+
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Recipe;
-import net.neoforged.neoforge.common.conditions.ICondition;
-import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Wrapper around a {@link RecipeOutput} that adds conditions to all received recipes.
  * Do not use directly, obtain via {@link RecipeOutput#withConditions(ICondition...)}.
  */
 @ApiStatus.Internal
-public class ConditionalRecipeOutput implements RecipeOutput {
+public class ConditionalRecipeOutput implements KiltConditionHandledRecipeOutput {
     private final RecipeOutput inner;
     private final ICondition[] conditions;
 

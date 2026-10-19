@@ -6,13 +6,18 @@
 package net.neoforged.neoforge.common.crafting;
 
 import java.util.stream.Stream;
+
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import xyz.bluspring.kilt.workarounds.FabricCustomIngredientSerializer;
+
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.jetbrains.annotations.ApiStatus;
+
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 
 /**
  * Interface that modders can implement to create new behaviors for {@link Ingredient}s.
@@ -26,7 +31,7 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>Implementations of this interface <b>must implement {@link Object#equals} and {@link Object#hashCode}</b>
  * to ensure that the ingredient also supports them.
  */
-public interface ICustomIngredient {
+public interface ICustomIngredient extends CustomIngredient { // Kilt: Attach to Fabric API's CustomIngredient system.
     /**
      * Checks if a stack matches this ingredient.
      * The stack <b>must not</b> be modified in any way.
@@ -61,12 +66,24 @@ public interface ICustomIngredient {
      */
     boolean isSimple();
 
+    // Kilt: Handle Fabric's implementation of isSimple.
+    @Override
+    default boolean requiresTesting() {
+        return this.isSimple();
+    }
+
     /**
      * {@return the type of this ingredient}
      *
      * <p>The type must be registered to {@link NeoForgeRegistries#INGREDIENT_TYPES}.
      */
     IngredientType<?> getType();
+
+    // Kilt: Handle Fabric API's serialization system.
+    @Override
+    default CustomIngredientSerializer<?> getSerializer() {
+        return FabricCustomIngredientSerializer.getOrCreate(this.getType());
+    }
 
     /**
      * Returns the display for this ingredient.
@@ -87,8 +104,10 @@ public interface ICustomIngredient {
     /**
      * {@return a new {@link Ingredient} behaving as defined by this custom ingredient}
      */
+    /* // Kilt: Handled by Fabric API
     @ApiStatus.NonExtendable
     default Ingredient toVanilla() {
         return new Ingredient(this);
     }
+     */
 }

@@ -5,27 +5,29 @@
 
 package net.neoforged.neoforge.registries.holdersets;
 
-import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import xyz.bluspring.kilt.injections.resources.RegistryOpsInjection;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderOwner;
 import net.minecraft.core.Registry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 /**
  * <p>Holderset that represents all elements of a registry. Json format:</p>
@@ -111,7 +113,7 @@ public record AnyHolderSet<T>(ResourceKey<? extends Registry<T>> registryKey, Ho
     public static class Type implements HolderSetType {
         @Override
         public <T> MapCodec<? extends ICustomHolderSet<T>> makeCodec(ResourceKey<? extends Registry<T>> registryKey, Codec<Holder<T>> holderCodec, boolean forceList) {
-            return RegistryOps.retrieveRegistryLookup(registryKey)
+            return RegistryOpsInjection.retrieveRegistryLookup(registryKey)
                     .xmap(lookup -> new AnyHolderSet<>(registryKey, lookup), set -> null); // Normally null would get us into trouble with codecs, but the ops resolver we're xmapping back to discards this result.
         }
 

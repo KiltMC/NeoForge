@@ -33,7 +33,8 @@ public abstract class BlockTagCopyingItemTagProvider extends IntrinsicHolderTags
             CompletableFuture<HolderLookup.Provider> lookupProvider,
             CompletableFuture<TagLookup<Block>> blockTags,
             String modId) {
-        super(output, Registries.ITEM, lookupProvider, item -> item.builtInRegistryHolder().key(), modId);
+        super(output, Registries.ITEM, lookupProvider, item -> item.builtInRegistryHolder().key());
+        this.kilt$setModId(modId);
         this.blockTags = blockTags;
     }
 

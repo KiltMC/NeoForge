@@ -5,8 +5,6 @@
 
 package net.neoforged.neoforge.registries;
 
-import com.mojang.logging.LogUtils;
-import io.netty.util.AttributeKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,12 +16,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.RegistrationInfo;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
+
+import com.mojang.logging.LogUtils;
+import io.netty.util.AttributeKey;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.network.configuration.RegistryDataMapNegotiation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -36,6 +31,13 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.RegistrationInfo;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 @ApiStatus.Internal
 public class RegistryManager {
@@ -165,7 +167,7 @@ public class RegistryManager {
     private static <T> void applySnapshot(MappedRegistry<T> registry, RegistrySnapshot snapshot, Set<ResourceKey<?>> missing) {
         // Needed for package-private operations
         // noinspection UnnecessaryLocalVariable
-        BaseMappedRegistry<T> forgeRegistry = registry;
+        BaseMappedRegistry<T> forgeRegistry = (BaseMappedRegistry<T>) (Object) registry;
         ResourceKey<? extends Registry<T>> registryKey = registry.key();
         Registry<T> backup = snapshot.getFullBackup();
 

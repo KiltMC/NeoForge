@@ -5,25 +5,12 @@
 
 package net.neoforged.neoforge.registries;
 
-import com.mojang.logging.LogUtils;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import net.minecraft.core.Holder;
-import net.minecraft.core.IdMapper;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gamerules.GameRuleCategory;
+
+import com.mojang.logging.LogUtils;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.loading.progress.StartupNotificationManager;
 import net.neoforged.neoforge.common.CommonHooks;
@@ -34,6 +21,22 @@ import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import xyz.bluspring.kilt.injections.core.registries.BuiltInRegistriesInjection;
+import xyz.bluspring.kilt.injections.world.entity.SpawnPlacementsInjection;
+
+import net.minecraft.core.Holder;
+import net.minecraft.core.IdMapper;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRuleCategory;
 
 @ApiStatus.Internal
 public class GameData {
@@ -100,7 +103,7 @@ public class GameData {
             throw aggregate;
         } else {
             CommonHooks.modifyAttributes();
-            SpawnPlacements.fireSpawnPlacementEvent();
+            SpawnPlacementsInjection.fireSpawnPlacementEvent();
             ModLoader.postEvent(new BlockEntityTypeAddBlocksEvent());
             CreativeModeTabRegistry.sortTabs();
             GameRuleCategory.registerModdedCategories();
@@ -122,7 +125,7 @@ public class GameData {
         ordered.add(Registries.ATTRIBUTE.identifier()); // Vanilla order is incorrect, both Item and MobEffect depend on Attribute at construction time.
         ordered.add(Registries.DATA_COMPONENT_TYPE.identifier()); // Vanilla order is incorrect, Item depends on data components at construction time.
         ordered.add(Registries.PARTICLE_TYPE.identifier()); // Vanilla order is incorrect, both Block and MobEffect depend on ParticleType at construction time.
-        ordered.addAll(BuiltInRegistries.getVanillaRegistrationOrder());
+        ordered.addAll(BuiltInRegistriesInjection.getVanillaRegistrationOrder());
         ordered.addAll(BuiltInRegistries.REGISTRY.keySet().stream().sorted(Identifier::compareNamespaced).toList());
         return ordered;
     }

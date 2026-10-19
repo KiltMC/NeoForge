@@ -5,11 +5,17 @@
 
 package net.neoforged.neoforge.registries;
 
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.neoforged.neoforge.registries.callback.AddCallback;
+import net.neoforged.neoforge.registries.callback.BakeCallback;
+import net.neoforged.neoforge.registries.callback.ClearCallback;
+import xyz.bluspring.kilt.injections.world.level.levelgen.DebugLevelSourceInjection;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMapper;
 import net.minecraft.core.Registry;
@@ -22,10 +28,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.DebugLevelSource;
-import net.neoforged.neoforge.registries.callback.AddCallback;
-import net.neoforged.neoforge.registries.callback.BakeCallback;
-import net.neoforged.neoforge.registries.callback.ClearCallback;
 
 class NeoForgeRegistryCallbacks {
     static class BlockCallbacks implements AddCallback<Block>, ClearCallback<Block>, BakeCallback<Block> {
@@ -62,7 +64,7 @@ class NeoForgeRegistryCallbacks {
                 }
             }
 
-            DebugLevelSource.initValidStates();
+            DebugLevelSourceInjection.initValidStates();
         }
 
         private static class ClearableObjectIntIdentityMap<T> extends IdMapper<T> {

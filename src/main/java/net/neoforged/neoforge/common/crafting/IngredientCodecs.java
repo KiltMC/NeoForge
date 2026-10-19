@@ -5,15 +5,17 @@
 
 package net.neoforged.neoforge.common.crafting;
 
+import java.util.Optional;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import java.util.Optional;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public class IngredientCodecs {
@@ -25,7 +27,7 @@ public class IngredientCodecs {
                         either -> either.map(ICustomIngredient::toVanilla, i -> i),
                         ingredient -> {
                             if (ingredient.isCustom()) {
-                                return Either.left(ingredient.getCustomIngredient());
+                                return Either.left(ingredient.kilt$getCustomIngredient());
                             } else {
                                 return Either.right(ingredient);
                             }
@@ -54,7 +56,7 @@ public class IngredientCodecs {
             public void encode(RegistryFriendlyByteBuf buf, Ingredient ingredient) {
                 if (ingredient.isCustom() && buf.getConnectionType().isNeoForge()) {
                     buf.writeVarInt(CUSTOM_INGREDIENT_MARKER);
-                    CUSTOM_INGREDIENT_CODEC.encode(buf, ingredient.getCustomIngredient());
+                    CUSTOM_INGREDIENT_CODEC.encode(buf, ingredient.kilt$getCustomIngredient());
                 } else {
                     vanillaCodec.encode(buf, ingredient);
                 }
@@ -80,7 +82,7 @@ public class IngredientCodecs {
             public void encode(RegistryFriendlyByteBuf buf, Optional<Ingredient> ingredient) {
                 if (ingredient.isPresent() && ingredient.get().isCustom() && buf.getConnectionType().isNeoForge()) {
                     buf.writeVarInt(CUSTOM_INGREDIENT_MARKER);
-                    CUSTOM_INGREDIENT_CODEC.encode(buf, ingredient.get().getCustomIngredient());
+                    CUSTOM_INGREDIENT_CODEC.encode(buf, ingredient.get().kilt$getCustomIngredient());
                 } else {
                     vanillaCodec.encode(buf, ingredient);
                 }
