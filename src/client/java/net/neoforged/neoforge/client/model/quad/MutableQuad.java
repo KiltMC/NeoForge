@@ -5,8 +5,19 @@
 
 package net.neoforged.neoforge.client.model.quad;
 
-import com.mojang.blaze3d.platform.Transparency;
 import java.util.Arrays;
+
+import com.mojang.blaze3d.platform.Transparency;
+import org.jetbrains.annotations.Contract;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.resources.model.cuboid.FaceBakeryInjection;
+import xyz.bluspring.kilt.injections.client.resources.model.geometry.BakedQuadInjection;
+
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.FaceInfo;
 import net.minecraft.client.renderer.Sheets;
@@ -19,13 +30,6 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
-import org.jetbrains.annotations.Contract;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector2fc;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A mutable representation of a {@link BakedQuad}.
@@ -943,7 +947,7 @@ public class MutableQuad {
             if (canReuseMaterialInfo) {
                 materialInfo = srcInfo;
             } else {
-                materialInfo = new BakedQuad.MaterialInfo(sprite, chunkLayer, itemRenderType, tintIndex, shade, lightEmission, ambientOcclusion);
+                materialInfo = BakedQuadInjection.MaterialInfoInjection.create(sprite, chunkLayer, itemRenderType, tintIndex, shade, lightEmission, ambientOcclusion);
             }
 
             // If the normals did not change, reuse the old object
@@ -970,12 +974,12 @@ public class MutableQuad {
             pos1 = new Vector3f(positions[1]);
             pos2 = new Vector3f(positions[2]);
             pos3 = new Vector3f(positions[3]);
-            materialInfo = new BakedQuad.MaterialInfo(sprite, chunkLayer, itemRenderType, tintIndex, shade, lightEmission, ambientOcclusion);
+            materialInfo = BakedQuadInjection.MaterialInfoInjection.create(sprite, chunkLayer, itemRenderType, tintIndex, shade, lightEmission, ambientOcclusion);
             bakedNormals = BakedNormals.of(normals[0], normals[1], normals[2], normals[3]);
             bakedColors = BakedColors.of(colors[0], colors[1], colors[2], colors[3]);
         }
 
-        return new BakedQuad(
+        return BakedQuadInjection.create(
                 pos0,
                 pos1,
                 pos2,
@@ -1031,7 +1035,7 @@ public class MutableQuad {
      * @see FaceBakery#recalculateWinding
      */
     public MutableQuad recalculateWinding() {
-        FaceBakery.recalculateWinding(positions, uvs, direction, colors, normals);
+        FaceBakeryInjection.recalculateWinding(positions, uvs, direction, colors, normals);
         return this;
     }
 

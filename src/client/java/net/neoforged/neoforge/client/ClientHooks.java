@@ -5,20 +5,6 @@
 
 package net.neoforged.neoforge.client;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MultimapBuilder;
-import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
-import com.mojang.blaze3d.pipeline.MainTarget;
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.resource.RenderTargetDescriptor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.TextureFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.datafixers.util.Either;
-import it.unimi.dsi.fastutil.floats.FloatComparators;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,8 +26,99 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.MultimapBuilder;
+import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
+import com.mojang.blaze3d.pipeline.MainTarget;
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.resource.RenderTargetDescriptor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.TextureFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.datafixers.util.Either;
+import it.unimi.dsi.fastutil.floats.FloatComparators;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.ValueConverter;
+import net.neoforged.bus.api.Event;
+import net.neoforged.fml.ModLoader;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.config.NeoForgeClientConfig;
+import net.neoforged.neoforge.client.entity.animation.json.AnimationTypeManager;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.AddSectionGeometryEvent;
+import net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent;
+import net.neoforged.neoforge.client.event.CalculatePlayerTurnEvent;
+import net.neoforged.neoforge.client.event.ClientChatEvent;
+import net.neoforged.neoforge.client.event.ClientChatReceivedEvent;
+import net.neoforged.neoforge.client.event.ClientPauseChangeEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerChangeGameTypeEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientResourceLoadFinishedEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
+import net.neoforged.neoforge.client.event.ConfigureMainRenderTargetEvent;
+import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.FrameGraphSetupEvent;
+import net.neoforged.neoforge.client.event.GatherEffectScreenTooltipsEvent;
+import net.neoforged.neoforge.client.event.InitializeClientRegistriesEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
+import net.neoforged.neoforge.client.event.PlayerHeartTypeEvent;
+import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterTextureAtlasesEvent;
+import net.neoforged.neoforge.client.event.RenderArmEvent;
+import net.neoforged.neoforge.client.event.RenderBlockScreenEffectEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.client.event.RenderHandEvent;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.event.ScreenshotEvent;
+import net.neoforged.neoforge.client.event.SelectMusicEvent;
+import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
+import net.neoforged.neoforge.client.event.ToastAddEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.neoforged.neoforge.client.event.WindowResizeEvent;
+import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
+import net.neoforged.neoforge.client.extensions.common.ClientExtensionsManager;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
+import net.neoforged.neoforge.client.gamerules.GameRuleEntryFactoryManager;
+import net.neoforged.neoforge.client.gui.ClientTooltipComponentManager;
+import net.neoforged.neoforge.client.gui.PictureInPictureRendererRegistration;
+import net.neoforged.neoforge.client.gui.map.MapDecorationRendererManager;
+import net.neoforged.neoforge.client.model.block.BlockStateModelHooks;
+import net.neoforged.neoforge.client.pipeline.PipelineModifiers;
+import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.NeoForgeBuildType;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.common.NeoForgeVersion;
+import net.neoforged.neoforge.internal.BrandingControl;
+import net.neoforged.neoforge.internal.NeoForgeVersionCheck;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import org.jetbrains.annotations.ApiStatus;
+import org.joml.Matrix4fc;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.util.function.Consumer5;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -140,80 +217,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.FogType;
-import net.neoforged.bus.api.Event;
-import net.neoforged.fml.ModLoader;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.client.config.NeoForgeClientConfig;
-import net.neoforged.neoforge.client.entity.animation.json.AnimationTypeManager;
-import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
-import net.neoforged.neoforge.client.event.AddSectionGeometryEvent;
-import net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent;
-import net.neoforged.neoforge.client.event.CalculatePlayerTurnEvent;
-import net.neoforged.neoforge.client.event.ClientChatEvent;
-import net.neoforged.neoforge.client.event.ClientChatReceivedEvent;
-import net.neoforged.neoforge.client.event.ClientPauseChangeEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerChangeGameTypeEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientResourceLoadFinishedEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
-import net.neoforged.neoforge.client.event.ConfigureMainRenderTargetEvent;
-import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.FrameGraphSetupEvent;
-import net.neoforged.neoforge.client.event.GatherEffectScreenTooltipsEvent;
-import net.neoforged.neoforge.client.event.InitializeClientRegistriesEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
-import net.neoforged.neoforge.client.event.PlayerHeartTypeEvent;
-import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterTextureAtlasesEvent;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
-import net.neoforged.neoforge.client.event.RenderBlockScreenEffectEvent;
-import net.neoforged.neoforge.client.event.RenderFrameEvent;
-import net.neoforged.neoforge.client.event.RenderHandEvent;
-import net.neoforged.neoforge.client.event.RenderTooltipEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.client.event.ScreenshotEvent;
-import net.neoforged.neoforge.client.event.SelectMusicEvent;
-import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
-import net.neoforged.neoforge.client.event.ToastAddEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
-import net.neoforged.neoforge.client.event.WindowResizeEvent;
-import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
-import net.neoforged.neoforge.client.extensions.common.ClientExtensionsManager;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
-import net.neoforged.neoforge.client.gamerules.GameRuleEntryFactoryManager;
-import net.neoforged.neoforge.client.gui.ClientTooltipComponentManager;
-import net.neoforged.neoforge.client.gui.PictureInPictureRendererRegistration;
-import net.neoforged.neoforge.client.gui.map.MapDecorationRendererManager;
-import net.neoforged.neoforge.client.model.block.BlockStateModelHooks;
-import net.neoforged.neoforge.client.pipeline.PipelineModifiers;
-import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.NeoForgeBuildType;
-import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.common.NeoForgeVersion;
-import net.neoforged.neoforge.internal.BrandingControl;
-import net.neoforged.neoforge.internal.NeoForgeVersionCheck;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-import org.jetbrains.annotations.ApiStatus;
-import org.joml.Matrix4fc;
-import org.joml.Vector2i;
-import org.joml.Vector2ic;
-import org.joml.Vector4f;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Class for various client-side-only hooks.
@@ -404,17 +407,25 @@ public class ClientHooks {
     }
 
     public static void drawScreen(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        kilt$drawScreen(screen, guiGraphics, mouseX, mouseY, partialTick, Screen::extractRenderStateWithTooltipAndSubtitles);
+    }
+
+    public static void kilt$drawScreen(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick, Consumer5<Screen, GuiGraphicsExtractor, Integer, Integer, Float> original) {
         guiLayers.forEach(layer -> {
             // Prevent the background layers from thinking the mouse is over their controls and showing them as highlighted.
-            drawScreenInternal(layer, guiGraphics, Integer.MAX_VALUE, Integer.MAX_VALUE, partialTick);
+            kilt$drawScreenInternal(layer, guiGraphics, Integer.MAX_VALUE, Integer.MAX_VALUE, partialTick, original);
             guiGraphics.nextStratum();
         });
-        drawScreenInternal(screen, guiGraphics, mouseX, mouseY, partialTick);
+        kilt$drawScreenInternal(screen, guiGraphics, mouseX, mouseY, partialTick, original);
     }
 
     private static void drawScreenInternal(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        kilt$drawScreenInternal(screen, guiGraphics, mouseX, mouseY, partialTick, Screen::extractRenderStateWithTooltipAndSubtitles);
+    }
+
+    private static void kilt$drawScreenInternal(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick, Consumer5<Screen, GuiGraphicsExtractor, Integer, Integer, Float> original) {
         if (!NeoForge.EVENT_BUS.post(new ScreenEvent.Render.Pre(screen, guiGraphics, mouseX, mouseY, partialTick)).isCanceled())
-            screen.extractRenderStateWithTooltipAndSubtitles(guiGraphics, mouseX, mouseY, partialTick);
+            original.call(screen, guiGraphics, mouseX, mouseY, partialTick);
         NeoForge.EVENT_BUS.post(new ScreenEvent.Render.Post(screen, guiGraphics, mouseX, mouseY, partialTick));
     }
 
