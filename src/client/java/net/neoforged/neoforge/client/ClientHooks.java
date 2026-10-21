@@ -35,7 +35,6 @@ import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.resource.RenderTargetDescriptor;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -117,6 +116,11 @@ import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.blaze3d.pipeline.MainTargetInjection;
+import xyz.bluspring.kilt.injections.blaze3d.systems.RenderSystemInjection;
+import xyz.bluspring.kilt.injections.client.gui.components.debug.DebugScreenEntriesInjection;
+import xyz.bluspring.kilt.injections.client.gui.screens.MenuScreensInjection;
+import xyz.bluspring.kilt.injections.client.renderer.RenderPipelinesInjection;
 import xyz.bluspring.kilt.util.function.Consumer5;
 
 import net.minecraft.ChatFormatting;
@@ -133,7 +137,6 @@ import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.gui.components.debug.DebugEntryCategory;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -162,7 +165,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
@@ -858,7 +860,7 @@ public class ClientHooks {
         initializedClientHooks = true;
 
         ClientExtensionsManager.init();
-        MenuScreens.init();
+        MenuScreensInjection.init();
         initClientRegistries();
 
         var rlEvent = new AddClientReloadListenersEvent(resourceManager);
@@ -879,10 +881,10 @@ public class ClientHooks {
         PresetEditorManager.init();
         MapDecorationRendererManager.init();
         DimensionTransitionScreenManager.init();
-        RenderPipelines.registerCustomPipelines();
+        RenderPipelinesInjection.registerCustomPipelines();
         PipelineModifiers.init();
         GameRuleEntryFactoryManager.register();
-        DebugScreenEntries.registerModdedDebugEntries();
+        DebugScreenEntriesInjection.registerModdedDebugEntries();
     }
 
     // Runs during Minecraft construction, before initial resource loading and during datagen startup
@@ -918,7 +920,7 @@ public class ClientHooks {
      */
     public static void fireRenderFramePost(DeltaTracker partialTick) {
         NeoForge.EVENT_BUS.post(new RenderFrameEvent.Post(partialTick));
-        RenderSystem.ensurePipelineModifiersEmpty();
+        RenderSystemInjection.ensurePipelineModifiersEmpty();
     }
 
     /**
@@ -981,7 +983,7 @@ public class ClientHooks {
     @ApiStatus.Internal
     public static MainTarget instantiateMainTarget(int width, int height) {
         var e = ModLoader.postEventWithReturn(new ConfigureMainRenderTargetEvent());
-        return new MainTarget(width, height, e.isStencilEnabled());
+        return MainTargetInjection.create(width, height, e.isStencilEnabled());
     }
 
     @ApiStatus.Internal

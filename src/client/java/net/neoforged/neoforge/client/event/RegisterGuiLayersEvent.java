@@ -5,12 +5,10 @@
 
 package net.neoforged.neoforge.client.event;
 
-import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
-import java.util.stream.IntStream;
-import net.minecraft.resources.Identifier;
+
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.fml.LogicalSide;
@@ -20,6 +18,11 @@ import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.client.workarounds.HudElementIdRemapper;
+
+import net.minecraft.resources.Identifier;
+
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 
 /**
  * Allows users to register custom {@link GuiLayer layers} for GUI rendering.
@@ -108,6 +111,7 @@ public class RegisterGuiLayersEvent extends Event implements IModBusEvent {
         Objects.requireNonNull(id);
         Objects.requireNonNull(wrapper);
 
+        /*
         for (int i = 0; i < layers.size(); i++) {
             var layer = layers.get(i);
             if (layer.name().equals(id)) {
@@ -119,10 +123,15 @@ public class RegisterGuiLayersEvent extends Event implements IModBusEvent {
         }
 
         throw new IllegalArgumentException("Attempted to wrap layer with id '" + id + "', which does not exist!");
+         */
+
+        // Kilt: okay, so like. this wraps really well.
+        HudElementRegistry.replaceElement(HudElementIdRemapper.tryRemap(id), (original) -> wrapper.apply(original::extractRenderState));
     }
 
     private void register(Ordering ordering, @Nullable Identifier other, Identifier key, GuiLayer layer) {
         Objects.requireNonNull(key);
+        /*
         for (var namedLayer : layers) {
             Preconditions.checkArgument(!namedLayer.name().equals(key), "Layer already registered: " + key);
         }
@@ -142,6 +151,25 @@ public class RegisterGuiLayersEvent extends Event implements IModBusEvent {
         }
 
         layers.add(insertPosition, new GuiLayerManager.NamedLayer(key, layer));
+         */
+
+        // Kilt: okay, hear me out.
+        switch (ordering) {
+            case BEFORE -> {
+                if (other == null) {
+                    HudElementRegistry.addFirst(key, layer);
+                } else {
+                    HudElementRegistry.attachElementBefore(HudElementIdRemapper.tryRemap(other), key, layer);
+                }
+            }
+            case AFTER -> {
+                if (other == null) {
+                    HudElementRegistry.addLast(key, layer);
+                } else {
+                    HudElementRegistry.attachElementAfter(HudElementIdRemapper.tryRemap(other), key, layer);
+                }
+            }
+        }
     }
 
     private enum Ordering {
