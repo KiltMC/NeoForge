@@ -15,6 +15,8 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.world.ModifiableBiomeInfo.BiomeInfo;
 import net.minecraftforge.registries.ForgeRegistries;
+import xyz.bluspring.kilt.Kilt;
+
 import java.util.function.Function;
 
 /**
@@ -38,7 +40,10 @@ public interface BiomeModifier
      * Mods can use this for data generation.
      */
     Codec<BiomeModifier> DIRECT_CODEC = ExtraCodecs.lazyInitializedCodec(() -> ForgeRegistries.BIOME_MODIFIER_SERIALIZERS.get().getCodec())
-            .dispatch(BiomeModifier::codec, Function.identity());
+            .dispatch(BiomeModifier::codec, Function.identity())
+            .orElse(error -> {
+                Kilt.Companion.getLogger().error("Failed to load biome modifier, but Kilt is going to fall back to using forge:none instead. Error: {}", error);
+            }, new NoneBiomeModifier()); // Kilt: Try to safeguard against Fabric mods bundling dead Forge data.
 
     /**
      * Codec for referring to biome modifiers by id in other datapack registry files.

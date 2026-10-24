@@ -16,6 +16,7 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraftforge.common.world.ModifiableStructureInfo.StructureInfo;
 import net.minecraftforge.registries.ForgeRegistries;
+import xyz.bluspring.kilt.Kilt;
 
 /**
  * JSON-serializable structure modifier.
@@ -38,7 +39,10 @@ public interface StructureModifier
      * Mods can use this for data generation.
      */
     Codec<StructureModifier> DIRECT_CODEC = ExtraCodecs.lazyInitializedCodec(() -> ForgeRegistries.STRUCTURE_MODIFIER_SERIALIZERS.get().getCodec())
-            .dispatch(StructureModifier::codec, Function.identity());
+            .dispatch(StructureModifier::codec, Function.identity())
+            .orElse(error -> {
+                Kilt.Companion.getLogger().error("Failed to load structure modifier, but Kilt is going to fall back to using forge:none instead. Error: {}", error);
+            }, new NoneStructureModifier()); // Kilt: Try to safeguard against Fabric mods bundling dead NeoForge data.
 
     /**
      * Codec for referring to structure modifiers by id in other datapack registry files.
