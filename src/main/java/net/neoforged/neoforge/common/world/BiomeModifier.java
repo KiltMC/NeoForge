@@ -5,16 +5,19 @@
 
 package net.neoforged.neoforge.common.world;
 
+import java.util.function.Function;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import java.util.function.Function;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import xyz.bluspring.kilt.Kilt;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.level.biome.Biome;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 /**
  * JSON-serializable biome modifier.
@@ -38,7 +41,10 @@ public interface BiomeModifier {
      * Mods can use this for data generation.
      */
     Codec<BiomeModifier> DIRECT_CODEC = NeoForgeRegistries.BIOME_MODIFIER_SERIALIZERS.byNameCodec()
-            .dispatch(BiomeModifier::codec, Function.identity());
+            .dispatch(BiomeModifier::codec, Function.identity())
+            .orElse(error -> {
+                Kilt.Companion.getLogger().error("Failed to load biome modifier, but Kilt is going to fall back to using neoforge:none instead. Error: {}", error);
+            }, new NoneBiomeModifier()); // Kilt: Try to safeguard against Fabric mods bundling dead NeoForge data.
 
     /**
      * Codec for referring to biome modifiers by id in other datapack registry files.

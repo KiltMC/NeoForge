@@ -5,17 +5,20 @@
 
 package net.neoforged.neoforge.common.world;
 
+import java.util.function.Function;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import java.util.function.Function;
+import net.neoforged.neoforge.common.world.ModifiableStructureInfo.StructureInfo;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import xyz.bluspring.kilt.Kilt;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.neoforged.neoforge.common.world.ModifiableStructureInfo.StructureInfo;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 /**
  * JSON-serializable structure modifier.
@@ -39,7 +42,10 @@ public interface StructureModifier {
      * Mods can use this for data generation.
      */
     Codec<StructureModifier> DIRECT_CODEC = NeoForgeRegistries.STRUCTURE_MODIFIER_SERIALIZERS.byNameCodec()
-            .dispatch(StructureModifier::codec, Function.identity());
+            .dispatch(StructureModifier::codec, Function.identity())
+            .orElse(error -> {
+                Kilt.Companion.getLogger().error("Failed to load structure modifier, but Kilt is going to fall back to using neoforge:none instead. Error: {}", error);
+            }, new NoneStructureModifier()); // Kilt: Try to safeguard against Fabric mods bundling dead NeoForge data.
 
     /**
      * Codec for referring to structure modifiers by id in other datapack registry files.
