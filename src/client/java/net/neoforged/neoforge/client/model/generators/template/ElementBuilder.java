@@ -5,7 +5,6 @@
 
 package net.neoforged.neoforge.client.model.generators.template;
 
-import com.google.common.base.Preconditions;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -13,13 +12,17 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.base.Preconditions;
+import net.neoforged.neoforge.client.model.ExtraFaceData;
+import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.resources.model.cuboid.CuboidModelElementInjection;
+
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.resources.model.cuboid.CuboidFace;
 import net.minecraft.client.resources.model.cuboid.CuboidModelElement;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.client.model.ExtraFaceData;
-import org.joml.Vector3f;
-import org.jspecify.annotations.Nullable;
 
 public final class ElementBuilder {
     private Vector3f from = new Vector3f();
@@ -226,7 +229,7 @@ public final class ElementBuilder {
         Map<Direction, CuboidFace> faces = this.faces.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().build(), (k1, k2) -> {
             throw new IllegalArgumentException();
         }, LinkedHashMap::new));
-        return new CuboidModelElement(from, to, faces, rotation == null ? null : rotation.build(), shade, lightEmission, new ExtraFaceData(this.color, 0, this.hasAmbientOcclusion));
+        return CuboidModelElementInjection.create(from, to, faces, rotation == null ? null : rotation.build(), shade, lightEmission, new ExtraFaceData(this.color, 0, this.hasAmbientOcclusion));
     }
 
     ElementBuilder copy() {

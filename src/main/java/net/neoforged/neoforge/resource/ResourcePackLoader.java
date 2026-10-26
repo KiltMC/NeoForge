@@ -5,6 +5,12 @@
 
 package net.neoforged.neoforge.resource;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.google.common.collect.Sets;
 import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Pair;
@@ -12,20 +18,22 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.SequencedSet;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoader;
+import net.neoforged.fml.ModLoadingIssue;
+import net.neoforged.fml.jarcontents.FolderJarContents;
+import net.neoforged.fml.jarcontents.JarContents;
+import net.neoforged.fml.jarcontents.JarFileContents;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforgespi.language.IModFileInfo;
+import net.neoforged.neoforgespi.language.IModInfo;
+import net.neoforged.neoforgespi.locating.IModFile;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.server.packs.repository.PackMetadataInjection;
+
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -48,20 +56,6 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.util.InclusiveRange;
 import net.minecraft.world.flag.FeatureFlagSet;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.ModLoader;
-import net.neoforged.fml.ModLoadingIssue;
-import net.neoforged.fml.jarcontents.FolderJarContents;
-import net.neoforged.fml.jarcontents.JarContents;
-import net.neoforged.fml.jarcontents.JarFileContents;
-import net.neoforged.neoforge.event.AddPackFindersEvent;
-import net.neoforged.neoforgespi.language.IModFileInfo;
-import net.neoforged.neoforgespi.language.IModInfo;
-import net.neoforged.neoforgespi.locating.IModFile;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.jetbrains.annotations.ApiStatus;
 
 public class ResourcePackLoader {
     public static final String MOD_DATA_ID = "mod_data";
@@ -234,7 +228,7 @@ public class ResourcePackLoader {
             overlays = List.copyOf(overlays);
 
             if (metadata == null) {
-                return new Pack.Metadata(location.title(), PackCompatibility.COMPATIBLE, flags, overlays, primaryResources.isHidden());
+                return PackMetadataInjection.create(location.title(), PackCompatibility.COMPATIBLE, flags, overlays, primaryResources.isHidden());
             }
 
             final PackCompatibility compatibility;
@@ -243,7 +237,7 @@ public class ResourcePackLoader {
             } else {
                 compatibility = PackCompatibility.forVersion(metadata.supportedFormats(), currentVersion);
             }
-            return new Pack.Metadata(metadata.description(), compatibility, flags, overlays, primaryResources.isHidden());
+            return PackMetadataInjection.create(metadata.description(), compatibility, flags, overlays, primaryResources.isHidden());
         }
     }
 

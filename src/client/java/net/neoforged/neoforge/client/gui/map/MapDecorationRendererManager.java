@@ -5,15 +5,17 @@
 
 package net.neoforged.neoforge.client.gui.map;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.neoforged.fml.ModLoader;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.world.level.saveddata.maps.MapDecorationType;
-import net.neoforged.fml.ModLoader;
-import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public final class MapDecorationRendererManager {
@@ -31,7 +33,7 @@ public final class MapDecorationRendererManager {
             boolean inItemFrame,
             int packedLight,
             int index) {
-        IMapDecorationRenderer decorationRenderer = RENDERERS.get(decorationRenderState.type.value());
+        IMapDecorationRenderer decorationRenderer = RENDERERS.get(decorationRenderState.kilt$getType().value());
         if (decorationRenderer != null) {
             return decorationRenderer.render(decorationRenderState, poseStack, submitNodeCollector, mapRenderState, decorationSprites, inItemFrame, packedLight, index);
         }

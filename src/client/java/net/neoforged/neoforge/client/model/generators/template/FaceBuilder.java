@@ -7,12 +7,14 @@ package net.neoforged.neoforge.client.model.generators.template;
 
 import com.google.common.base.Preconditions;
 import com.mojang.math.Quadrant;
-import net.minecraft.client.data.models.model.TextureSlot;
-import net.minecraft.client.resources.model.cuboid.CuboidFace;
-import net.minecraft.core.Direction;
 import net.neoforged.neoforge.client.model.ExtraFaceData;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.resources.model.cuboid.CuboidFaceInjection;
+
+import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.resources.model.cuboid.CuboidFace;
+import net.minecraft.core.Direction;
 
 public final class FaceBuilder {
     @Nullable
@@ -113,7 +115,7 @@ public final class FaceBuilder {
         if (this.texture == null) {
             throw new IllegalStateException("A model face must have a texture");
         }
-        return new CuboidFace(cullface, tintindex, texture.toString(), uvs, rotation, new ExtraFaceData(this.color, this.lightEmission, this.hasAmbientOcclusion), new MutableObject<>());
+        return CuboidFaceInjection.create(cullface, tintindex, texture.toString(), uvs, rotation, new ExtraFaceData(this.color, this.lightEmission, this.hasAmbientOcclusion), new MutableObject<>());
     }
 
     FaceBuilder copy() {

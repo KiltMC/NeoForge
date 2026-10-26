@@ -6,6 +6,12 @@
 package net.neoforged.neoforge.client.extensions;
 
 import java.util.List;
+
+import net.neoforged.neoforge.common.extensions.IBlockGetterExtension;
+import net.neoforged.neoforge.common.extensions.IBlockStateExtension;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -14,12 +20,10 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.extensions.IBlockGetterExtension;
-import net.neoforged.neoforge.common.extensions.IBlockStateExtension;
-import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
 
-public interface BlockStateModelExtension {
+import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModel;
+
+public interface BlockStateModelExtension extends FabricBlockStateModel {
     private BlockStateModel self() {
         return (BlockStateModel) this;
     }
