@@ -16,8 +16,10 @@ public class NeoForgeCoreMod implements ClassProcessorProvider {
                 "specialEffects", "getModifiedSpecialEffects")));
         collector.add(new ReplaceFieldWithGetterAccess("net.minecraft.world.level.levelgen.structure.Structure", Map.of(
                 "settings", "getModifiedStructureSettings")));
+        /* // Kilt: we have a better one
         collector.add(new ReplaceFieldWithGetterAccess("net.minecraft.world.level.block.FlowerPotBlock", Map.of(
                 "potted", "getPotted")));
+         */
 
         collector.add(new MethodRedirector());
     }

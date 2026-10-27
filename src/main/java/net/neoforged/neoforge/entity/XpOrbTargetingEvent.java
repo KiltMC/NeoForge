@@ -6,13 +6,16 @@
 package net.neoforged.neoforge.entity;
 
 import java.util.Optional;
-import net.minecraft.world.entity.ExperienceOrb;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import java.util.function.Supplier;
+
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
 import org.jspecify.annotations.Nullable;
+
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 /**
  * Event to determine which player an XP Orb should follow.
@@ -35,17 +38,26 @@ public class XpOrbTargetingEvent extends Event {
     @Nullable
     private Optional<Player> followingPlayer = null;
 
+    private Supplier<@Nullable Player> kilt$followingPlayerGetter;
+
     // Not internal, modded XP Orbs may call this.
     public XpOrbTargetingEvent(ExperienceOrb xpOrb, double scanDistance) {
         this.xpOrb = xpOrb;
         this.scanDistance = scanDistance;
+        this.kilt$followingPlayerGetter = () -> xpOrb.level().getNearestPlayer(xpOrb, scanDistance);
+    }
+
+    // Kilt: Mod support wrapper
+    public XpOrbTargetingEvent(ExperienceOrb xpOrb, double scanDistance, Supplier<@Nullable Player> followingPlayerGetter) {
+        this(xpOrb, scanDistance);
+        this.kilt$followingPlayerGetter = followingPlayerGetter;
     }
 
     /**
      * The result of the event.
      */
     public @Nullable Player getFollowingPlayer() {
-        return followingPlayer != null ? followingPlayer.orElse(null) : xpOrb.level().getNearestPlayer(xpOrb, scanDistance);
+        return followingPlayer != null ? followingPlayer.orElse(null) : this.kilt$followingPlayerGetter.get();
     }
 
     /**

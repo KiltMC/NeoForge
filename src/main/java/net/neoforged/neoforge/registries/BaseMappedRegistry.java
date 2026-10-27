@@ -25,7 +25,7 @@ import net.minecraft.resources.ResourceKey;
 
 @ApiStatus.Internal
 public abstract class BaseMappedRegistry<T> implements Registry<T> {
-    protected final List<AddCallback<T>> addCallbacks = new ArrayList<>();
+    public final List<AddCallback<T>> addCallbacks = new ArrayList<>();
     public final List<BakeCallback<T>> bakeCallbacks = new ArrayList<>();
     public final List<ClearCallback<T>> clearCallbacks = new ArrayList<>();
     final Map<Identifier, Identifier> aliases = new HashMap<>();
