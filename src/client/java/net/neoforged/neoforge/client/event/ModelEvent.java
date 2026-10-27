@@ -5,14 +5,11 @@
 
 package net.neoforged.neoforge.client.event;
 
-import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.resources.Identifier;
+
+import com.google.common.base.Preconditions;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.fml.LogicalSide;
@@ -21,6 +18,12 @@ import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.neoforged.neoforge.client.model.standalone.UnbakedStandaloneModel;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.client.resources.model.ModelBakeryInjection;
+
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.resources.Identifier;
 
 /**
  * Houses events related to models.
@@ -98,7 +101,7 @@ public abstract class ModelEvent extends Event {
         @ApiStatus.Internal
         public BakingCompleted(ModelManager modelManager, ModelBakery.BakingResult bakingResult, ModelBakery modelBakery) {
             this.modelManager = modelManager;
-            this.bakingResult = new ModelBakery.BakingResult(
+            this.bakingResult = ModelBakeryInjection.BakingResultInjection.create(
                     bakingResult.missingModels(),
                     Collections.unmodifiableMap(bakingResult.blockStateModels()),
                     Collections.unmodifiableMap(bakingResult.itemStackModels()),

@@ -6,6 +6,8 @@
 package net.neoforged.neoforge.client.gui.widget;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import xyz.bluspring.kilt.mixin.client.gui.components.ButtonBuilderAccessor;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -34,7 +36,9 @@ public class ExtendedButton extends Button {
     }
 
     public ExtendedButton(Button.Builder builder) {
-        super(builder);
+        // Kilt: We can't target super here, so this works.
+        super(((ButtonBuilderAccessor) builder).getX(), ((ButtonBuilderAccessor) builder).getY(), ((ButtonBuilderAccessor) builder).getWidth(), ((ButtonBuilderAccessor) builder).getHeight(), ((ButtonBuilderAccessor) builder).getMessage(), ((ButtonBuilderAccessor) builder).getOnPress(), ((ButtonBuilderAccessor) builder).getCreateNarration());
+        this.setTooltip(((ButtonBuilderAccessor) builder).getTooltip());
     }
 
     /**

@@ -5,22 +5,15 @@
 
 package net.neoforged.neoforge.client.data.internal;
 
-import java.util.stream.Stream;
-import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
-import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.DyedItemColor;
-import net.minecraft.world.level.block.Block;
 
 public class VanillaModelProvider extends ModelProvider {
     public VanillaModelProvider(PackOutput packOutput) {
-        super(packOutput, "minecraft");
+        super(packOutput/*, "minecraft"*/);
     }
 
+    /* // Kilt: we don't need these, do we?
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         itemModels.generateDynamicTrimmableItem(Items.TURTLE_HELMET, ItemModelGenerators.TRIM_PREFIX_HELMET);
@@ -59,4 +52,5 @@ public class VanillaModelProvider extends ModelProvider {
     protected Stream<? extends Holder<Item>> getKnownItems() {
         return Stream.empty();
     }
+     */
 }

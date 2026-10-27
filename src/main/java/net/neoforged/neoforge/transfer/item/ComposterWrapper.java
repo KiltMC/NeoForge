@@ -5,9 +5,18 @@
 
 package net.neoforged.neoforge.transfer.item;
 
-import com.google.common.collect.MapMaker;
 import java.util.Map;
 import java.util.Objects;
+
+import com.google.common.collect.MapMaker;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.world.level.block.ComposterBlockInjection;
+
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,12 +27,6 @@ import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.TransferPreconditions;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
-import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
 
 /**
  * {@code ResourceHandler<ItemResource>} implementation for the composter block.
@@ -107,7 +110,7 @@ public class ComposterWrapper extends SnapshotJournal<BlockState> {
     }
 
     private static float getComposterValue(ItemResource resource) {
-        return ComposterBlock.getValue(resource.toStack());
+        return ComposterBlockInjection.getValue(resource.toStack());
     }
 
     /**

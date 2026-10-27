@@ -17,6 +17,7 @@ import net.neoforged.neoforge.client.event.RegisterBlockStateModels;
 import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.bluspring.kilt.injections.client.renderer.block.dispatch.BlockStateModelDispatcherInjection;
+import xyz.bluspring.kilt.injections.client.renderer.block.dispatch.SingleVariantInjection;
 
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;
 import net.minecraft.client.renderer.block.dispatch.SingleVariant;
@@ -38,7 +39,7 @@ public class BlockStateModelHooks {
                 BLOCK_STATE_MODEL_IDS.codec(Identifier.CODEC),
                 CustomUnbakedBlockStateModel::codec,
                 c -> c,
-                SingleVariant.Unbaked.MAP_CODEC);
+                SingleVariantInjection.UnbakedInjection.MAP_CODEC);
     }
 
     public static Codec<Weighted<Either<CustomUnbakedBlockStateModel, SingleVariant.Unbaked>>> makeElementCodec() {

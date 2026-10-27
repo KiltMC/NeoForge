@@ -5,16 +5,18 @@
 
 package net.neoforged.neoforge.client.gui.widget;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
 import net.neoforged.fml.VersionChecker;
 import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforge.client.loading.ClientModLoader;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.mixin.client.gui.components.ButtonBuilderAccessor;
+
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
 
 /**
  * Custom button subclass to draw an indicator overlay on the button when updates are available.
@@ -27,7 +29,9 @@ public class ModsButton extends Button.Plain {
     private boolean hasCheckedForUpdates = false;
 
     public ModsButton(Builder builder) {
-        super(builder);
+        // Kilt: We can't target super here, so this works.
+        super(((ButtonBuilderAccessor) builder).getX(), ((ButtonBuilderAccessor) builder).getY(), ((ButtonBuilderAccessor) builder).getWidth(), ((ButtonBuilderAccessor) builder).getHeight(), ((ButtonBuilderAccessor) builder).getMessage(), ((ButtonBuilderAccessor) builder).getOnPress(), ((ButtonBuilderAccessor) builder).getCreateNarration());
+        this.setTooltip(((ButtonBuilderAccessor) builder).getTooltip());
     }
 
     @Override

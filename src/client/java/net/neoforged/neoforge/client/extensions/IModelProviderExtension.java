@@ -10,7 +10,7 @@ import net.minecraft.resources.Identifier;
 
 public interface IModelProviderExtension {
     default Identifier modLocation(String modelPath) {
-        return Identifier.fromNamespaceAndPath(self().modId, modelPath);
+        return Identifier.fromNamespaceAndPath(self().kilt$getModId(), modelPath);
     }
 
     default Identifier mcLocation(String modelPath) {
