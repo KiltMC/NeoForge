@@ -5,16 +5,29 @@
 
 package net.neoforged.neoforge.client.model.item;
 
-import com.mojang.math.Transformation;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.mojang.math.Transformation;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.neoforged.neoforge.client.NeoForgeRenderTypes;
+import net.neoforged.neoforge.client.color.item.FluidContentsTint;
+import net.neoforged.neoforge.client.model.ComposedModelState;
+import net.neoforged.neoforge.client.model.ExtraFaceData;
+import net.neoforged.neoforge.client.model.UnbakedElementsHelper;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.resources.model.geometry.BakedQuadInjection;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.Sheets;
@@ -46,16 +59,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.client.NeoForgeRenderTypes;
-import net.neoforged.neoforge.client.color.item.FluidContentsTint;
-import net.neoforged.neoforge.client.model.ComposedModelState;
-import net.neoforged.neoforge.client.model.ExtraFaceData;
-import net.neoforged.neoforge.client.model.UnbakedElementsHelper;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
-import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A dynamic fluid container model, capable of re-texturing itself at runtime to match the contained fluid.
@@ -134,7 +137,7 @@ public class DynamicFluidContainerModel implements ItemModel {
             boolean opaque = unbakedModel.forceOpaqueFluid;
             boolean emissive = unbakedModel.applyFluidLuminosity && fluid.getFluidType().getLightLevel() > 0;
             ModelBaker.Interner interner = baker.interner();
-            BakedQuad.MaterialInfo fluidInfo = interner.materialInfo(new BakedQuad.MaterialInfo(
+            BakedQuad.MaterialInfo fluidInfo = interner.materialInfo(BakedQuadInjection.MaterialInfoInjection.create(
                     fluidSprite.sprite(), ChunkSectionLayer.SOLID, computeFluidItemRenderType(fluidSprite, opaque, emissive), 0, !emissive, emissive ? Level.MAX_BRIGHTNESS : 0, !emissive));
             QuadCollection quads = UnbakedElementsHelper.bakeItemMaskQuads(baker, templateSprite, fluidInfo, transformedState, ExtraFaceData.DEFAULT); // Use template as mask
 

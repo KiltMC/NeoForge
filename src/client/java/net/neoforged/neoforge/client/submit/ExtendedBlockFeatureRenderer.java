@@ -8,20 +8,22 @@ package net.neoforged.neoforge.client.submit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.neoforged.neoforge.client.NeoForgeRenderTypes;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollection;
-import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.feature.BlockFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.client.NeoForgeRenderTypes;
-import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
+
+import net.fabricmc.fabric.api.client.renderer.v1.render.FabricSubmitNodeCollection;
 
 @ApiStatus.Internal
 public final class ExtendedBlockFeatureRenderer extends BlockFeatureRenderer {
@@ -33,7 +35,7 @@ public final class ExtendedBlockFeatureRenderer extends BlockFeatureRenderer {
             OutlineBufferSource outlineBufferSource,
             QuadInstance quadInstance,
             boolean translucent) {
-        for (SubmitNodeStorage.MultiLayerBlockModelSubmit submit : nodeCollection.getMultiLayerBlockModelSubmits()) {
+        for (FabricSubmitNodeCollection.ExtendedBlockModelSubmit submit : nodeCollection.getExtendedBlockModelSubmits()) { // Kilt: use Fabric API's implementation
             if (submit.translucent() != translucent) {
                 continue;
             }

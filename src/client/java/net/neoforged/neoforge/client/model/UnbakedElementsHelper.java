@@ -5,24 +5,28 @@
 
 package net.neoforged.neoforge.client.model;
 
-import com.mojang.math.Quadrant;
-import com.mojang.math.Transformation;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+
+import com.mojang.math.Quadrant;
+import com.mojang.math.Transformation;
+import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.resources.model.cuboid.FaceBakeryInjection;
+import xyz.bluspring.kilt.injections.client.resources.model.cuboid.ItemModelGeneratorInjection;
+import xyz.bluspring.kilt.injections.client.resources.model.geometry.BakedQuadInjection;
+
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.cuboid.CuboidFace;
 import net.minecraft.client.resources.model.cuboid.CuboidModelElement;
 import net.minecraft.client.resources.model.cuboid.FaceBakery;
-import net.minecraft.client.resources.model.cuboid.ItemModelGenerator;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
-import org.joml.Vector3f;
 
 public final class UnbakedElementsHelper {
     private UnbakedElementsHelper() {}
@@ -50,7 +54,7 @@ public final class UnbakedElementsHelper {
      */
     public static QuadCollection bakeItemMaskQuads(ModelBaker baker, int layerIndex, Material.Baked maskMaterial, Material.Baked outputMaterial, ModelState modelState, ExtraFaceData faceData, UnaryOperator<BakedQuad.MaterialInfo> materialModifier) {
         ModelBaker.Interner interner = baker.interner();
-        BakedQuad.MaterialInfo outMaterialInfo = interner.materialInfo(materialModifier.apply(BakedQuad.MaterialInfo.of(outputMaterial, outputMaterial.sprite().transparency(), layerIndex, true, faceData.lightEmission(), faceData.ambientOcclusion())));
+        BakedQuad.MaterialInfo outMaterialInfo = interner.materialInfo(materialModifier.apply(BakedQuadInjection.MaterialInfoInjection.of(outputMaterial, outputMaterial.sprite().transparency(), layerIndex, true, faceData.lightEmission(), faceData.ambientOcclusion())));
         return bakeItemMaskQuads(baker, maskMaterial, outMaterialInfo, modelState, faceData);
     }
 
@@ -60,10 +64,10 @@ public final class UnbakedElementsHelper {
     public static QuadCollection bakeItemMaskQuads(ModelBaker baker, Material.Baked maskMaterial, BakedQuad.MaterialInfo outMaterialInfo, ModelState modelState, ExtraFaceData faceData) {
         ModelBaker.Interner interner = baker.interner();
         QuadCollection.Builder builder = new QuadCollection.Builder();
-        BakedQuad.MaterialInfo maskMaterialInfo = interner.materialInfo(BakedQuad.MaterialInfo.of(maskMaterial, maskMaterial.sprite().transparency(), -1, true, 0, true));
+        BakedQuad.MaterialInfo maskMaterialInfo = interner.materialInfo(BakedQuadInjection.MaterialInfoInjection.of(maskMaterial, maskMaterial.sprite().transparency(), -1, true, 0, true));
 
         // TODO 26.1: why are the side faces included at all?
-        ItemModelGenerator.bakeSideFaces(builder, interner, modelState, maskMaterialInfo, faceData);
+        ItemModelGeneratorInjection.bakeSideFaces(builder, interner, modelState, maskMaterialInfo, faceData);
 
         SpriteContents spriteContents = maskMaterialInfo.sprite().contents();
         int width = spriteContents.width();
@@ -109,8 +113,8 @@ public final class UnbakedElementsHelper {
                     CuboidFace.UVs northUvs = FaceBakery.defaultFaceUV(from, to, Direction.NORTH);
                     CuboidFace.UVs southUvs = FaceBakery.defaultFaceUV(from, to, Direction.SOUTH);
                     // Create quads
-                    builder.addUnculledFace(FaceBakery.bakeQuad(interner, from, to, northUvs, Quadrant.R0, outMaterialInfo, Direction.SOUTH, modelState, null, faceData));
-                    builder.addUnculledFace(FaceBakery.bakeQuad(interner, from, to, southUvs, Quadrant.R0, outMaterialInfo, Direction.NORTH, modelState, null, faceData));
+                    builder.addUnculledFace(FaceBakeryInjection.bakeQuad(interner, from, to, northUvs, Quadrant.R0, outMaterialInfo, Direction.SOUTH, modelState, null, faceData));
+                    builder.addUnculledFace(FaceBakeryInjection.bakeQuad(interner, from, to, southUvs, Quadrant.R0, outMaterialInfo, Direction.NORTH, modelState, null, faceData));
 
                     // Reset xStart
                     xStart = -1;

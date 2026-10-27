@@ -93,6 +93,13 @@ public class ConditionalOps<T> extends RegistryOps<T> {
                 NeoForgeExtraCodecs.listWithOptionalElements(createConditionalCodec(ownerCodec)));
     }
 
+    public static <T> Codec<List<T>> kilt$decodeListWithElementConditions(final Codec<List<T>> listCodec, final Codec<T> ownerCodec) {
+        return Codec.of(
+            listCodec,
+            NeoForgeExtraCodecs.listWithOptionalElements(createConditionalCodec(ownerCodec))
+        );
+    }
+
     /**
      * @see #createConditionalCodecWithConditions(Codec, String)
      */

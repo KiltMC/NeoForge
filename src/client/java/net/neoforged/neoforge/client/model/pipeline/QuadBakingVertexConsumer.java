@@ -5,10 +5,17 @@
 
 package net.neoforged.neoforge.client.model.pipeline;
 
+import java.util.Arrays;
+
 import com.mojang.blaze3d.platform.Transparency;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
-import java.util.Arrays;
+import net.neoforged.neoforge.client.model.quad.BakedColors;
+import net.neoforged.neoforge.client.model.quad.BakedNormals;
+import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
+import xyz.bluspring.kilt.injections.client.resources.model.geometry.BakedQuadInjection;
+
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
@@ -20,10 +27,6 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
-import net.neoforged.neoforge.client.model.quad.BakedColors;
-import net.neoforged.neoforge.client.model.quad.BakedNormals;
-import org.joml.Vector3f;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Vertex consumer that outputs {@linkplain BakedQuad baked quads}.
@@ -172,7 +175,7 @@ public class QuadBakingVertexConsumer implements VertexConsumer {
             throw new IllegalStateException("No item RenderType set");
         }
 
-        BakedQuad.MaterialInfo materialInfo = new BakedQuad.MaterialInfo(sprite, chunkLayer, itemRenderType, tintIndex, shade, lightEmission, ambientOcclusion);
+        BakedQuad.MaterialInfo materialInfo = BakedQuadInjection.MaterialInfoInjection.create(sprite, chunkLayer, itemRenderType, tintIndex, shade, lightEmission, ambientOcclusion);
         BakedNormals bakedNormals = BakedNormals.of(normals[0], normals[1], normals[2], normals[3]);
         BakedColors bakedColors = BakedColors.of(colors[0], colors[1], colors[2], colors[3]);
         if (interner != null) {
@@ -180,7 +183,7 @@ public class QuadBakingVertexConsumer implements VertexConsumer {
             bakedNormals = interner.normals(bakedNormals);
             bakedColors = interner.colors(bakedColors);
         }
-        BakedQuad quad = new BakedQuad(
+        BakedQuad quad = BakedQuadInjection.create(
                 positions[0],
                 positions[1],
                 positions[2],

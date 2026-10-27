@@ -38,16 +38,7 @@ import net.neoforged.neoforge.common.advancements.critereon.PiglinCurrencyItemPr
 import net.neoforged.neoforge.common.advancements.critereon.PiglinNeutralArmorEntityPredicate;
 import net.neoforged.neoforge.common.advancements.critereon.SnowBootsEntityPredicate;
 import net.neoforged.neoforge.common.advancements.critereon.TridentEntityPredicate;
-import net.neoforged.neoforge.common.conditions.AlwaysCondition;
-import net.neoforged.neoforge.common.conditions.AndCondition;
-import net.neoforged.neoforge.common.conditions.FeatureFlagsEnabledCondition;
-import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
-import net.neoforged.neoforge.common.conditions.NeverCondition;
-import net.neoforged.neoforge.common.conditions.NotCondition;
-import net.neoforged.neoforge.common.conditions.OrCondition;
-import net.neoforged.neoforge.common.conditions.RegisteredCondition;
-import net.neoforged.neoforge.common.conditions.TagEmptyCondition;
+import net.neoforged.neoforge.common.conditions.*;
 import net.neoforged.neoforge.common.config.NeoForgeCommonConfig;
 import net.neoforged.neoforge.common.config.NeoForgeServerConfig;
 import net.neoforged.neoforge.common.crafting.BlockTagIngredient;
@@ -116,6 +107,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jspecify.annotations.Nullable;
 import xyz.bluspring.kilt.injections.commands.synchronization.ArgumentTypeInfosInjection;
+import xyz.bluspring.kilt.injections.server.level.TicketTypeInjection;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.advancements.criterion.EntitySubPredicate;
@@ -396,9 +388,9 @@ public class NeoForgeMod {
     public static final Holder<TicketType> GENERATE_FORCED_TICKET = TICKET_TYPES.register("generate_forced", () -> new TicketType(0L, TicketType.FLAG_LOADING));
     //Note: We don't persist the tickets via the TicketType, as we keep handle persisting multiple backing sources of the ticket at once and will reinstate any ones that are still valid
     public static final Holder<TicketType> BLOCK_TICKET = TICKET_TYPES.register("block", () -> new TicketType(0L, TicketType.FLAG_LOADING | TicketType.FLAG_SIMULATION));
-    public static final Holder<TicketType> BLOCK_WITH_NATURAL_SPAWNING_TICKET = TICKET_TYPES.register("block_with_natural_spawning", () -> new TicketType(0L, TicketType.FLAG_LOADING | TicketType.FLAG_SIMULATION, true));
+    public static final Holder<TicketType> BLOCK_WITH_NATURAL_SPAWNING_TICKET = TICKET_TYPES.register("block_with_natural_spawning", () -> TicketTypeInjection.create(0L, TicketType.FLAG_LOADING | TicketType.FLAG_SIMULATION, true));
     public static final Holder<TicketType> ENTITY_TICKET = TICKET_TYPES.register("entity", () -> new TicketType(0L, TicketType.FLAG_LOADING | TicketType.FLAG_SIMULATION));
-    public static final Holder<TicketType> ENTITY_WITH_NATURAL_SPAWNING_TICKET = TICKET_TYPES.register("entity_with_natural_spawning", () -> new TicketType(0L, TicketType.FLAG_LOADING | TicketType.FLAG_SIMULATION, true));
+    public static final Holder<TicketType> ENTITY_WITH_NATURAL_SPAWNING_TICKET = TICKET_TYPES.register("entity_with_natural_spawning", () -> TicketTypeInjection.create(0L, TicketType.FLAG_LOADING | TicketType.FLAG_SIMULATION, true));
 
     private static final DeferredRegister<FluidType> VANILLA_FLUID_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.FLUID_TYPES, "minecraft");
 

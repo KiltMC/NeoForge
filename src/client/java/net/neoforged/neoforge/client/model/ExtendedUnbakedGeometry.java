@@ -5,6 +5,9 @@
 
 package net.neoforged.neoforge.client.model;
 
+import net.neoforged.neoforge.client.extensions.UnbakedModelExtension;
+import xyz.bluspring.kilt.injections.util.context.ContextMapInjection;
+
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelDebugName;
@@ -12,7 +15,6 @@ import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.util.context.ContextMap;
-import net.neoforged.neoforge.client.extensions.UnbakedModelExtension;
 
 /**
  * Base interface for unbaked models that wish to support the NeoForge-added {@code bake} method
@@ -22,7 +24,7 @@ import net.neoforged.neoforge.client.extensions.UnbakedModelExtension;
 public interface ExtendedUnbakedGeometry extends UnbakedGeometry {
     @Override
     default QuadCollection bake(TextureSlots textureSlots, ModelBaker modelBaker, ModelState modelState, ModelDebugName name) {
-        return bake(textureSlots, modelBaker, modelState, name, ContextMap.EMPTY);
+        return bake(textureSlots, modelBaker, modelState, name, ContextMapInjection.EMPTY);
     }
 
     // Re-abstract the extended version

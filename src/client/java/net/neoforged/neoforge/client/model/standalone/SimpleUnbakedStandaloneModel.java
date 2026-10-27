@@ -5,6 +5,8 @@
 
 package net.neoforged.neoforge.client.model.standalone;
 
+import xyz.bluspring.kilt.injections.client.resources.model.SimpleModelWrapperInjection;
+
 import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -14,7 +16,6 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.resources.Identifier;
 
@@ -62,7 +63,7 @@ public final class SimpleUnbakedStandaloneModel<T> implements UnbakedStandaloneM
      */
     public static SimpleUnbakedStandaloneModel<BlockStateModelPart> simpleModelWrapper(Identifier modelId) {
         return new SimpleUnbakedStandaloneModel<>(
-                modelId, (model, baker, _) -> SimpleModelWrapper.bake(baker, model, BlockModelRotation.IDENTITY));
+                modelId, (model, baker, _) -> SimpleModelWrapperInjection.bake(baker, model, BlockModelRotation.IDENTITY));
     }
 
     /**
@@ -70,7 +71,7 @@ public final class SimpleUnbakedStandaloneModel<T> implements UnbakedStandaloneM
      */
     public static SimpleUnbakedStandaloneModel<BlockStateModelPart> simpleModelWrapper(Identifier modelId, ModelState modelState) {
         return new SimpleUnbakedStandaloneModel<>(
-                modelId, (model, baker, _) -> SimpleModelWrapper.bake(baker, model, modelState));
+                modelId, (model, baker, _) -> SimpleModelWrapperInjection.bake(baker, model, modelState));
     }
 
     /**
@@ -78,7 +79,7 @@ public final class SimpleUnbakedStandaloneModel<T> implements UnbakedStandaloneM
      */
     public static SimpleUnbakedStandaloneModel<BlockStateModel> blockStateModel(Identifier modelId) {
         return new SimpleUnbakedStandaloneModel<>(
-                modelId, (model, baker, _) -> new SingleVariant(SimpleModelWrapper.bake(baker, model, BlockModelRotation.IDENTITY)));
+                modelId, (model, baker, _) -> new SingleVariant(SimpleModelWrapperInjection.bake(baker, model, BlockModelRotation.IDENTITY)));
     }
 
     /**
@@ -86,7 +87,7 @@ public final class SimpleUnbakedStandaloneModel<T> implements UnbakedStandaloneM
      */
     public static SimpleUnbakedStandaloneModel<BlockStateModel> blockStateModel(Identifier modelId, ModelState modelState) {
         return new SimpleUnbakedStandaloneModel<>(
-                modelId, (model, baker, _) -> new SingleVariant(SimpleModelWrapper.bake(baker, model, modelState)));
+                modelId, (model, baker, _) -> new SingleVariant(SimpleModelWrapperInjection.bake(baker, model, modelState)));
     }
 
     /**

@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.server.packs.OverlayMetadataSectionInjection;
 import xyz.bluspring.kilt.injections.server.packs.repository.PackMetadataInjection;
 
 import net.minecraft.SharedConstants;
@@ -213,7 +214,7 @@ public class ResourcePackLoader {
                 LOGGER.warn("Error reading vanilla overlays for {}, falling back to empty overlays", location.id(), exception);
             }
 
-            MetadataSectionType<OverlayMetadataSection> neoOverlayType = OverlayMetadataSection.forPackTypeNeoForge(type);
+            MetadataSectionType<OverlayMetadataSection> neoOverlayType = OverlayMetadataSectionInjection.forPackTypeNeoForge(type);
             List<String> neoOverlays = List.of();
             try {
                 neoOverlays = Optional.ofNullable(primaryResources.getMetadataSection(neoOverlayType))

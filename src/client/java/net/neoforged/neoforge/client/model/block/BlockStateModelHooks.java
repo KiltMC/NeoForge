@@ -5,21 +5,24 @@
 
 package net.neoforged.neoforge.client.model.block;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.Optional;
-import java.util.function.Function;
+import net.neoforged.fml.ModLoader;
+import net.neoforged.neoforge.client.event.RegisterBlockStateModels;
+import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
+import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.injections.client.renderer.block.dispatch.BlockStateModelDispatcherInjection;
+
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;
 import net.minecraft.client.renderer.block.dispatch.SingleVariant;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.random.Weighted;
-import net.neoforged.fml.ModLoader;
-import net.neoforged.neoforge.client.event.RegisterBlockStateModels;
-import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
-import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public class BlockStateModelHooks {
@@ -48,19 +51,23 @@ public class BlockStateModelHooks {
     }
 
     public static Codec<BlockStateModelDispatcher> makeDefinitionCodec() {
+        return kilt$makeDefinitionCodec(BlockStateModelDispatcherInjection.kilt$getVanillaCodec());
+    }
+
+    public static Codec<BlockStateModelDispatcher> kilt$makeDefinitionCodec(MapCodec<BlockStateModelDispatcher> original) {
         return NeoForgeExtraCodecs.dispatchMapOrElse(
                 "neoforge:definition_type",
                 BLOCK_MODEL_DEFINITION_IDS.codec(Identifier.CODEC),
                 CustomBlockModelDefinition::codec,
                 Function.identity(),
-                BlockStateModelDispatcher.VANILLA_CODEC).xmap(
-                        BlockStateModelHooks::packDefinition,
-                        BlockStateModelHooks::unpackDefinition)
-                .codec();
+                original).xmap(
+                    BlockStateModelHooks::packDefinition,
+                    BlockStateModelHooks::unpackDefinition)
+            .codec();
     }
 
     private static BlockStateModelDispatcher packDefinition(Either<CustomBlockModelDefinition, BlockStateModelDispatcher> definition) {
-        return definition.map(def -> new BlockStateModelDispatcher(Optional.empty(), Optional.empty(), Optional.of(def)), Function.identity());
+        return definition.map(def -> BlockStateModelDispatcherInjection.create(Optional.empty(), Optional.empty(), Optional.of(def)), Function.identity());
     }
 
     private static Either<CustomBlockModelDefinition, BlockStateModelDispatcher> unpackDefinition(BlockStateModelDispatcher definition) {

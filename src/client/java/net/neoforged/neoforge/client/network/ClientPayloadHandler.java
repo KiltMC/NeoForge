@@ -5,26 +5,13 @@
 
 package net.neoforged.neoforge.client.network;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import io.netty.buffer.Unpooled;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.crafting.RecipeMap;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import io.netty.buffer.Unpooled;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -39,23 +26,28 @@ import net.neoforged.neoforge.common.world.LevelChunkAuxiliaryLightManager;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 import net.neoforged.neoforge.network.ConfigSync;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.payload.AdvancedAddEntityPayload;
-import net.neoforged.neoforge.network.payload.AdvancedContainerSetDataPayload;
-import net.neoforged.neoforge.network.payload.AdvancedOpenScreenPayload;
-import net.neoforged.neoforge.network.payload.AuxiliaryLightDataPayload;
-import net.neoforged.neoforge.network.payload.ConfigFilePayload;
-import net.neoforged.neoforge.network.payload.FrozenRegistryPayload;
-import net.neoforged.neoforge.network.payload.FrozenRegistrySyncCompletedPayload;
-import net.neoforged.neoforge.network.payload.FrozenRegistrySyncStartPayload;
-import net.neoforged.neoforge.network.payload.KnownRegistryDataMapsPayload;
-import net.neoforged.neoforge.network.payload.RecipeContentPayload;
-import net.neoforged.neoforge.network.payload.RegistryDataMapSyncPayload;
-import net.neoforged.neoforge.network.payload.SyncAttachmentsPayload;
+import net.neoforged.neoforge.network.payload.*;
 import net.neoforged.neoforge.registries.RegistryManager;
 import net.neoforged.neoforge.registries.RegistrySnapshot;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.bluspring.kilt.injections.client.gui.screens.MenuScreensInjection;
+import xyz.bluspring.kilt.injections.network.RegistryFriendlyByteBufInjection;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 
 @ApiStatus.Internal
 @EventBusSubscriber(modid = NeoForgeMod.MOD_ID, value = Dist.CLIENT)
@@ -127,7 +119,7 @@ final class ClientPayloadHandler {
         try {
             Entity entity = context.player().level().getEntity(advancedAddEntityPayload.entityId());
             if (entity instanceof IEntityWithComplexSpawn entityAdditionalSpawnData) {
-                final RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(advancedAddEntityPayload.customPayload()), entity.registryAccess(), context.listener().getConnectionType());
+                final RegistryFriendlyByteBuf buf = RegistryFriendlyByteBufInjection.create(Unpooled.wrappedBuffer(advancedAddEntityPayload.customPayload()), entity.registryAccess(), context.listener().getConnectionType());
                 try {
                     entityAdditionalSpawnData.readSpawnData(buf);
                 } finally {
@@ -143,7 +135,7 @@ final class ClientPayloadHandler {
     private static void handle(AdvancedOpenScreenPayload msg, IPayloadContext context) {
         Minecraft mc = Minecraft.getInstance();
         RegistryAccess registryAccess = mc.player.registryAccess();
-        final RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(msg.additionalData()), registryAccess, context.listener().getConnectionType());
+        final RegistryFriendlyByteBuf buf = RegistryFriendlyByteBufInjection.create(Unpooled.wrappedBuffer(msg.additionalData()), registryAccess, context.listener().getConnectionType());
         try {
             createMenuScreen(msg.name(), msg.menuType(), msg.windowId(), buf);
         } catch (Throwable t) {
@@ -156,7 +148,7 @@ final class ClientPayloadHandler {
 
     private static <T extends AbstractContainerMenu> void createMenuScreen(Component name, MenuType<T> menuType, int windowId, RegistryFriendlyByteBuf buf) {
         Minecraft mc = Minecraft.getInstance();
-        MenuScreens.getScreenFactory(menuType).ifPresent(f -> {
+        MenuScreensInjection.getScreenFactory(menuType).ifPresent(f -> {
             Screen s = f.create(menuType.create(windowId, mc.player.getInventory(), buf), mc.player.getInventory(), name);
             mc.player.containerMenu = ((MenuAccess<?>) s).getMenu();
             mc.setScreen(s);

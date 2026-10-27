@@ -6,10 +6,12 @@
 package net.neoforged.neoforge.client.model.quad;
 
 import com.mojang.math.Transformation;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
+import xyz.bluspring.kilt.injections.client.resources.model.geometry.BakedQuadInjection;
+
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 
 public final class QuadTransforms {
     private QuadTransforms() {}
@@ -37,7 +39,7 @@ public final class QuadTransforms {
             };
         }
         var posTemp = new Vector4f();
-        return new BakedQuad(
+        return BakedQuadInjection.create(
                 transformPosition(posTemp, quad.position0(), transformation),
                 transformPosition(posTemp, quad.position1(), transformation),
                 transformPosition(posTemp, quad.position2(), transformation),

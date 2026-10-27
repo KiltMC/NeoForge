@@ -5,9 +5,11 @@
 
 package net.neoforged.neoforge.client.model.generators.template;
 
+import org.joml.Vector3f;
+import xyz.bluspring.kilt.injections.client.resources.model.cuboid.ItemTransformInjection;
+
 import net.minecraft.client.resources.model.cuboid.ItemTransform;
 import net.minecraft.world.item.ItemDisplayContext;
-import org.joml.Vector3f;
 
 public class TransformVecBuilder {
     private Vector3f rotation = new Vector3f(ItemTransform.Deserializer.DEFAULT_ROTATION);
@@ -65,7 +67,7 @@ public class TransformVecBuilder {
     }
 
     ItemTransform build() {
-        return new ItemTransform(rotation, translation, scale, rightRotation);
+        return ItemTransformInjection.create(rotation, translation, scale, rightRotation);
     }
 
     TransformVecBuilder copy() {

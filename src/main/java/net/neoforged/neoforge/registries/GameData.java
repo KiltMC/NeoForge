@@ -23,6 +23,7 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import xyz.bluspring.kilt.injections.core.registries.BuiltInRegistriesInjection;
 import xyz.bluspring.kilt.injections.world.entity.SpawnPlacementsInjection;
+import xyz.bluspring.kilt.injections.world.level.gamerules.GameRuleCategoryInjection;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMapper;
@@ -36,7 +37,6 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gamerules.GameRuleCategory;
 
 @ApiStatus.Internal
 public class GameData {
@@ -106,7 +106,7 @@ public class GameData {
             SpawnPlacementsInjection.fireSpawnPlacementEvent();
             ModLoader.postEvent(new BlockEntityTypeAddBlocksEvent());
             CreativeModeTabRegistry.sortTabs();
-            GameRuleCategory.registerModdedCategories();
+            GameRuleCategoryInjection.registerModdedCategories();
             ItemTooltipHandler.init();
         }
     }

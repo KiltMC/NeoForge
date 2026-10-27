@@ -32,6 +32,8 @@ public class PlayerRespawnPositionEvent extends PlayerEvent {
     private final boolean fromEndFight;
     private boolean copyOriginalSpawnPosition;
 
+    public boolean kilt$wasModified = false;
+
     public PlayerRespawnPositionEvent(ServerPlayer player, TeleportTransition teleportTransition, boolean fromEndFight) {
         super(player);
         this.teleportTransition = teleportTransition;
@@ -98,6 +100,7 @@ public class PlayerRespawnPositionEvent extends PlayerEvent {
      * @see #copyOriginalSpawnPosition()
      */
     public void setCopyOriginalSpawnPosition(boolean copyOriginalSpawnPosition) {
+        this.kilt$wasModified = true;
         this.copyOriginalSpawnPosition = copyOriginalSpawnPosition;
     }
 

@@ -249,6 +249,10 @@ public final class AttachmentSync {
         }
     }
 
+    public static void receiveSyncedDataAttachments(IAttachmentHolder holder, RegistryAccess registryAccess, List<AttachmentType<?>> types, byte[] bytes) {
+        receiveSyncedDataAttachments((AttachmentHolder) holder, registryAccess, types, bytes);
+    }
+
     public static void receiveSyncedDataAttachments(AttachmentHolder holder, RegistryAccess registryAccess, List<AttachmentType<?>> types, byte[] bytes) {
         var buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(bytes), registryAccess);
         buf.kilt$setConnectionType(ConnectionType.NEOFORGE);
