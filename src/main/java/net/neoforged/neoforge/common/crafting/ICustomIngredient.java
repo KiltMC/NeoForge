@@ -5,13 +5,18 @@
 
 package net.neoforged.neoforge.common.crafting;
 
+import java.util.List;
 import java.util.stream.Stream;
+
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import xyz.bluspring.kilt.workarounds.resource.FabricCustomIngredientSerializer;
+
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.jetbrains.annotations.ApiStatus;
-import xyz.bluspring.kilt.injections.world.item.crafting.IngredientInjection;
+
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 
 /**
  * Interface that modders can implement to create new behaviors for {@link Ingredient}s.
@@ -25,7 +30,7 @@ import xyz.bluspring.kilt.injections.world.item.crafting.IngredientInjection;
  * <p>Implementations of this interface <b>must implement {@link Object#equals} and {@link Object#hashCode}</b>
  * to ensure that the ingredient also supports them.
  */
-public interface ICustomIngredient {
+public interface ICustomIngredient extends CustomIngredient { // Kilt: Attach to Fabric API's CustomIngredient system
     /**
      * Checks if a stack matches this ingredient.
      * The stack <b>must not</b> be modified in any way.
@@ -52,6 +57,11 @@ public interface ICustomIngredient {
      */
     Stream<ItemStack> getItems();
 
+    @Override
+    default List<ItemStack> getMatchingStacks() { // Kilt: Handle Fabric's implementation of getItems
+        return this.getItems().toList();
+    }
+
     /**
      * Returns whether this ingredient always requires {@linkplain #test direct stack testing}.
      *
@@ -60,6 +70,12 @@ public interface ICustomIngredient {
      */
     boolean isSimple();
 
+    // Kilt: Handle Fabric's implementation of isSimple.
+    @Override
+    default boolean requiresTesting() {
+        return this.isSimple();
+    }
+
     /**
      * {@return the type of this ingredient}
      *
@@ -67,11 +83,19 @@ public interface ICustomIngredient {
      */
     IngredientType<?> getType();
 
+    // Kilt: Handle Fabric API's serialization system.
+    @Override
+    default CustomIngredientSerializer<?> getSerializer() {
+        return FabricCustomIngredientSerializer.getOrCreate(this.getType());
+    }
+
     /**
      * {@return a new {@link Ingredient} behaving as defined by this custom ingredient}
      */
+    /* // Kilt: Handled by Fabric API
     @ApiStatus.NonExtendable
     default Ingredient toVanilla() {
         return IngredientInjection.create(this);
     }
+     */
 }

@@ -33,7 +33,7 @@ public class CraftingHelper {
                 return CompoundIngredient.of(list.toArray(Ingredient[]::new));
             }, i -> i), ingredient -> {
                 if (ingredient.isCustom()) {
-                    if (ingredient.neoforge$getCustomIngredient() instanceof CompoundIngredient compound) {
+                    if (ingredient.getCustomIngredient() instanceof CompoundIngredient compound) {
                         // Use [] syntax for CompoundIngredients.
                         return Either.left(compound.children());
                     }
@@ -62,7 +62,7 @@ public class CraftingHelper {
                         // Convert vanilla ingredients with 2+ values to a CompoundIngredient. Empty ingredients are not allowed here.
                         return Either.left(new CompoundIngredient(Stream.of(ingredient.getValues()).map(v -> Ingredient.fromValues(Stream.of(v))).toList()));
                     }
-                    return Either.left(ingredient.neoforge$getCustomIngredient());
+                    return Either.left(ingredient.getCustomIngredient());
                 })
                 .validate(ingredient -> {
                     if (!ingredient.isCustom() && ingredient.getValues().length == 0) {
