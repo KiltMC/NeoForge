@@ -5,9 +5,10 @@
 
 package net.neoforged.neoforge.event.entity.player;
 
+import net.neoforged.neoforge.common.CommonHooks;
+
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.common.CommonHooks;
 
 /**
  * This event is fired when a player attacks an entity in {@link Player#attack(Entity)}.
@@ -25,6 +26,8 @@ public class CriticalHitEvent extends PlayerEvent {
     private float dmgMultiplier;
     private boolean isCriticalHit;
     private boolean disableSweep = true;
+
+    public boolean kilt$wasModified = false;
 
     /**
      * Fire via {@link CommonHooks#fireCriticalHit(Player, Entity, boolean, float)}
@@ -65,6 +68,7 @@ public class CriticalHitEvent extends PlayerEvent {
             throw new UnsupportedOperationException("Attempted to set a negative damage multiplier: " + dmgMultiplier);
         }
         this.dmgMultiplier = dmgMultiplier;
+        this.kilt$wasModified = true;
     }
 
     /**
@@ -81,6 +85,7 @@ public class CriticalHitEvent extends PlayerEvent {
      */
     public void setCriticalHit(boolean isCriticalHit) {
         this.isCriticalHit = isCriticalHit;
+        this.kilt$wasModified = true;
     }
 
     /**
@@ -111,6 +116,7 @@ public class CriticalHitEvent extends PlayerEvent {
      */
     public void setDisableSweep(boolean disableSweep) {
         this.disableSweep = disableSweep;
+        this.kilt$wasModified = true;
     }
 
     /**
