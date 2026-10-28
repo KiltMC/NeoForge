@@ -8,7 +8,15 @@ package net.neoforged.neoforge.common.extensions;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import net.fabricmc.fabric.api.block.v1.FabricBlockState;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.common.enums.BubbleColumnDirection;
+import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
+import net.neoforged.neoforge.event.EventHooks;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,14 +51,8 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
-import net.neoforged.neoforge.common.ItemAbilities;
-import net.neoforged.neoforge.common.ItemAbility;
-import net.neoforged.neoforge.common.enums.BubbleColumnDirection;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
-import net.neoforged.neoforge.event.EventHooks;
-import org.jetbrains.annotations.Nullable;
+
+import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 
 public interface IBlockStateExtension extends FabricBlockState {
     private BlockState self() {
@@ -745,9 +747,11 @@ public interface IBlockStateExtension extends FabricBlockState {
      * @return The appearance of this block from the given side
      * @see IBlockExtension#getAppearance(BlockState, BlockAndTintGetter, BlockPos, Direction, BlockState, BlockPos)
      */
+    /* // Kilt: Fabric API has this exact method
     default BlockState getAppearance(BlockAndTintGetter level, BlockPos pos, Direction side, @Nullable BlockState queryState, @Nullable BlockPos queryPos) {
         return self().getBlock().getAppearance(self(), level, pos, side, queryState, queryPos);
     }
+     */
 
     /**
      * Return true if the state is able to be replaced with Blocks.AIR in chunk sections that is entirely made of blocks that return true for isEmpty
