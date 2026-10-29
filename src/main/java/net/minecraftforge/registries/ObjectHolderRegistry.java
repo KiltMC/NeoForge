@@ -18,6 +18,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import net.minecraft.resources.ResourceLocation;
+
+import com.google.common.collect.Maps;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.forgespi.language.ModFileScanData;
@@ -32,6 +34,9 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.MappingResolver;
 
 /**
  * Internal registry for tracking {@link ObjectHolder} references
@@ -200,7 +205,7 @@ public class ObjectHolderRegistry
                 throw new RuntimeException(ex);
             }
         }
-        ResourceLocation regName = ResourceLocation.parse(registryName);
+        ResourceLocation regName = new ResourceLocation(registryName);
         if (isClass)
         {
             scanClassForFields(classModIds, type, regName, registryClass, value, clazz, extractFromValue);
