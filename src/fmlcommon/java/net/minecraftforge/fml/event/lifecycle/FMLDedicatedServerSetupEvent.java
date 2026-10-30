@@ -28,6 +28,7 @@ import net.minecraftforge.fml.ModLoadingStage;
  */
 public class FMLDedicatedServerSetupEvent extends ParallelDispatchEvent
 {
+    public FMLDedicatedServerSetupEvent() { super(null, null); } // Kilt: otherwise EventBus crashes. why.
     public FMLDedicatedServerSetupEvent(ModContainer container, ModLoadingStage stage)
     {
         super(container, stage);

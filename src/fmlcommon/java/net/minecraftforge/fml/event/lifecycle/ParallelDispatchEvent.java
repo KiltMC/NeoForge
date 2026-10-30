@@ -16,6 +16,8 @@ import java.util.function.Supplier;
 public class ParallelDispatchEvent extends ModLifecycleEvent {
     private final ModLoadingStage modLoadingStage;
 
+    public ParallelDispatchEvent() { super(null); this.modLoadingStage = null; } // Kilt: otherwise EventBus crashes. why.
+
     public ParallelDispatchEvent(final ModContainer container, final ModLoadingStage stage) {
         super(container);
         this.modLoadingStage = stage;

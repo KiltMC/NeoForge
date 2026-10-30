@@ -16,6 +16,7 @@ import net.minecraftforge.fml.ModLoadingStage;
  */
 public class FMLLoadCompleteEvent extends ParallelDispatchEvent
 {
+    public FMLLoadCompleteEvent() { super(null, null); } // Kilt: otherwise EventBus crashes. why.
     public FMLLoadCompleteEvent(final ModContainer container, final ModLoadingStage stage)
     {
         super(container, stage);

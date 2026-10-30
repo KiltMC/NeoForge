@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import xyz.bluspring.kilt.loader.mod.ForgeMod;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -33,7 +34,7 @@ public class FMLModContainer extends ModContainer
     private final ModFileScanData scanResults;
     private final IEventBus eventBus;
     private Object modInstance;
-    private final Class<?> modClass;
+    private Class<?> modClass;
     private final FMLJavaModLoadingContext context = new FMLJavaModLoadingContext(this);
 
     public FMLModContainer(IModInfo info, String className, ModFileScanData modFileScanResults, ModuleLayer gameLayer)
@@ -47,8 +48,9 @@ public class FMLModContainer extends ModContainer
         this.contextExtension = () -> context;
         try
         {
-            var layer = gameLayer.findModule(info.getOwningFile().moduleName()).orElseThrow();
-            modClass = Class.forName(layer, className);
+//            var layer = gameLayer.findModule(info.getOwningFile().moduleName()).orElseThrow();
+//            modClass = Class.forName(layer, className);
+            modClass = Class.forName(className, false, Thread.currentThread().getContextClassLoader()); // Kilt: weirdly enough, "layer" arg means initialize = false...??
             LOGGER.trace(LOADING,"Loaded modclass {} with {}", modClass.getName(), modClass.getClassLoader());
         }
         catch (Throwable e)

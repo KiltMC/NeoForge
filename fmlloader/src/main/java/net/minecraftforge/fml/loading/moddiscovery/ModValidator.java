@@ -8,7 +8,6 @@ package net.minecraftforge.fml.loading.moddiscovery;
 import com.mojang.logging.LogUtils;
 import cpw.mods.jarhandling.SecureJar;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
-import cpw.mods.modlauncher.api.ITransformationService;
 import net.minecraftforge.fml.loading.*;
 import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 import net.minecraftforge.forgespi.language.IModFileInfo;
@@ -70,6 +69,7 @@ public class ModValidator {
         return brokenFiles;
     }
 
+    /*
     public ITransformationService.Resource getPluginResources() {
         return new ITransformationService.Resource(IModuleLayerManager.Layer.PLUGIN, this.candidatePlugins.stream().map(IModFile::getSecureJar).toList());
     }
@@ -96,6 +96,7 @@ public class ModValidator {
 
         return new ITransformationService.Resource(IModuleLayerManager.Layer.GAME, mods);
     }
+     */
 
     private List<EarlyLoadingException.ExceptionData> validateLanguages() {
         List<EarlyLoadingException.ExceptionData> errorData = new ArrayList<>();

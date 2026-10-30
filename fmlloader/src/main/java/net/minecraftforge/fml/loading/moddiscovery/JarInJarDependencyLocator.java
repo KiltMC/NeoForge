@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/*
 package net.minecraftforge.fml.loading.moddiscovery;
 
 import com.google.common.collect.ImmutableMap;
@@ -163,3 +164,4 @@ public class JarInJarDependencyLocator extends AbstractJarFileDependencyLocator
     private record ModWithVersionRange(IModInfo modInfo, VersionRange versionRange, ArtifactVersion artifactVersion)
     {}
 }
+ */

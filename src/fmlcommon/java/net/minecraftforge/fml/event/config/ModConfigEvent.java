@@ -13,6 +13,7 @@ import net.minecraftforge.fml.event.IModBusEvent;
 public class ModConfigEvent extends Event implements IModBusEvent, IConfigEvent {
     private final ModConfig config;
 
+    public ModConfigEvent() { super(); this.config = null; } // Kilt: otherwise EventBus crashes. why.
     ModConfigEvent(final ModConfig config) {
         this.config = config;
     }
@@ -27,6 +28,7 @@ public class ModConfigEvent extends Event implements IModBusEvent, IConfigEvent 
      * Any Config objects associated with this will be valid and can be queried directly.
      */
     public static class Loading extends ModConfigEvent {
+        public Loading() { super(null); } // Kilt: otherwise EventBus crashes. why.
         public Loading(final ModConfig config) {
             super(config);
         }
@@ -39,6 +41,7 @@ public class ModConfigEvent extends Event implements IModBusEvent, IConfigEvent 
      * any resultant changes.
      */
     public static class Reloading extends ModConfigEvent {
+        public Reloading() { super(null); } // Kilt: otherwise EventBus crashes. why.
         public Reloading(final ModConfig config) {
             super(config);
         }
@@ -51,6 +54,7 @@ public class ModConfigEvent extends Event implements IModBusEvent, IConfigEvent 
      * The config file will be saved after this event has fired.
      */
     public static class Unloading extends ModConfigEvent {
+        public Unloading() { super(null); } // Kilt: otherwise EventBus crashes. why.
         public Unloading(final ModConfig config) {
             super(config);
         }

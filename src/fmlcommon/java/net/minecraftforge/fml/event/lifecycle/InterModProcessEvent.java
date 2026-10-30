@@ -25,6 +25,7 @@ import java.util.function.Predicate;
  */
 public class InterModProcessEvent extends ParallelDispatchEvent
 {
+    public InterModProcessEvent() { super(null, null); } // Kilt: otherwise EventBus crashes. why.
     public InterModProcessEvent(final ModContainer container, final ModLoadingStage stage)
     {
         super(container, stage);

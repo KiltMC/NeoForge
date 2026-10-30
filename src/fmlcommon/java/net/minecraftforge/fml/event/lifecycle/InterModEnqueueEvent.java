@@ -21,7 +21,7 @@ import net.minecraftforge.fml.ModLoadingStage;
  */
 public class InterModEnqueueEvent extends ParallelDispatchEvent
 {
-
+    public InterModEnqueueEvent() { super(null, null); } // Kilt: otherwise EventBus crashes. why.
     public InterModEnqueueEvent(final ModContainer container, final ModLoadingStage stage)
     {
         super(container, stage);

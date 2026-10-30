@@ -5,8 +5,10 @@
 
 package net.minecraftforge.fml;
 
+import kotlin.collections.CollectionsKt;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
+import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -17,6 +19,10 @@ import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.Kilt;
+import xyz.bluspring.kilt.loader.KiltLoader;
+import xyz.bluspring.kilt.loader.mod.ForgeMod;
+import xyz.bluspring.kilt.loader.mod.fabric.WrappedFabricModContainer;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -41,6 +47,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.fabricmc.loader.api.FabricLoader;
+
 /**
  * Master list of all mods - game-side version. This is classloaded in the game scope and
  * can dispatch game level events as a result.
@@ -48,7 +56,8 @@ import java.util.stream.Stream;
 public class ModList
 {
     private static Logger LOGGER = LogManager.getLogger();
-    private static ModList INSTANCE;
+    private static ModList INSTANCE = new ModList();
+    /*
     private final List<IModFileInfo> modFiles;
     private final List<IModInfo> sortedList;
     private final Map<String, ModFileInfo> fileById;
@@ -83,11 +92,11 @@ public class ModList
     }
     private String crashReport() {
         return "\n"+applyForEachModFile(this::fileToLine).collect(Collectors.joining("\n\t\t", "\t\t", ""));
-    }
+    }*/
 
     public static ModList of(List<ModFile> modFiles, List<ModInfo> sortedList)
     {
-        INSTANCE = new ModList(modFiles, sortedList);
+//        INSTANCE = new ModList(modFiles, sortedList); // Kilt: idc
         return INSTANCE;
     }
 
@@ -105,12 +114,16 @@ public class ModList
 
     public List<IModFileInfo> getModFiles()
     {
-        return modFiles;
+        // Kilt: redirect here, it just works, don't question it.
+        return (List<IModFileInfo>) (Object) LoadingModList.get().getModFiles();
+//        return modFiles;
     }
 
     public IModFileInfo getModFileById(String modid)
     {
-        return this.fileById.get(modid);
+        // Kilt: redirect here, it just works, don't question it.
+        return LoadingModList.get().getModFileById(modid);
+//        return this.fileById.get(modid);
     }
 
     <T extends Event & IModBusEvent> Function<Executor, CompletableFuture<Void>> futureVisitor(
@@ -118,10 +131,12 @@ public class ModList
             final ProgressMeter progressBar,
             final BiFunction<ModLoadingStage, Throwable, ModLoadingStage> stateChange) {
         return executor -> gather(
-                this.mods.stream()
+//                this.mods.stream()
+            KiltLoader.Companion.getInstance().getMods().stream()
+                .map(ForgeMod::getContainer)
                 .map(mod -> ModContainer.buildTransitionHandler(mod, eventGenerator, progressBar, stateChange, executor))
                 .collect(Collectors.toList()))
-            .thenComposeAsync(ModList::completableFutureFromExceptionList, executor);
+            .thenComposeAsync(ModList::completableFutureFromExceptionList/*, executor*/); // Kilt: otherwise, race condition
     }
     static CompletionStage<Void> completableFutureFromExceptionList(List<? extends Map.Entry<?, Throwable>> t) {
         if (t.stream().noneMatch(e->e.getValue()!=null)) {
@@ -158,9 +173,11 @@ public class ModList
 
     void setLoadedMods(final List<ModContainer> modContainers)
     {
+        /*
         this.mods = modContainers;
         this.sortedContainers = modContainers.stream().sorted(Comparator.comparingInt(c->sortedList.indexOf(c.getModInfo()))).toList();
         this.indexedMods = modContainers.stream().collect(Collectors.toMap(ModContainer::getModId, Function.identity()));
+         */
     }
 
     @SuppressWarnings("unchecked")
@@ -171,31 +188,52 @@ public class ModList
 
     public Optional<? extends ModContainer> getModContainerById(String modId)
     {
-        return Optional.ofNullable(this.indexedMods.get(modId));
+        // Kilt: Point to loader
+        if (Kilt.Companion.getLoader().getFORGE_TO_FABRIC_MODS().containsKey(modId))
+            return FabricLoader.getInstance().getModContainer(Kilt.Companion.getLoader().getFORGE_TO_FABRIC_MODS().get(modId)).map(WrappedFabricModContainer::get);
+
+        return Optional.ofNullable(Kilt.Companion.getLoader().getMod(modId)).map(ForgeMod::getContainer)
+            .or(() -> FabricLoader.getInstance().getModContainer(modId).map(WrappedFabricModContainer::get))
+            .or(() -> FabricLoader.getInstance().getModContainer(modId.replace("_", "-")).map(WrappedFabricModContainer::get));
+//        return Optional.ofNullable(this.indexedMods.get(modId));
     }
 
     public Optional<? extends ModContainer> getModContainerByObject(Object obj)
     {
-        return mods.stream().filter(mc -> mc.getMod() == obj).findFirst();
+        return KiltLoader.Companion.getInstance().getMods().stream().filter(e -> e.getContainer().getMod() == obj)
+            .findFirst().map(ForgeMod::getContainer);
+//        return mods.stream().filter(mc -> mc.getMod() == obj).findFirst();
     }
 
     public List<IModInfo> getMods()
     {
-        return this.sortedList;
+        return (List<IModInfo>) (Object) KiltLoader.Companion.getInstance().getMods();
+//        return this.sortedList;
     }
 
     public boolean isLoaded(String modTarget)
     {
-        return this.indexedMods.containsKey(modTarget);
+        // Kilt: Point to loader
+        if (Kilt.Companion.getLoader().getFORGE_TO_FABRIC_MODS().containsKey(modTarget))
+            return FabricLoader.getInstance().isModLoaded(Kilt.Companion.getLoader().getFORGE_TO_FABRIC_MODS().get(modTarget));
+
+        return Kilt.Companion.getLoader().hasMod(modTarget) || FabricLoader.getInstance().isModLoaded(modTarget)
+            || FabricLoader.getInstance().isModLoaded(modTarget.replace("_", "-")); // Cloth Config detection, probably
+
+//        return this.indexedMods.containsKey(modTarget);
     }
 
     public int size()
     {
-        return mods.size();
+        // Kilt: Point to loader
+        return Kilt.Companion.getLoader().getMods().size();
+
+//        return mods.size();
     }
 
     public List<ModFileScanData> getAllScanData()
     {
+        /*
         if (modFileScanData == null)
         {
             modFileScanData = this.sortedList.stream().
@@ -207,28 +245,41 @@ public class ModList
                     collect(Collectors.toList());
         }
         return modFileScanData;
+         */
 
+        return Kilt.Companion.getLoader().getMods().stream().map(ForgeMod::getScanData).toList();
     }
 
     public void forEachModFile(Consumer<IModFile> fileConsumer)
     {
-        modFiles.stream().map(IModFileInfo::getFile).forEach(fileConsumer);
+//        modFiles.stream().map(IModFileInfo::getFile).forEach(fileConsumer);
+        Kilt.Companion.getLoader().getMods().stream().map(e -> e.getOwningFile().getFile()).forEach(fileConsumer);
     }
 
     public <T> Stream<T> applyForEachModFile(Function<IModFile, T> function) {
-        return modFiles.stream().map(IModFileInfo::getFile).map(function);
+//        return modFiles.stream().map(IModFileInfo::getFile).map(function);
+        return Kilt.Companion.getLoader().getMods().stream().map(e -> e.getOwningFile().getFile()).map(function);
     }
 
     public void forEachModContainer(BiConsumer<String, ModContainer> modContainerConsumer) {
-        indexedMods.forEach(modContainerConsumer);
+        Kilt.Companion.getLoader().getMods().stream().map(ForgeMod::getContainer).forEach(container -> {
+            modContainerConsumer.accept(container.getModId(), container);
+        });
+//        indexedMods.forEach(modContainerConsumer);
+    }
+
+    public List<ModContainer> getSortedMods() {
+        return CollectionsKt.plus(WrappedFabricModContainer.getWrappedContainers(), Kilt.Companion.getLoader().getMods().stream().map(ForgeMod::getContainer).toList());
     }
 
     public void forEachModInOrder(Consumer<ModContainer> containerConsumer) {
-        this.sortedContainers.forEach(containerConsumer);
+//        this.sortedContainers.forEach(containerConsumer);
+        this.getSortedMods().forEach(containerConsumer);
     }
 
     public <T> Stream<T> applyForEachModContainer(Function<ModContainer, T> function) {
-        return indexedMods.values().stream().map(function);
+//        return indexedMods.values().stream().map(function);
+        return this.getSortedMods().stream().map(function);
     }
 
     private static class UncaughtModLoadingException extends ModLoadingException {

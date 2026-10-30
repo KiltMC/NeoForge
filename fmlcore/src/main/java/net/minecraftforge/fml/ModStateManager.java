@@ -21,7 +21,7 @@ public class ModStateManager {
 
     public ModStateManager() {
         INSTANCE = this;
-        final var sp = ServiceLoader.load(FMLLoader.getGameLayer(), IModStateProvider.class);
+        final var sp = ServiceLoader.load(IModStateProvider.class);
         this.stateMap = ServiceLoaderUtils.streamWithErrorHandling(sp, sce->{})
                 .map(IModStateProvider::getAllStates)
                 .<IModLoadingState>mapMulti(Iterable::forEach)

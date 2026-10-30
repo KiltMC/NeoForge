@@ -34,6 +34,7 @@ import net.minecraftforge.server.LanguageHook;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.bluspring.kilt.injections.client.OptionsInjection;
+import xyz.bluspring.knit.loader.KnitLoader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,6 +52,13 @@ public class ClientModLoader
     private static Minecraft mc;
     private static boolean loadingComplete;
     private static LoadingFailedException error;
+
+    private static void kilt$displayModErrors() {
+        // Kilt: Just display the error immediately, man.
+        if (error != null) {
+            KnitLoader.Companion.getInstance().displayError("Kilt: Failed to load Forge mods!", error);
+        }
+    }
 
     public static void begin(final Minecraft minecraft, final PackRepository defaultResourcePacks, final ReloadableResourceManager mcResourceManager)
     {
@@ -96,6 +104,7 @@ public class ClientModLoader
 
     private static void finishModLoading(ModWorkManager.DrivenExecutor syncExecutor, Executor parallelExecutor)
     {
+        kilt$displayModErrors();
         createRunnableWithCatch(() -> ModLoader.get().finishMods(syncExecutor, parallelExecutor, () -> {})).run();
         loading = false;
         loadingComplete = true;
@@ -135,7 +144,8 @@ public class ClientModLoader
             dumpedLocation = CrashReportExtender.dumpModLoadingCrashReport(LOGGER, error, mc.gameDirectory);
         }
         if (error != null || !warnings.isEmpty()) {
-            mc.setScreen(new LoadingErrorScreen(error, warnings, dumpedLocation));
+            kilt$displayModErrors();
+//            mc.setScreen(new LoadingErrorScreen(error, warnings, dumpedLocation)); // Kilt: no
             return true;
         } else {
             return false;

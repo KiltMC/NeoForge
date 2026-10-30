@@ -5,6 +5,7 @@
 
 package net.minecraftforge.fml.loading;
 
+/*
 import cpw.mods.modlauncher.api.NamedPath;
 import cpw.mods.modlauncher.serviceapi.ITransformerDiscoveryService;
 import org.apache.logging.log4j.LogManager;
@@ -59,3 +60,4 @@ public class ClasspathTransformerDiscoverer implements ITransformerDiscoveryServ
         }
     }
 }
+ */

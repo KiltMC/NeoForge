@@ -29,6 +29,7 @@ import java.util.function.Consumer;
  */
 public class FMLCommonSetupEvent extends ParallelDispatchEvent
 {
+    public FMLCommonSetupEvent() { super(null, null); } // Kilt: otherwise EventBus crashes. why.
     public FMLCommonSetupEvent(final ModContainer container, final ModLoadingStage stage)
     {
         super(container, stage);

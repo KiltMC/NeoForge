@@ -21,6 +21,7 @@ public class ModLifecycleEvent extends Event implements IModBusEvent
 {
     private final ModContainer container;
 
+    public ModLifecycleEvent() { super(); this.container = null; } // Kilt: otherwise EventBus crashes. why.
     public ModLifecycleEvent(ModContainer container)
     {
         this.container = container;

@@ -11,6 +11,7 @@ import net.minecraftforge.fml.loading.progress.ProgressMeter;
 import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.loader.KiltLoader;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 public class ImmediateWindowHandler {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static ImmediateWindowProvider provider;
+    private static ImmediateWindowProvider provider = new DummyProvider();
 
     private static ProgressMeter earlyProgress;
     public static void load(final String launchTarget, final String[] arguments) {
@@ -86,7 +87,7 @@ public class ImmediateWindowHandler {
     }
 
     public static void acceptGameLayer(final ModuleLayer layer) {
-        provider.updateModuleReads(layer);
+//        provider.updateModuleReads(layer);
     }
 
     public static void renderTick() {
@@ -94,11 +95,11 @@ public class ImmediateWindowHandler {
     }
 
     public static String getGLVersion() {
-        return provider.getGLVersion();
+        return KiltLoader.Companion.getInstance().getOpenGlVersionString();
     }
 
     public static void updateProgress(final String message) {
-        earlyProgress.label(message);
+//        earlyProgress.label(message);
     }
 
     private record DummyProvider() implements ImmediateWindowProvider {

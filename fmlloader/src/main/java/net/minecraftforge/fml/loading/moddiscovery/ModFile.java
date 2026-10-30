@@ -20,7 +20,10 @@ import net.minecraftforge.forgespi.locating.IModProvider;
 import net.minecraftforge.forgespi.locating.ModFileFactory;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
+import xyz.bluspring.kilt.loader.KiltModProvider;
+import xyz.bluspring.kilt.loader.mod.ForgeMod;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,6 +83,47 @@ public class ModFile implements IModFile {
         modFileType = Type.valueOf(type);
         jarVersion = Optional.ofNullable(manifest.getMainAttributes().getValue(Attributes.Name.IMPLEMENTATION_VERSION)).orElse("0.0NONE");
         this.modFileInfo = ModFileParser.readModList(this, this.parser);
+    }
+
+    // Kilt: Copy from existing NeoForge mod.
+    @ApiStatus.Internal
+    public ModFile(ForgeMod kiltMod, ModFileInfo info) {
+        this.jarVersion = kiltMod.getVersion().toString();
+        this.parser = ModFileParser::modsTomlParser;
+        this.jar = kiltMod.getSecureJar().get();
+        this.provider = KiltModProvider.INSTANCE;
+
+        if (kiltMod.getManifest() != null && kiltMod.getManifest().getMainAttributes() != null) {
+            var library = kiltMod.getManifest().getMainAttributes().get("FMLLIBRARY");
+            if (library != null && library instanceof String str) {
+                this.modFileType = Type.valueOf(str);
+            } else {
+                this.modFileType = Type.MOD;
+            }
+        } else {
+            this.modFileType = Type.MOD;
+        }
+
+        this.manifest = kiltMod.getManifest();
+        this.modFileInfo = info;
+    }
+
+    // Kilt: Copy from an implementing interface.
+    @ApiStatus.Internal
+    public ModFile(IModFile existingFile) {
+        this.jar = existingFile.getSecureJar();
+        this.parser = $ -> null; // Kilt: We're just gonna return null always, I guess.
+        this.provider = existingFile.getProvider();
+
+        if (existingFile.getSecureJar() != null) {
+            this.manifest = existingFile.getSecureJar().moduleDataProvider().getManifest();
+        } else {
+            this.manifest = new Manifest();
+        }
+
+        this.modFileType = existingFile.getType();
+        this.jarVersion = Optional.ofNullable(this.manifest.getMainAttributes().getValue(Attributes.Name.IMPLEMENTATION_VERSION)).orElse("0.0NONE");
+        this.modFileInfo = existingFile.getModFileInfo();
     }
 
     @Override

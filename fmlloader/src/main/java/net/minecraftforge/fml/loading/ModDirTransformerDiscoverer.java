@@ -5,6 +5,7 @@
 
 package net.minecraftforge.fml.loading;
 
+/*
 import com.mojang.logging.LogUtils;
 import cpw.mods.jarhandling.SecureJar;
 import cpw.mods.modlauncher.Launcher;
@@ -81,3 +82,4 @@ public class ModDirTransformerDiscoverer implements ITransformerDiscoveryService
             .forEach(s -> found.add(new NamedPath(s, path)));
     }
 }
+ */

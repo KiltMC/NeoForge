@@ -20,6 +20,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 public class MCPNamingService implements INameMappingService {
+    /*
     private static final Logger LOGGER = LogUtils.getLogger();
     private HashMap<String, String> methods;
     private HashMap<String, String> fields;
@@ -87,4 +88,5 @@ public class MCPNamingService implements INameMappingService {
             LOGGER.error(LogMarkers.CORE, "Error reading mappings", e1);
         }
     }
+     */
 }

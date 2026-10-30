@@ -44,7 +44,7 @@ public interface IModStateTransition {
                 .thenApplyAsync(n -> {
                     progressBar.label(progressBar.name() + ": dispatching "+name);
                     return null;
-                }, parallelExecutor)
+                }/*, parallelExecutor*/) // Kilt: otherwise, race condition
                 .thenComposeAsync(n -> eventDispatchCF, parallelExecutor)
                 .thenApply(r -> {
                     postSyncTask.apply(syncExecutor);

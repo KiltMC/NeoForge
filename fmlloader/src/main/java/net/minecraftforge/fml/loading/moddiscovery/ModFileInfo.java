@@ -14,7 +14,10 @@ import net.minecraftforge.forgespi.language.IConfigurable;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.language.MavenVersionAdapter;
+import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
+import xyz.bluspring.kilt.loader.mod.ForgeMod;
+
 import javax.security.auth.x500.X500Principal;
 import java.net.URL;
 import java.security.CodeSigner;
@@ -109,6 +112,65 @@ public class ModFileInfo implements IModFileInfo, IConfigurable
                     this.mods.stream().map(IModInfo::getModId).collect(Collectors.joining(",", "{", "}")),
                     this.mods.stream().map(IModInfo::getVersion).map(Objects::toString).collect(Collectors.joining(",", "{", "}")));
         }
+    }
+
+    private IModFileInfo kilt$wrapped;
+
+    // Kilt: Initialize from Kilt's info
+    @ApiStatus.Internal
+    public ModFileInfo(ForgeMod kiltMod) {
+        this.config = kiltMod.getConfig();
+        this.modFile = new ModFile(kiltMod, this);
+        this.modFile.setScanResult(kiltMod.getScanData(), null);
+
+        // Kilt: copied from above
+        // modloader is essential
+        var modLoader = config.<String>getConfigElement("modLoader")
+            .orElseThrow(() -> new InvalidModFileException("Missing ModLoader in file", this));
+        // as is modloader version
+        var modLoaderVersion = config.<String>getConfigElement("loaderVersion")
+            .map(MavenVersionAdapter::createFromVersionSpec)
+            .orElseThrow(() -> new InvalidModFileException("Missing ModLoader version in file", this));
+        this.languageSpecs = new ArrayList<>(List.of(new LanguageSpec(modLoader, modLoaderVersion)));
+        // the remaining properties are optional with sensible defaults
+        this.license = config.<String>getConfigElement("license")
+            .orElse("");
+        // Validate the license is set. Only apply this validation to mods.
+        if (this.license.isBlank() && !kiltMod.getModId().startsWith("jij_")) {
+            throw new InvalidModFileException("Missing license", this);
+        }
+        this.showAsResourcePack = config.<Boolean>getConfigElement("showAsResourcePack")
+            .orElse(false);
+        this.usesServices = config.<List<String>>getConfigElement("services")
+            .orElse(List.of());
+        this.properties = config.<Map<String, Object>>getConfigElement("properties")
+            .orElse(Collections.emptyMap());
+        this.modFile.setFileProperties(this.properties);
+        this.issueURL = config.<String>getConfigElement("issueTrackerURL")
+            .map(StringUtils::toURL)
+            .orElse(null);
+        final List<? extends IConfigurable> modConfigs = config.getConfigList("mods");
+        if (modConfigs.isEmpty() && !kiltMod.getModId().startsWith("jij_")) {
+            throw new InvalidModFileException("Missing mods list", this);
+        }
+        this.mods = modConfigs.stream()
+            .map(mi -> (IModInfo) new ModInfo(this, mi))
+            .toList();
+    }
+
+    // Kilt: Copy from existing mod file info.
+    @ApiStatus.Internal
+    public ModFileInfo(IModFileInfo info) {
+        this.config = info.getConfig();
+        this.modFile = new ModFile(info.getFile());
+        this.issueURL = null;
+        this.languageSpecs = info.requiredLanguageLoaders();
+        this.showAsResourcePack = info.showAsResourcePack();
+        this.mods = info.getMods();
+        this.properties = info.getFileProperties();
+        this.license = info.getLicense();
+        this.usesServices = info.usesServices();
+        this.kilt$wrapped = info;
     }
 
     public ModFileInfo(final ModFile file, final IConfigurable config, Consumer<IModFileInfo> configFileConsumer, final List<LanguageSpec> languageSpecs) {
@@ -214,11 +276,13 @@ public class ModFileInfo implements IModFileInfo, IConfigurable
 
     @Override
     public String moduleName() {
+        if (this.kilt$wrapped != null) return this.kilt$wrapped.moduleName();
         return getMods().get(0).getModId();
     }
 
     @Override
     public String versionString()  {
+        if (this.kilt$wrapped != null) return this.kilt$wrapped.versionString();
         return getMods().get(0).getVersion().toString();
     }
 

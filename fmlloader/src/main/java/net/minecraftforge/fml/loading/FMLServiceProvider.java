@@ -5,6 +5,7 @@
 
 package net.minecraftforge.fml.loading;
 
+/*
 import com.mojang.logging.LogUtils;
 import cpw.mods.modlauncher.api.*;
 import joptsimple.ArgumentAcceptingOptionSpec;
@@ -134,3 +135,4 @@ public class FMLServiceProvider implements ITransformationService
     }
 
 }
+ */

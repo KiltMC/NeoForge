@@ -13,6 +13,7 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.ImmediateWindowHandler;
 import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.moddiscovery.InvalidModIdentifier;
+import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
@@ -23,6 +24,9 @@ import net.minecraftforge.forgespi.locating.ForgeFeature;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xyz.bluspring.kilt.Kilt;
+import xyz.bluspring.kilt.loader.KiltLoader;
+import xyz.bluspring.kilt.loader.mod.ForgeMod;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -35,6 +39,10 @@ import java.util.stream.Collectors;
 
 import static net.minecraftforge.fml.Logging.CORE;
 import static net.minecraftforge.fml.Logging.LOADING;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.impl.launch.FabricLauncherBase;
 
 /**
  * Loads mods.
@@ -111,7 +119,7 @@ public class ModLoader
     }
 
     private String computeLanguageList() {
-        return "\n"+FMLLoader.getLanguageLoadingProvider().applyForEach(lp->lp.name() +"@"+ lp.getClass().getPackage().getImplementationVersion()).collect(Collectors.joining("\n\t\t", "\t\t", ""));
+        return "\n"+KiltLoader.Companion.getInstance().getLanguageLoaders().stream().map(lp->lp.name() +"@"+ lp.getClass().getPackage().getImplementationVersion()).collect(Collectors.joining("\n\t\t", "\t\t", ""));
     }
 
     private String computeModLauncherServiceList() {
@@ -138,6 +146,7 @@ public class ModLoader
         ForgeFeature.registerFeature("javaVersion", ForgeFeature.VersionFeatureTest.forVersionString(IModInfo.DependencySide.BOTH, System.getProperty("java.version")));
         ForgeFeature.registerFeature("openGLVersion", ForgeFeature.VersionFeatureTest.forVersionString(IModInfo.DependencySide.CLIENT, ImmediateWindowHandler.getGLVersion()));
         loadingStateValid = true;
+        /* // Kilt: ignore all of FML's loading sequence, use Kilt's instead.
         FMLLoader.backgroundScanHandler.waitForScanToComplete(periodicTask);
         final ModList modList = ModList.of(loadingModList.getModFiles().stream().map(ModFileInfo::getFile).toList(),
                 loadingModList.getMods());
@@ -176,6 +185,15 @@ public class ModLoader
             loadingStateValid = false;
             throw new LoadingFailedException(loadingExceptions);
         }
+        */
+
+        KiltLoader.Companion.getInstance().loadMods();
+        var kiltMods = KiltLoader.Companion.getInstance().getMods();
+        List<ModContainer> modContainers = kiltMods.stream()
+            .map(ForgeMod::getContainer).toList();
+        ModList modList = ModList.get();
+        Kilt.Companion.load(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER);
+
         modList.setLoadedMods(modContainers);
         this.modList = modList;
         var stateList = stateManager.getStates(ModLoadingPhase.GATHER);
@@ -345,6 +363,15 @@ public class ModLoader
             pre.accept(mc, e);
             mc.acceptEvent(e);
             post.accept(mc, e);
+        });
+    }
+
+    // Kilt: Better handling for us, to be honest.
+    public <T extends Event & IModBusEvent> void kiltPostEventWrappingModsBuildEvent(Function<ModContainer, T> eventGetter) {
+        ModList.get().forEachModInOrder(mc -> {
+            ModLoadingContext.get().setActiveContainer(mc);
+            mc.acceptEvent(eventGetter.apply(mc));
+            ModLoadingContext.get().setActiveContainer(null);
         });
     }
 

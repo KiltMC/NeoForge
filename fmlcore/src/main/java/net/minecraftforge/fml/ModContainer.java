@@ -125,7 +125,7 @@ public abstract class ModContainer
                     ModLoadingContext.get().setActiveContainer(target);
                     target.activityMap.getOrDefault(target.modLoadingStage, ()->{}).run();
                     target.acceptEvent(eventGenerator.apply(target));
-                }, executor)
+                }/*, executor*/) // Kilt: otherwise, race condition
                 .whenComplete((mc, exception) -> {
                     target.modLoadingStage = stateChangeHandler.apply(target.modLoadingStage, exception);
                     progressBar.increment();

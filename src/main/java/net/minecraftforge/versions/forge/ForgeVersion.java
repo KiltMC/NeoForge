@@ -13,6 +13,7 @@ import net.minecraftforge.fml.loading.JarVersionLookupHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import xyz.bluspring.kilt.loader.KiltLoader;
 
 public class ForgeVersion
 {
@@ -28,7 +29,7 @@ public class ForgeVersion
         LOGGER.debug(Logging.CORE, "Forge Version package {} from {}", ForgeVersion.class.getPackage(), ForgeVersion.class.getClassLoader());
         String vers = JarVersionLookupHandler.getImplementationVersion(ForgeVersion.class).orElse(FMLLoader.versionInfo().forgeVersion());
         if (vers == null) throw new RuntimeException("Missing forge version, cannot continue");
-        String spec = JarVersionLookupHandler.getSpecificationVersion(ForgeVersion.class).orElse(System.getenv("FORGE_SPEC"));
+        String spec = JarVersionLookupHandler.getSpecificationVersion(ForgeVersion.class).orElse(KiltLoader.Companion.getSUPPORTED_FORGE_SPEC_VERSION().toString());
         if (spec == null) throw new RuntimeException("Missing forge spec, cannot continue");
         String group = JarVersionLookupHandler.getImplementationTitle(ForgeVersion.class).orElse(FMLLoader.versionInfo().forgeGroup());
         if (group == null) {

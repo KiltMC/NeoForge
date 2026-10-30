@@ -13,6 +13,7 @@ import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.slf4j.Logger;
+import xyz.bluspring.kilt.Kilt;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -26,6 +27,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import net.fabricmc.loader.api.FabricLoader;
+
 /**
  * Master list of all mods <em>in the loading context. This class cannot refer outside the
  * loading package</em>
@@ -33,12 +36,19 @@ import java.util.stream.Collectors;
 public class LoadingModList
 {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static LoadingModList INSTANCE;
+    private static LoadingModList INSTANCE = new LoadingModList();
     private final List<ModFileInfo> modFiles;
     private final List<ModInfo> sortedList;
     private final Map<String, ModFileInfo> fileById;
     private final List<EarlyLoadingException> preLoadErrors;
-    private List<IModFile> brokenFiles;
+    private List<IModFile> brokenFiles = List.of();
+
+    private LoadingModList() {
+        this.modFiles = List.of();
+        this.sortedList = List.of();
+        this.fileById = Map.of();
+        this.preLoadErrors = List.of();
+    }
 
     private LoadingModList(final List<ModFile> modFiles, final List<ModInfo> sortedList)
     {
@@ -59,11 +69,13 @@ public class LoadingModList
 
     public static LoadingModList of(List<ModFile> modFiles, List<ModInfo> sortedList, final EarlyLoadingException earlyLoadingException)
     {
+        /*
         INSTANCE = new LoadingModList(modFiles, sortedList);
         if (earlyLoadingException != null)
         {
             INSTANCE.preLoadErrors.add(earlyLoadingException);
         }
+         */
         return INSTANCE;
     }
 
@@ -165,12 +177,34 @@ public class LoadingModList
 
     public ModFileInfo getModFileById(String modid)
     {
-        return this.fileById.get(modid);
+//        return this.fileById.get(modid);
+        var kiltMod = Kilt.Companion.getLoader().getMod(modid);
+
+        if (kiltMod == null) {
+            var existingMod = FabricLoader.getInstance().getModContainer(modid);
+
+            if (existingMod.isEmpty()) {
+                existingMod = FabricLoader.getInstance().getModContainer(modid.replace("_", "-"));
+            }
+
+            if (existingMod.isEmpty()) {
+                existingMod = FabricLoader.getInstance().getModContainer(modid.replace("_", ""));
+            }
+
+            if (existingMod.isPresent()) {
+                var wrapper = new ModInfo(existingMod.orElseThrow());
+                return new ModFileInfo(wrapper.getOwningFile());
+            }
+
+            return null;
+        }
+
+        return (ModFileInfo) kiltMod.getOwningFile();
     }
 
     public List<ModInfo> getMods()
     {
-        return this.sortedList;
+        return Kilt.Companion.getLoader().getMods().stream().map(ModInfo::new).toList();
     }
 
     public List<EarlyLoadingException> getErrors() {

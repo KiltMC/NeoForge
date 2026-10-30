@@ -5,7 +5,6 @@
 
 package net.minecraftforge.fml.server;
 
-import cpw.mods.modlauncher.InvalidLauncherSetupException;
 import cpw.mods.modlauncher.Launcher;
 
 import java.io.File;
@@ -45,12 +44,14 @@ public class ServerMain {
 
     private static class Runner {
         private void runLauncher(final String[] result) {
+            /*
             try {
                 Launcher.main(result);
             } catch (InvalidLauncherSetupException e) {
                 System.err.println("The server is missing critical libraries and cannot load. Please run the installer to correct this");
                 System.exit(1);
             }
+             */
         }
     }
     private static Manifest urlToManifest(URL url) {

@@ -14,14 +14,17 @@ import net.minecraftforge.fml.loading.moddiscovery.BackgroundScanHandler;
 import net.minecraftforge.fml.loading.moddiscovery.ModDiscoverer;
 import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 import net.minecraftforge.fml.loading.moddiscovery.ModValidator;
-import net.minecraftforge.accesstransformer.service.AccessTransformerService;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 import net.minecraftforge.fml.loading.targets.CommonLaunchHandler;
 import net.minecraftforge.forgespi.Environment;
 import net.minecraftforge.forgespi.coremod.ICoreModProvider;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
+import xyz.bluspring.kilt.loader.Constants;
+import xyz.bluspring.kilt.loader.KiltLoader;
+import xyz.bluspring.kilt.loader.asm.AccessTransformerLoader;
+import xyz.bluspring.kilt.loader.provider.KiltLaunchHandler;
+import xyz.bluspring.kilt.util.DistUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,32 +35,35 @@ import java.util.stream.Collectors;
 import static net.minecraftforge.fml.loading.LogMarkers.CORE;
 import static net.minecraftforge.fml.loading.LogMarkers.SCAN;
 
+import net.fabricmc.loader.api.FabricLoader;
+
 public class FMLLoader
 {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static AccessTransformerService accessTransformer;
+//    private static AccessTransformerService accessTransformer; // Kilt: We have our own system
     private static ModDiscoverer modDiscoverer;
     private static ICoreModProvider coreModProvider;
     private static ILaunchPluginService eventBus;
     private static LanguageLoadingProvider languageLoadingProvider;
-    private static Dist dist;
-    private static String naming;
-    private static LoadingModList loadingModList;
+    private static Dist dist = DistUtil.INSTANCE.envTypeToDist(FabricLoader.getInstance().getEnvironmentType());
+    private static String naming = "kilt";
+    private static LoadingModList loadingModList = LoadingModList.get();
     private static RuntimeDistCleaner runtimeDistCleaner;
-    private static Path gamePath;
-    private static VersionInfo versionInfo;
-    private static String launchHandlerName;
-    private static CommonLaunchHandler commonLaunchHandler;
+    private static Path gamePath = FabricLoader.getInstance().getGameDir();
+    private static VersionInfo versionInfo = new VersionInfo(Constants.FORGE_API_VERSION.toString(), KiltLoader.Companion.getMC_VERSION().getFriendlyString(), "kilt", "net.minecraftforge");
+    private static String launchHandlerName = "Kilt";
+    private static CommonLaunchHandler commonLaunchHandler = KiltLaunchHandler.INSTANCE;
     public static Runnable progressWindowTick;
     private static ModValidator modValidator;
     public static BackgroundScanHandler backgroundScanHandler;
-    private static boolean production;
+    private static boolean production = !FabricLoader.getInstance().isDevelopmentEnvironment();
     private static IModuleLayerManager moduleLayerManager;
 
     static void onInitialLoad(IEnvironment environment, Set<String> otherServices) throws IncompatibleEnvironmentException
     {
         final String version = LauncherVersion.getVersion();
         LOGGER.debug(CORE,"FML {} loading", version);
+        /*
         final Package modLauncherPackage = ITransformationService.class.getPackage();
         LOGGER.debug(CORE,"FML found ModLauncher version : {}", modLauncherPackage.getImplementationVersion());
         if (!modLauncherPackage.isCompatibleWith("4.0")) {
@@ -127,13 +133,16 @@ public class FMLLoader
             LOGGER.error(CORE, "Failed to load NightConfig");
             throw new IncompatibleEnvironmentException("Missing NightConfig");
         }
+         */
     }
 
+    /*
     private static void setupBlackboardKeys() {
         LOGGER.debug(CORE, "Requesting CoreMods to not apply the fix for ASMAPI.findFirstInstructionBefore by default");
         var blackboardKey = TypesafeMap.Key.getOrCreate(Launcher.INSTANCE.blackboard(), "coremods.use_old_findFirstInstructionBefore", Boolean.class);
         Launcher.INSTANCE.blackboard().<Boolean>computeIfAbsent(blackboardKey, k -> true);
     }
+     */
 
     static void setupLaunchHandler(final IEnvironment environment, final Map<String, Object> arguments)
     {
@@ -160,12 +169,14 @@ public class FMLLoader
 
         versionInfo = new VersionInfo(arguments);
 
-        accessTransformer.getExtension().accept(Pair.of(naming, "srg"));
+//        accessTransformer.getExtension().accept(Pair.of(naming, "srg"));
 
         LOGGER.debug(CORE,"Received command line version data  : {}", versionInfo);
 
         runtimeDistCleaner.getExtension().accept(dist);
     }
+
+    /*
     public static List<ITransformationService.Resource> beginModScan(final Map<String,?> arguments)
     {
         LOGGER.debug(SCAN,"Scanning for Mod Locators");
@@ -182,6 +193,7 @@ public class FMLLoader
         loadingModList = backgroundScanHandler.getLoadingModList();
         return List.of(modValidator.getModResources());
     }
+     */
 
     public static ICoreModProvider getCoreModProvider() {
         return coreModProvider;
@@ -203,7 +215,7 @@ public class FMLLoader
     public static void addAccessTransformer(Path atPath, ModFile modName)
     {
         LOGGER.debug(SCAN, "Adding Access Transformer in {} in {}", atPath, modName.getFilePath());
-        accessTransformer.offerResource(atPath, modName.getFileName());
+        AccessTransformerLoader.INSTANCE.convertTransformers(atPath);
     }
 
     public static Dist getDist()
@@ -233,15 +245,18 @@ public class FMLLoader
     }
 
     public static Optional<BiFunction<INameMappingService.Domain, String, String>> getNameFunction(final String naming) {
-        return Launcher.INSTANCE.environment().findNameMapping(naming);
+//        return Launcher.INSTANCE.environment().findNameMapping(naming);
+        return Optional.empty();
     }
 
     public static String getLauncherInfo() {
-        return Launcher.INSTANCE.environment().getProperty(IEnvironment.Keys.MLIMPL_VERSION.get()).orElse("MISSING");
+//        return Launcher.INSTANCE.environment().getProperty(IEnvironment.Keys.MLIMPL_VERSION.get()).orElse("MISSING");
+        return "Kilt";
     }
 
     public static List<Map<String, String>> modLauncherModList() {
-        return Launcher.INSTANCE.environment().getProperty(IEnvironment.Keys.MODLIST.get()).orElseGet(Collections::emptyList);
+//        return Launcher.INSTANCE.environment().getProperty(IEnvironment.Keys.MODLIST.get()).orElseGet(Collections::emptyList);
+        return Collections.emptyList();
     }
 
     public static String launcherHandlerName() {
@@ -257,7 +272,8 @@ public class FMLLoader
     }
 
     public static ModuleLayer getGameLayer() {
-        return moduleLayerManager.getLayer(IModuleLayerManager.Layer.GAME).orElseThrow();
+//        return moduleLayerManager.getLayer(IModuleLayerManager.Layer.GAME).orElseThrow();
+        return ModuleLayer.empty();
     }
 
     public static VersionInfo versionInfo() {

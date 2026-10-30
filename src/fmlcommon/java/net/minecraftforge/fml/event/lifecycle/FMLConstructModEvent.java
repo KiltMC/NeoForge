@@ -9,6 +9,7 @@ import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingStage;
 
 public class FMLConstructModEvent extends ParallelDispatchEvent {
+    public FMLConstructModEvent() { super(null, null); } // Kilt: otherwise EventBus crashes. why.
     public FMLConstructModEvent(final ModContainer container, final ModLoadingStage stage) {
         super(container, stage);
     }
