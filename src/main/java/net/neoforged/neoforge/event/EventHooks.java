@@ -1073,6 +1073,10 @@ public class EventHooks {
      * @return The new enchantment map.
      */
     public static ItemEnchantments getAllEnchantmentLevels(ItemEnchantments enchantments, ItemStack stack, RegistryLookup<Enchantment> lookup) {
+        // Kilt: safeguard against null enchantments
+        if (enchantments == null)
+            enchantments = ItemEnchantments.EMPTY;
+
         var mutableEnchantments = new ItemEnchantments.Mutable(enchantments);
         var event = new GetEnchantmentLevelEvent(stack, mutableEnchantments, null, lookup);
         NeoForge.EVENT_BUS.post(event);
