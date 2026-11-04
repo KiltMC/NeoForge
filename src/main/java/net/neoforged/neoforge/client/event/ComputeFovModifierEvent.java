@@ -5,13 +5,14 @@
 
 package net.neoforged.neoforge.client.event;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.ApiStatus;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * Fired after the field of vision (FOV) modifier for the player is calculated to allow developers to adjust it further.
@@ -27,6 +28,8 @@ public class ComputeFovModifierEvent extends Event {
     private final Player player;
     private final float fovModifier;
     private float newFovModifier;
+
+    public boolean kilt$wasModified = false;
 
     @ApiStatus.Internal
     public ComputeFovModifierEvent(Player player, float fovModifier) {
@@ -63,5 +66,6 @@ public class ComputeFovModifierEvent extends Event {
      */
     public void setNewFovModifier(float newFovModifier) {
         this.newFovModifier = newFovModifier;
+        this.kilt$wasModified = true;
     }
 }
