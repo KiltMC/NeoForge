@@ -11,7 +11,7 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.loading.StringUtils;
-import xyz.bluspring.kilt.loader.WrappedFabricModContainer;
+import xyz.bluspring.kilt.loader.mod.fabric.WrappedFabricModContainer;
 
 import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
