@@ -5,11 +5,6 @@
 
 package net.neoforged.neoforge.network.registration;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.mojang.logging.LogUtils;
-import io.netty.channel.ChannelHandlerContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +18,38 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.mojang.logging.LogUtils;
+import io.netty.channel.ChannelHandlerContext;
+import net.neoforged.fml.ModLoader;
+import net.neoforged.neoforge.client.network.handling.ClientPayloadContext;
+import net.neoforged.neoforge.common.NeoForgeVersion;
+import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
+import net.neoforged.neoforge.network.configuration.CommonRegisterTask;
+import net.neoforged.neoforge.network.configuration.CommonVersionTask;
+import net.neoforged.neoforge.network.connection.ConnectionType;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.filters.NetworkFilters;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import net.neoforged.neoforge.network.handling.ServerPayloadContext;
+import net.neoforged.neoforge.network.negotiation.NegotiableNetworkComponent;
+import net.neoforged.neoforge.network.negotiation.NegotiationResult;
+import net.neoforged.neoforge.network.negotiation.NetworkComponentNegotiator;
+import net.neoforged.neoforge.network.payload.CommonRegisterPayload;
+import net.neoforged.neoforge.network.payload.CommonVersionPayload;
+import net.neoforged.neoforge.network.payload.ModdedNetworkPayload;
+import net.neoforged.neoforge.network.payload.ModdedNetworkQueryComponent;
+import net.neoforged.neoforge.network.payload.ModdedNetworkQueryPayload;
+import net.neoforged.neoforge.network.payload.ModdedNetworkSetupFailedPayload;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.VisibleForTesting;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.FriendlyByteBuf;
@@ -41,32 +68,15 @@ import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
-import net.neoforged.fml.ModLoader;
-import net.neoforged.neoforge.common.NeoForgeVersion;
-import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
-import net.neoforged.neoforge.network.configuration.CommonRegisterTask;
-import net.neoforged.neoforge.network.configuration.CommonVersionTask;
-import net.neoforged.neoforge.network.connection.ConnectionType;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.filters.NetworkFilters;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.handling.IPayloadHandler;
-import net.neoforged.neoforge.network.handling.ServerPayloadContext;
-import net.neoforged.neoforge.network.negotiation.NegotiableNetworkComponent;
-import net.neoforged.neoforge.network.negotiation.NegotiationResult;
-import net.neoforged.neoforge.network.negotiation.NetworkComponentNegotiator;
-import net.neoforged.neoforge.network.payload.CommonRegisterPayload;
-import net.neoforged.neoforge.network.payload.CommonVersionPayload;
-import net.neoforged.neoforge.network.payload.MinecraftRegisterPayload;
-import net.neoforged.neoforge.network.payload.MinecraftUnregisterPayload;
-import net.neoforged.neoforge.network.payload.ModdedNetworkPayload;
-import net.neoforged.neoforge.network.payload.ModdedNetworkQueryComponent;
-import net.neoforged.neoforge.network.payload.ModdedNetworkQueryPayload;
-import net.neoforged.neoforge.network.payload.ModdedNetworkSetupFailedPayload;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.VisibleForTesting;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.impl.networking.RegistrationPayload;
+import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Core registry for all modded networking.
@@ -93,13 +103,16 @@ public class NetworkRegistry {
      * TODO: Separate by protocol + flow.
      */
     protected static final Map<Identifier, StreamCodec<FriendlyByteBuf, ? extends CustomPacketPayload>> BUILTIN_PAYLOADS = ImmutableMap.of(
-            MinecraftRegisterPayload.ID, MinecraftRegisterPayload.STREAM_CODEC,
-            MinecraftUnregisterPayload.ID, MinecraftUnregisterPayload.STREAM_CODEC,
+        // Kilt: Fabric API should be used instead here.
+//            MinecraftRegisterPayload.ID, MinecraftRegisterPayload.STREAM_CODEC,
+//            MinecraftUnregisterPayload.ID, MinecraftUnregisterPayload.STREAM_CODEC,
             ModdedNetworkQueryPayload.ID, ModdedNetworkQueryPayload.STREAM_CODEC,
             ModdedNetworkPayload.ID, ModdedNetworkPayload.STREAM_CODEC,
-            ModdedNetworkSetupFailedPayload.ID, ModdedNetworkSetupFailedPayload.STREAM_CODEC,
-            CommonVersionPayload.ID, CommonVersionPayload.STREAM_CODEC,
-            CommonRegisterPayload.ID, CommonRegisterPayload.STREAM_CODEC);
+            ModdedNetworkSetupFailedPayload.ID, ModdedNetworkSetupFailedPayload.STREAM_CODEC
+            // Kilt: Same here.
+//            CommonVersionPayload.ID, CommonVersionPayload.STREAM_CODEC,
+//            CommonRegisterPayload.ID, CommonRegisterPayload.STREAM_CODEC
+    );
 
     /**
      * Registry of all custom payload handlers. The initial state of this map should reflect the protocols which support custom payloads.
@@ -118,6 +131,16 @@ public class NetworkRegistry {
     protected static boolean setup = false;
 
     protected NetworkRegistry() {}
+
+    // Kilt: Allow checking if a payload exists here somehow
+    public static boolean kilt$payloadExists(ConnectionProtocol protocol, Identifier id) {
+        var payloads = PAYLOAD_REGISTRATIONS.get(protocol);
+
+        if (payloads == null)
+            return false;
+
+        return payloads.containsKey(id);
+    }
 
     /**
      * Sets up the network registry by firing {@link RegisterPayloadHandlersEvent}, storing the resulting payload registrations in {@link #PAYLOAD_REGISTRATIONS}.
@@ -191,6 +214,21 @@ public class NetworkRegistry {
 
             byProtocol.put(type.id(), reg);
 
+            // Kilt: Register directly to Fabric API
+            if (protocol.isConfiguration()) {
+                if (flow.isEmpty() || flow.orElseThrow().isClientbound())
+                    PayloadTypeRegistry.clientboundConfiguration().register(type, (StreamCodec<? super FriendlyByteBuf, T>) codec);
+
+                if (flow.isEmpty() || flow.orElseThrow().isServerbound())
+                    PayloadTypeRegistry.serverboundConfiguration().register(type, (StreamCodec<? super FriendlyByteBuf, T>) codec);
+            } else if (protocol.isPlay()) {
+                if (flow.isEmpty() || flow.orElseThrow().isClientbound())
+                    PayloadTypeRegistry.clientboundPlay().register(type, (StreamCodec<? super FriendlyByteBuf, T>) codec);
+
+                if (flow.isEmpty() || flow.orElseThrow().isServerbound())
+                    PayloadTypeRegistry.serverboundPlay().register(type, (StreamCodec<? super FriendlyByteBuf, T>) codec);
+            }
+
             if (serverHandler != null && reg.matchesFlow(PacketFlow.SERVERBOUND)) {
                 registerHandler(SERVERBOUND_HANDLERS, protocol, PacketFlow.SERVERBOUND, type, serverHandler);
             }
@@ -216,6 +254,39 @@ public class NetworkRegistry {
         }
 
         byProtocol.put(type.id(), handler);
+
+        // Kilt: Register directly to Fabric API
+        if (protocol.isConfiguration()) {
+            if (flow.isServerbound()) {
+                ServerConfigurationNetworking.registerGlobalReceiver(type, (packet, ctx) -> {
+                    handler.handle(packet, new ServerPayloadContext(ctx.packetListener(), type.id()));
+                });
+            } else if (flow.isClientbound() && FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+                KiltClientPayloadReceiver.kilt$handleClientConfigurationReceiver(type, handler);
+            }
+        } else if (protocol.isPlay()) {
+            if (flow.isServerbound()) {
+                ServerPlayNetworking.registerGlobalReceiver(type, (packet, ctx) -> {
+                    handler.handle(packet, new ServerPayloadContext(ctx.player().connection, type.id()));
+                });
+            } else if (flow.isClientbound() && FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+                KiltClientPayloadReceiver.kilt$handleClientPlayReceiver(type, handler);
+            }
+        }
+    }
+
+    private static class KiltClientPayloadReceiver {
+        public static <T extends CustomPacketPayload> void kilt$handleClientPlayReceiver(CustomPacketPayload.Type<T> type, IPayloadHandler<T> handler) {
+            ClientPlayNetworking.registerGlobalReceiver(type, (payload, ctx) -> {
+                handler.handle(payload, new ClientPayloadContext(ctx.player().connection, type.id()));
+            });
+        }
+
+        public static <T extends CustomPacketPayload> void kilt$handleClientConfigurationReceiver(CustomPacketPayload.Type<T> type, IPayloadHandler<T> handler) {
+            ClientConfigurationNetworking.registerGlobalReceiver(type, (payload, ctx) -> {
+                handler.handle(payload, new ClientPayloadContext(ctx.packetListener(), type.id()));
+            });
+        }
     }
 
     /**
@@ -249,7 +320,8 @@ public class NetworkRegistry {
 
             // These two checks can only be hit on receipt of a payload, as senders will be checked before reaching this method.
             if (registration == null) {
-                LOGGER.warn("No registration for payload {}; refusing to decode.", id);
+                // Kilt: Too much log spam, no.
+//                LOGGER.warn("No registration for payload {}; refusing to decode.", id);
                 return null;
             }
 
@@ -291,8 +363,9 @@ public class NetworkRegistry {
         NetworkPayloadSetup payloadSetup = ChannelAttributes.getPayloadSetup(listener.getConnection());
         // Check if channels were negotiated.
         if (payloadSetup == null) {
-            LOGGER.warn("Received a modded payload before channel negotiation; disconnecting.");
-            listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Payload Setup)".formatted(NeoForgeVersion.getVersion())));
+            // Kilt: WHY IS THIS A THING?!
+//            LOGGER.warn("Received a modded payload before channel negotiation; disconnecting.");
+//            listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Payload Setup)".formatted(NeoForgeVersion.getVersion())));
             return;
         }
 
@@ -304,23 +377,26 @@ public class NetworkRegistry {
 
             // Check if the channel should even be processed.
             if (channel == null && !hasAdhocChannel(listener.protocol(), context.payloadId(), PacketFlow.SERVERBOUND)) {
-                LOGGER.warn("Received a modded payload {} with an unknown or unaccepted channel; disconnecting.", context.payloadId());
-                listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Channel for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
+                // Kilt: WHY IS THIS A THING?!
+//                LOGGER.warn("Received a modded payload {} with an unknown or unaccepted channel; disconnecting.", context.payloadId());
+//                listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Channel for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
                 return;
             }
 
             IPayloadHandler handler = SERVERBOUND_HANDLERS.get(listener.protocol()).get(context.payloadId());
             if (handler == null) {
-                LOGGER.error("Received a modded payload {} with no registration; disconnecting.", context.payloadId());
-                listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Handler for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
-                dumpStackToLog(); // This case is only likely when handling packets without serialization, i.e. from a compound listener, so this can help debug why.
+                // Kilt: Nope!
+//                LOGGER.error("Received a modded payload {} with no registration; disconnecting.", context.payloadId());
+//                listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Handler for %s)".formatted(NeoForgeVersion.getVersion(), context.payloadId().toString())));
+//                dumpStackToLog(); // This case is only likely when handling packets without serialization, i.e. from a compound listener, so this can help debug why.
                 return;
             }
 
             handler.handle(packet.payload(), context);
         } else {
-            LOGGER.error("Received a modded payload {} while not in the configuration or play phase; disconnecting.", context.payloadId());
-            listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (Invalid Protocol %s)".formatted(NeoForgeVersion.getVersion(), listener.protocol().name())));
+            // Kilt: Still no!
+//            LOGGER.error("Received a modded payload {} while not in the configuration or play phase; disconnecting.", context.payloadId());
+//            listener.disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (Invalid Protocol %s)".formatted(NeoForgeVersion.getVersion(), listener.protocol().name())));
         }
     }
 
@@ -371,7 +447,7 @@ public class NetworkRegistry {
         ImmutableSet.Builder<Identifier> nowListeningOn = ImmutableSet.builder();
         nowListeningOn.addAll(getInitialListeningChannels(listener.flow()));
         nowListeningOn.addAll(setup.getChannels(ConnectionProtocol.CONFIGURATION).keySet());
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
     }
 
     /**
@@ -410,7 +486,7 @@ public class NetworkRegistry {
                 .filter(registration -> registration.getValue().matchesFlow(listener.flow()))
                 .filter(registration -> registration.getValue().optional())
                 .forEach(registration -> nowListeningOn.add(registration.getKey()));
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
 
         return true;
     }
@@ -493,6 +569,10 @@ public class NetworkRegistry {
      * @return True if the connection has a connection setup that can transmit the given payload id, false otherwise.
      */
     public static boolean hasChannel(Connection connection, @Nullable ConnectionProtocol protocol, Identifier payloadId) {
+        // Kilt: Otherwise Flashback has problems.
+        if (connection.channel() == null)
+            return false;
+
         NetworkPayloadSetup payloadSetup = ChannelAttributes.getPayloadSetup(connection);
         if (payloadSetup != null) {
             // If a protocol is specified, only check against channels for that protocol
@@ -609,8 +689,9 @@ public class NetworkRegistry {
 
     public static Set<Identifier> getInitialServerUnregisterChannels() {
         final ImmutableSet.Builder<Identifier> nowForgottenChannels = ImmutableSet.builder();
-        nowForgottenChannels.add(MinecraftRegisterPayload.ID);
-        nowForgottenChannels.add(MinecraftUnregisterPayload.ID);
+        // Kilt: Fabric API should be handling this.
+//        nowForgottenChannels.add(MinecraftRegisterPayload.ID);
+//        nowForgottenChannels.add(MinecraftUnregisterPayload.ID);
         PAYLOAD_REGISTRATIONS.get(ConnectionProtocol.PLAY).entrySet().stream()
                 .filter(registration -> registration.getValue().matchesFlow(PacketFlow.SERVERBOUND))
                 .filter(registration -> registration.getValue().optional())
@@ -692,18 +773,18 @@ public class NetworkRegistry {
         final ImmutableSet.Builder<Identifier> notListeningAnymoreOn = ImmutableSet.builder();
         notListeningAnymoreOn.addAll(getInitialListeningChannels(listener.flow()));
         notListeningAnymoreOn.addAll(setup.getChannels(ConnectionProtocol.CONFIGURATION).keySet());
-        listener.send(new MinecraftUnregisterPayload(notListeningAnymoreOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.UNREGISTER, List.copyOf(notListeningAnymoreOn.build()))); // Kilt: Use Fabric API
 
         final ImmutableSet.Builder<Identifier> nowListeningOn = ImmutableSet.builder();
-        nowListeningOn.add(MinecraftRegisterPayload.ID);
-        nowListeningOn.add(MinecraftUnregisterPayload.ID);
+//        nowListeningOn.add(MinecraftRegisterPayload.ID);
+//        nowListeningOn.add(MinecraftUnregisterPayload.ID); // Kilt: Fabric API should be handling this.
         if (listener.getConnectionType().isNeoForge()) {
             nowListeningOn.add(ModdedNetworkQueryPayload.ID);
         } else {
             // For non-Neo connections, send the registered channels
             nowListeningOn.addAll(getCommonPlayChannels(listener.flow()));
         }
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
     }
 
     public static ConnectionType getConnectionType(Connection connection) {

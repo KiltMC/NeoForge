@@ -5,20 +5,12 @@
 
 package net.neoforged.neoforge.client.network.registration;
 
-import com.google.common.collect.ImmutableSet;
-import com.mojang.logging.LogUtils;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.network.ConnectionProtocol;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.network.protocol.common.ClientCommonPacketListener;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.custom.BrandPayload;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
-import net.minecraft.resources.Identifier;
+
+import com.google.common.collect.ImmutableSet;
+import com.mojang.logging.LogUtils;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.config.ConfigTracker;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
@@ -33,7 +25,6 @@ import net.neoforged.neoforge.network.handling.MainThreadPayloadHandler;
 import net.neoforged.neoforge.network.negotiation.NegotiableNetworkComponent;
 import net.neoforged.neoforge.network.negotiation.NegotiationResult;
 import net.neoforged.neoforge.network.negotiation.NetworkComponentNegotiator;
-import net.neoforged.neoforge.network.payload.MinecraftRegisterPayload;
 import net.neoforged.neoforge.network.payload.ModdedNetworkPayload;
 import net.neoforged.neoforge.network.payload.ModdedNetworkQueryPayload;
 import net.neoforged.neoforge.network.registration.ChannelAttributes;
@@ -44,6 +35,18 @@ import net.neoforged.neoforge.network.registration.NetworkRegistry;
 import net.neoforged.neoforge.network.registration.PayloadRegistration;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
+
+import net.minecraft.network.ConnectionProtocol;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
+import net.minecraft.resources.Identifier;
+
+import net.fabricmc.fabric.impl.networking.RegistrationPayload;
 
 @ApiStatus.Internal
 public final class ClientNetworkRegistry extends NetworkRegistry {
@@ -139,8 +142,9 @@ public final class ClientNetworkRegistry extends NetworkRegistry {
         NetworkPayloadSetup payloadSetup = ChannelAttributes.getPayloadSetup(listener.getConnection());
         // Check if channels were negotiated.
         if (payloadSetup == null) {
-            LOGGER.warn("Received a modded payload before channel negotiation; disconnecting.");
-            listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Payload Setup)".formatted(NeoForgeVersion.getVersion())));
+            // Kilt: no.
+//            LOGGER.warn("Received a modded payload before channel negotiation; disconnecting.");
+//            listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Payload Setup)".formatted(NeoForgeVersion.getVersion())));
             return;
         }
 
@@ -153,23 +157,26 @@ public final class ClientNetworkRegistry extends NetworkRegistry {
 
             // Check if the channel should even be processed.
             if (channel == null && !hasAdhocChannel(listener.protocol(), packet.payload().type().id(), PacketFlow.CLIENTBOUND)) {
-                LOGGER.warn("Received a modded payload with an unknown or unaccepted channel; disconnecting.");
-                listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Channel for %s)".formatted(NeoForgeVersion.getVersion(), payloadId.toString())));
+                // Kilt: no.
+//                LOGGER.warn("Received a modded payload with an unknown or unaccepted channel; disconnecting.");
+//                listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Channel for %s)".formatted(NeoForgeVersion.getVersion(), payloadId.toString())));
                 return;
             }
 
             IPayloadHandler handler = CLIENTBOUND_HANDLERS.get(listener.protocol()).get(payloadId);
             if (handler == null) {
-                LOGGER.error("Received a modded payload with no registration; disconnecting.");
-                listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Handler for %s)".formatted(NeoForgeVersion.getVersion(), payloadId.toString())));
-                dumpStackToLog(); // This case is only likely when handling packets without serialization, i.e. from a compound listener, so this can help debug why.
+                // Kilt: fuck off
+//                LOGGER.error("Received a modded payload with no registration; disconnecting.");
+//                listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (No Handler for %s)".formatted(NeoForgeVersion.getVersion(), payloadId.toString())));
+//                dumpStackToLog(); // This case is only likely when handling packets without serialization, i.e. from a compound listener, so this can help debug why.
                 return;
             }
 
             handler.handle(packet.payload(), context);
         } else {
-            LOGGER.error("Received a modded payload while not in the configuration or play phase. Disconnecting.");
-            listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (Invalid Protocol %s)".formatted(NeoForgeVersion.getVersion(), listener.protocol().name())));
+            // Kilt: no.
+//            LOGGER.error("Received a modded payload while not in the configuration or play phase. Disconnecting.");
+//            listener.getConnection().disconnect(Component.translatable("multiplayer.disconnect.incompatible", "NeoForge %s (Invalid Protocol %s)".formatted(NeoForgeVersion.getVersion(), listener.protocol().name())));
         }
     }
 
@@ -205,7 +212,7 @@ public final class ClientNetworkRegistry extends NetworkRegistry {
         final ImmutableSet.Builder<Identifier> nowListeningOn = ImmutableSet.builder();
         nowListeningOn.addAll(getInitialListeningChannels(listener.flow()));
         nowListeningOn.addAll(setup.getChannels(ConnectionProtocol.CONFIGURATION).keySet());
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
     }
 
     /**
@@ -270,7 +277,7 @@ public final class ClientNetworkRegistry extends NetworkRegistry {
                 .filter(registration -> registration.getValue().matchesFlow(listener.flow()))
                 .filter(registration -> registration.getValue().optional())
                 .forEach(registration -> nowListeningOn.add(registration.getKey()));
-        listener.send(new MinecraftRegisterPayload(nowListeningOn.build()));
+        listener.send(new RegistrationPayload(RegistrationPayload.REGISTER, List.copyOf(nowListeningOn.build()))); // Kilt: Use Fabric API
     }
 
     /**

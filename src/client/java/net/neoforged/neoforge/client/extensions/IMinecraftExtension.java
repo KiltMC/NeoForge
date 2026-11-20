@@ -6,9 +6,11 @@
 package net.neoforged.neoforge.client.extensions;
 
 import java.util.Locale;
+
+import net.neoforged.neoforge.client.ClientHooks;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.neoforged.neoforge.client.ClientHooks;
 
 /**
  * Extension interface for {@link Minecraft}.
@@ -32,6 +34,11 @@ public interface IMinecraftExtension {
      */
     default void popGuiLayer() {
         ClientHooks.popGuiLayer(self());
+    }
+
+    // Kilt: make sure to wrap the original call.
+    default void kilt$popGuiLayer(Runnable onPop) {
+        ClientHooks.kilt$popGuiLayer(self(), onPop);
     }
 
     /**

@@ -20,12 +20,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
+
 import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 
 /**
  * Contains helpers for performing file I/O in a resilient manner.
@@ -88,9 +90,14 @@ public final class IOUtilities {
      * @throws IOException if an I/O error occurs during writing.
      */
     public static void writeNbtCompressed(CompoundTag tag, Path path) throws IOException {
+        kilt$writeNbtCompressed(path, bufferedStream ->
+            NbtIo.writeCompressed(tag, bufferedStream));
+    }
+
+    public static void kilt$writeNbtCompressed(Path path, IOUtilities.WriteCallback writer) throws IOException {
         atomicWrite(path, stream -> {
             try (var bufferedStream = new BufferedOutputStream(stream)) {
-                NbtIo.writeCompressed(tag, bufferedStream);
+                writer.write(bufferedStream);
             }
         });
     }

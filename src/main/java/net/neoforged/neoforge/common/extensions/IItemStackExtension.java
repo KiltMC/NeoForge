@@ -368,7 +368,10 @@ public interface IItemStackExtension extends ItemInstanceExtension {
      */
     default ItemAttributeModifiers getAttributeModifiers() {
         ItemAttributeModifiers defaultModifiers = self().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+        return kilt$getAttributeModifiers(defaultModifiers);
+    }
 
+    default ItemAttributeModifiers kilt$getAttributeModifiers(ItemAttributeModifiers defaultModifiers) {
         if (defaultModifiers.modifiers().isEmpty()) {
             defaultModifiers = self().getItem().getDefaultAttributeModifiers(self());
         }

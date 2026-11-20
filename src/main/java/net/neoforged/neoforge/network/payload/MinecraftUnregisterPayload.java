@@ -6,13 +6,16 @@
 package net.neoforged.neoforge.network.payload;
 
 import java.util.Set;
+
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
+@Deprecated(forRemoval = true) // Kilt: Use RegistrationPayload instead.
 public record MinecraftUnregisterPayload(Set<Identifier> forgottenChannels) implements CustomPacketPayload {
     public static final Identifier ID = Identifier.withDefaultNamespace("unregister");
     public static final Type<MinecraftUnregisterPayload> TYPE = new Type<>(ID);

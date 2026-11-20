@@ -6,19 +6,7 @@
 package net.neoforged.neoforge.client;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.SequencedMap;
-import java.util.Set;
-import java.util.Stack;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -47,45 +35,7 @@ import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.config.NeoForgeClientConfig;
 import net.neoforged.neoforge.client.entity.animation.json.AnimationTypeManager;
-import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
-import net.neoforged.neoforge.client.event.AddSectionGeometryEvent;
-import net.neoforged.neoforge.client.event.CalculateDetachedCameraDistanceEvent;
-import net.neoforged.neoforge.client.event.CalculatePlayerTurnEvent;
-import net.neoforged.neoforge.client.event.ClientChatEvent;
-import net.neoforged.neoforge.client.event.ClientChatReceivedEvent;
-import net.neoforged.neoforge.client.event.ClientPauseChangeEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerChangeGameTypeEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientResourceLoadFinishedEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
-import net.neoforged.neoforge.client.event.ConfigureMainRenderTargetEvent;
-import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.FrameGraphSetupEvent;
-import net.neoforged.neoforge.client.event.GatherEffectScreenTooltipsEvent;
-import net.neoforged.neoforge.client.event.InitializeClientRegistriesEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
-import net.neoforged.neoforge.client.event.PlayerHeartTypeEvent;
-import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterTextureAtlasesEvent;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
-import net.neoforged.neoforge.client.event.RenderBlockScreenEffectEvent;
-import net.neoforged.neoforge.client.event.RenderFrameEvent;
-import net.neoforged.neoforge.client.event.RenderHandEvent;
-import net.neoforged.neoforge.client.event.RenderTooltipEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.client.event.ScreenshotEvent;
-import net.neoforged.neoforge.client.event.SelectMusicEvent;
-import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
-import net.neoforged.neoforge.client.event.ToastAddEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
-import net.neoforged.neoforge.client.event.WindowResizeEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 import net.neoforged.neoforge.client.extensions.common.ClientExtensionsManager;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -259,8 +209,13 @@ public class ClientHooks {
     }
 
     public static void popGuiLayer(Minecraft minecraft) {
+        kilt$popGuiLayer(minecraft, () -> minecraft.setScreen(null));
+    }
+
+    public static void kilt$popGuiLayer(Minecraft minecraft, Runnable onEmptyPop) {
         if (guiLayers.isEmpty()) {
-            minecraft.setScreen(null);
+//            minecraft.setScreen(null);
+            onEmptyPop.run();
             return;
         }
 
@@ -982,8 +937,13 @@ public class ClientHooks {
 
     @ApiStatus.Internal
     public static MainTarget instantiateMainTarget(int width, int height) {
+        return kilt$instantiateMainTarget(isStencilEnabled ->
+            isStencilEnabled ? MainTargetInjection.create(width, height, true) : new MainTarget(width, height));
+    }
+
+    public static MainTarget kilt$instantiateMainTarget(Function<Boolean, MainTarget> original) {
         var e = ModLoader.postEventWithReturn(new ConfigureMainRenderTargetEvent());
-        return MainTargetInjection.create(width, height, e.isStencilEnabled());
+        return original.apply(e.isStencilEnabled());
     }
 
     @ApiStatus.Internal

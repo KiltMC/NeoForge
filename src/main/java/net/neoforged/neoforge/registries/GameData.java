@@ -76,6 +76,11 @@ public class GameData {
 
         RegistryManager.takeFrozenSnapshot();
 
+        // Kilt: Unfreeze again for Fabric's sake
+        BuiltInRegistries.REGISTRY.stream().filter(r -> r instanceof MappedRegistry).forEach(r -> {
+            ((MappedRegistry<?>) r).unfreeze(false);
+        });
+
         LOGGER.debug(REGISTRIES, "All registries frozen");
     }
 

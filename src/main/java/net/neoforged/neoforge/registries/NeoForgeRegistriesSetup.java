@@ -6,11 +6,13 @@
 package net.neoforged.neoforge.registries;
 
 import java.util.Set;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentSync;
 import org.jetbrains.annotations.ApiStatus;
+
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 @ApiStatus.Internal
 public class NeoForgeRegistriesSetup {
@@ -62,7 +64,7 @@ public class NeoForgeRegistriesSetup {
     );
 
     private static void registerRegistries(NewRegistryEvent event) {
-        event.register(NeoForgeRegistries.ENTITY_DATA_SERIALIZERS);
+//        event.register(NeoForgeRegistries.ENTITY_DATA_SERIALIZERS); // Kilt: We're already registered
         event.register(NeoForgeRegistries.GLOBAL_LOOT_MODIFIER_SERIALIZERS);
         event.register(NeoForgeRegistries.BIOME_MODIFIER_SERIALIZERS);
         event.register(NeoForgeRegistries.STRUCTURE_MODIFIER_SERIALIZERS);

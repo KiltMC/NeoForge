@@ -212,6 +212,7 @@ public record CheckExtensibleEnums(ServerConfigurationPacketListener listener) i
                 .map(ModFileScanData::getAnnotations)
                 .flatMap(Set::stream)
                 .filter(a -> NETWORKED_ENUM.equals(a.annotationType()))
+                .filter(a -> !(a.clazz().getClassName().contains("kilt") && a.clazz().getClassName().contains("injects") && a.clazz().getClassName().endsWith("Inject"))) // Kilt: remove our mixins, for the love of god.
                 .map(a -> classForName(a.clazz().getClassName()))
                 .filter(Class::isEnum)
                 .filter(IExtensibleEnum.class::isAssignableFrom)

@@ -11,12 +11,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.RegistryDataLoader;
-import net.minecraft.resources.RegistryValidator;
-import net.minecraft.resources.ResourceKey;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
+
+import net.minecraft.core.Registry;
+import net.minecraft.resources.RegistryDataLoader;
+import net.minecraft.resources.ResourceKey;
+
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 
 @ApiStatus.Internal
 public final class DataPackRegistriesHooks {
@@ -45,7 +48,12 @@ public final class DataPackRegistriesHooks {
         DATA_PACK_REGISTRIES.add(loaderData);
         if (data.networkCodec() != null) {
             SYNCED_CUSTOM_REGISTRIES.add(loaderData.key());
-            NETWORKABLE_REGISTRIES.add(new RegistryDataLoader.RegistryData<T>(loaderData.key(), data.networkCodec(), RegistryValidator.none()));
+//            NETWORKABLE_REGISTRIES.add(new RegistryDataLoader.RegistryData<T>(loaderData.key(), data.networkCodec(), RegistryValidator.none())); // Kilt: Handled by Fabric API
+
+            // Kilt: Register into Fabric API
+            DynamicRegistries.registerSynced(loaderData.key(), loaderData.elementCodec(), data.networkCodec());
+        } else {
+            DynamicRegistries.register(loaderData.key(), loaderData.elementCodec());
         }
     }
 
@@ -73,6 +81,9 @@ public final class DataPackRegistriesHooks {
     @ApiStatus.Internal
     @SuppressWarnings("unchecked")
     public static <T> RegistryDataLoader.@Nullable RegistryData<T> getSyncedRegistry(final ResourceKey<? extends Registry<T>> registry) {
-        return (RegistryDataLoader.RegistryData<T>) NETWORKABLE_REGISTRIES.stream().filter(data -> data.key().equals(registry)).findFirst().orElse(null);
+        return (RegistryDataLoader.RegistryData<T>) NETWORKABLE_REGISTRIES.stream().filter(data -> data.key().equals(registry)).findFirst()
+            // Kilt: Search through Vanilla/Fabric too.
+            .orElseGet(() -> RegistryDataLoader.SYNCHRONIZED_REGISTRIES.stream().filter(data -> data.key().equals(registry)).findFirst()
+            .orElse(null));
     }
 }
