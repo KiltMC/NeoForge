@@ -27,7 +27,7 @@ public class IngredientCodecs {
                         either -> either.map(ICustomIngredient::toVanilla, i -> i),
                         ingredient -> {
                             if (ingredient.isCustom()) {
-                                return Either.left(ingredient.kilt$getCustomIngredient());
+                                return Either.left(ingredient.getCustomIngredient());
                             } else {
                                 return Either.right(ingredient);
                             }
@@ -56,7 +56,7 @@ public class IngredientCodecs {
             public void encode(RegistryFriendlyByteBuf buf, Ingredient ingredient) {
                 if (ingredient.isCustom() && buf.getConnectionType().isNeoForge()) {
                     buf.writeVarInt(CUSTOM_INGREDIENT_MARKER);
-                    CUSTOM_INGREDIENT_CODEC.encode(buf, ingredient.kilt$getCustomIngredient());
+                    CUSTOM_INGREDIENT_CODEC.encode(buf, ingredient.getCustomIngredient());
                 } else {
                     vanillaCodec.encode(buf, ingredient);
                 }
@@ -82,7 +82,7 @@ public class IngredientCodecs {
             public void encode(RegistryFriendlyByteBuf buf, Optional<Ingredient> ingredient) {
                 if (ingredient.isPresent() && ingredient.get().isCustom() && buf.getConnectionType().isNeoForge()) {
                     buf.writeVarInt(CUSTOM_INGREDIENT_MARKER);
-                    CUSTOM_INGREDIENT_CODEC.encode(buf, ingredient.get().kilt$getCustomIngredient());
+                    CUSTOM_INGREDIENT_CODEC.encode(buf, ingredient.get().getCustomIngredient());
                 } else {
                     vanillaCodec.encode(buf, ingredient);
                 }
