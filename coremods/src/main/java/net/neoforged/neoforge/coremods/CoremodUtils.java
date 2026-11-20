@@ -5,13 +5,15 @@
 
 package net.neoforged.neoforge.coremods;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.jspecify.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -68,11 +70,14 @@ final class CoremodUtils {
         }
 
         if (foundMethod == null) {
+            /* // Kilt: We run too early, we need to just apply this directly.
             if (methodName != null) {
                 throw new IllegalStateException("Unable to find method " + methodSignature + " with name " + methodName + " in " + classNode.name);
             } else {
                 throw new IllegalStateException("Unable to find method " + methodSignature + " in " + classNode.name);
             }
+             */
+            foundMethod = new MethodNode(Opcodes.ACC_PUBLIC, methodName, methodSignature, null, null);
         }
         return foundMethod;
     }
