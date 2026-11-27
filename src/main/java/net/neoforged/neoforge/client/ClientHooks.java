@@ -58,6 +58,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import xyz.bluspring.kilt.injections.client.gui.screens.MenuScreensInjection;
 import xyz.bluspring.kilt.injections.client.renderer.ShaderInstanceInjection;
+import xyz.bluspring.kilt.workarounds.WrappedClientTooltipComponent;
 
 import net.minecraft.FileUtil;
 import net.minecraft.client.Camera;
@@ -802,6 +803,18 @@ public class ClientHooks {
         return gatherTooltipComponentsFromElements(stack, elements, mouseX, screenWidth, screenHeight, fallbackFont);
     }
 
+    public static List<ClientTooltipComponent> kilt$gatherTooltipComponentsFromElements(ItemStack stack, List<Either<FormattedText, TooltipComponent>> elements, int screenWidth, int screenHeight) {
+        var event = new RenderTooltipEvent.GatherComponents(stack, screenWidth, screenHeight, elements, -1);
+        NeoForge.EVENT_BUS.post(event);
+        if (event.isCanceled()) return List.of();
+
+        return event.getTooltipElements().stream()
+            .map(either -> either.map(
+                text -> ClientTooltipComponent.create(text instanceof Component ? ((Component) text).getVisualOrderText() : Language.getInstance().getVisualOrder(text)),
+                c -> c instanceof WrappedClientTooltipComponent wrapped ? wrapped.wrapped() : ClientTooltipComponent.create(c)))
+            .toList();
+    }
+
     public static List<ClientTooltipComponent> gatherTooltipComponentsFromElements(ItemStack stack, List<Either<FormattedText, TooltipComponent>> elements, int mouseX, int screenWidth, int screenHeight, Font fallbackFont) {
         Font font = getTooltipFont(stack, fallbackFont);
 
@@ -817,8 +830,7 @@ public class ClientHooks {
 
         boolean needsWrap = false;
 
-        // Kilt: no text wrapping
-        /*int tooltipX = mouseX + 12;
+        int tooltipX = mouseX + 12;
         if (tooltipX + tooltipTextWidth + 4 > screenWidth) {
             tooltipX = mouseX - 16 - tooltipTextWidth;
             if (tooltipX < 4) // if the tooltip doesn't fit on the screen
@@ -834,7 +846,7 @@ public class ClientHooks {
         if (event.getMaxWidth() > 0 && tooltipTextWidth > event.getMaxWidth()) {
             tooltipTextWidth = event.getMaxWidth();
             needsWrap = true;
-        }*/
+        }
 
         int tooltipTextWidthF = tooltipTextWidth;
         if (needsWrap) {

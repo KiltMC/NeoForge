@@ -7,14 +7,16 @@ package net.neoforged.neoforge.event;
 
 import it.unimi.dsi.fastutil.objects.ObjectSortedSet;
 import it.unimi.dsi.fastutil.objects.ObjectSortedSets;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.neoforge.common.util.InsertableLinkedOpenCustomHashSet;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.bluspring.kilt.Kilt;
+
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Fired when the contents of a specific creative mode tab are being populated in {@link CreativeModeTab#buildContents(CreativeModeTab.ItemDisplayParameters)}.
@@ -193,7 +195,7 @@ public final class BuildCreativeModeTabContentsEvent extends Event implements IM
 
     private void assertNewEntryDoesNotAlreadyExists(InsertableLinkedOpenCustomHashSet<ItemStack> setToCheck, ItemStack newEntry) {
         if (setToCheck.contains(newEntry)) {
-            throw new IllegalArgumentException("Itemstack " + newEntry + " already exists in the tab's list");
+            Kilt.Companion.getLogger().warn("Itemstack {} already exists in the tab's list", newEntry); // Kilt: warn instead, don't throw.
         }
     }
 
